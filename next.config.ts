@@ -14,6 +14,20 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/terms',
+        destination: '/termos-de-uso',
+        permanent: true,
+      },
+      {
+        source: '/privacy',
+        destination: '/politica-de-privacidade',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
@@ -435,6 +436,29 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   ⚡ Simular login de teste (Mock Dev)
                 </button>
               )}
+
+              {/* Aviso Legal Discreto (Termos e Privacidade) */}
+              <p className="mt-3 text-center text-[11px] leading-relaxed text-[#64748b] dark:text-[#9aa1ad]">
+                Ao continuar, você concorda com nossos{' '}
+                <Link
+                  href="/termos-de-uso"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-[#121417] underline underline-offset-2 hover:text-black dark:text-[#f3f4f6] dark:hover:text-white"
+                >
+                  Termos de Uso
+                </Link>{' '}
+                e{' '}
+                <Link
+                  href="/politica-de-privacidade"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-[#121417] underline underline-offset-2 hover:text-black dark:text-[#f3f4f6] dark:hover:text-white"
+                >
+                  Política de Privacidade
+                </Link>
+                .
+              </p>
             </div>
           </div>
         </motion.div>

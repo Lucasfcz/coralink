@@ -18,7 +18,7 @@ export function Footer() {
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white border border-[#e5e7eb] p-1.5 shadow-sm dark:bg-[#15181e] dark:border-[#242831]">
                 <Image
-                  src="/logo.png"
+                  src="/coralink-logo.png"
                   alt="Coralink Logo"
                   width={28}
                   height={28}
@@ -65,9 +65,24 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Copyright */}
+        {/* Copyright & Links Legais */}
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#9aa1ad] dark:text-[#697282]">
           <p>© {new Date().getFullYear()} Coralink. Todos os direitos reservados.</p>
+          <div className="flex items-center gap-3 font-medium">
+            <Link
+              href="/termos-de-uso"
+              className="hover:text-[#121417] dark:hover:text-white transition-colors"
+            >
+              Termos de Uso
+            </Link>
+            <span>•</span>
+            <Link
+              href="/politica-de-privacidade"
+              className="hover:text-[#121417] dark:hover:text-white transition-colors"
+            >
+              Política de Privacidade
+            </Link>
+          </div>
           <p>Feito com foco em design editorial e inteligência artificial.</p>
         </div>
       </div>
