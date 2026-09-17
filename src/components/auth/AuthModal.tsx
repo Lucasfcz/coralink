@@ -55,6 +55,9 @@ interface WindowWithGoogle extends Window {
 
 function getErrorMessage(err: unknown, fallback: string): string {
   if (err instanceof Error) {
+    if (err.message === 'Failed to fetch' || err.message.includes('fetch') || err.name === 'TypeError') {
+      return 'Não foi possível conectar ao servidor. Verifique sua conexão ou tente novamente em instantes.';
+    }
     return err.message;
   }
   return fallback;
