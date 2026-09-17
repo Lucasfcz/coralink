@@ -1,127 +1,81 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Bot, BrainCircuit, LayoutGrid, CheckCircle2 } from 'lucide-react';
 
 export function SobrePipelineSteps() {
   const steps = [
     {
-      number: '01',
-      title: 'Robôs Exploradores',
-      subtitle: 'Varredura Contínua',
+      phase: 'FASE 01',
+      title: 'Varredura Autônoma',
       description:
-        'Nossos robôs visitam os portais oficiais de universidades e institutos de Pernambuco diariamente, identificando editais e notícias no momento em que são publicados.',
-      icon: Bot,
-      pillColor: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
-      badge: 'Coleta Autônoma',
-      highlights: ['Verificação diária', 'Links originais auditados'],
+        'Robôs de coleta visitam os canais oficiais de universidades, centros de pesquisa e parques tecnológicos de Pernambuco diariamente, identificando novos editais e notícias no exato momento da publicação.',
+      detail: 'UFPE, UPE, IFPE, Porto Digital e mais 8 fontes oficiais monitoradas 24 horas por dia.',
     },
     {
-      number: '02',
-      title: 'Inteligência Artificial Curadora',
-      subtitle: 'Compreensão Profunda',
+      phase: 'FASE 02',
+      title: 'Curadoria com Inteligência Artificial',
       description:
-        'Uma IA especializada lê cada edital na íntegra, filtra o que é relevante e extrai requisitos, datas de inscrição, bolsas e benefícios.',
-      icon: BrainCircuit,
-      pillColor: 'text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 border-cyan-500/20',
-      badge: 'IA & NLP',
-      highlights: ['Extração de prazos', 'Eliminação de ruídos'],
+        'Modelos de linguagem avançados analisam o edital completo: extraem datas críticas de inscrição, valor de bolsas, vagas, benefícios, pré-requisitos e o público de cursos elegíveis.',
+      detail: 'Elimina burocracia e transforma PDFs de 30 páginas em resumos objetivos e auditados.',
     },
     {
-      number: '03',
-      title: 'Seu Feed em Tempo Real',
-      subtitle: 'Acesso Direto',
+      phase: 'FASE 03',
+      title: 'Entrega Direta no Feed',
       description:
-        'As oportunidades chegam prontas, categorizadas por instituição e área, para você nunca mais perder um prazo importante.',
-      icon: LayoutGrid,
-      pillColor: 'text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border-indigo-500/20',
-      badge: 'Entrega Instantânea',
-      highlights: ['Filtros por área', 'Zero enrolação'],
+        'As oportunidades catalogadas chegam instantaneamente à sua tela, com filtros por curso e instituição, permitindo que você encontre sua próxima bolsa ou estágio em poucos segundos.',
+      detail: 'Links diretos para o edital oficial e canais de inscrição verificados pela comunidade.',
     },
   ];
 
   return (
-    <section className="relative py-16 md:py-24">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        {/* Cabeçalho da Seção */}
-        <div className="flex flex-col items-center text-center">
-          <span className="rounded-full border border-[#e5e7eb] bg-white/70 px-3.5 py-1 text-[11px] font-bold tracking-wider text-[#697282] uppercase dark:border-[#242831] dark:bg-[#121417]/70 dark:text-[#9aa1ad]">
-            Engenharia Simples & Eficiente
+    <section id="como-funciona" className="relative py-20 md:py-32 border-b border-[#e5e7eb] dark:border-[#242831]/60">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Cabeçalho Editorial com Tipografia de Grande Porte */}
+        <div className="max-w-3xl">
+          <span className="text-[11px] sm:text-xs font-mono font-bold uppercase tracking-[0.2em] text-[#697282] dark:text-[#9aa1ad]">
+            O MECANISMO DE BUSCA
           </span>
-
-          <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-[#121417] sm:text-4xl md:text-5xl dark:text-white">
-            Como o Coralink Funciona
+          <h2 className="mt-3 text-3xl sm:text-5xl md:text-6xl font-black tracking-tight uppercase text-[#121417] dark:text-white leading-[1.02]">
+            VARREDURA. CURADORIA. ENTREGA.
           </h2>
-
-          <p className="mt-4 max-w-2xl text-base text-[#697282] sm:text-lg dark:text-[#9aa1ad]">
-            A tecnologia do ecossistema explicada sem jargões e complicações.
+          <p className="mt-4 text-base sm:text-lg text-[#4b5563] dark:text-[#9aa1ad] leading-relaxed">
+            Como o ecossistema Coralink monitora, processa e disponibiliza oportunidades de forma 100%
+            autônoma e sem jargões técnicos para os estudantes.
           </p>
         </div>
 
-        {/* Grade de 3 Passos */}
-        <div className="mt-12 md:mt-16 grid grid-cols-1 gap-6 md:grid-cols-3">
-          {steps.map((step, index) => {
-            const Icon = step.icon;
+        {/* Faixa Horizontal Contínua (Inspirada no Pôster MAFIA) */}
+        <div className="mt-14 sm:mt-20 grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#e5e7eb] dark:divide-[#242831]/80 border-y border-[#e5e7eb] dark:border-[#242831]/80">
+          {steps.map((step, idx) => (
+            <motion.div
+              key={step.phase}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: idx * 0.12 }}
+              className="py-10 md:py-12 md:px-8 first:md:pl-0 last:md:pr-0 flex flex-col justify-between"
+            >
+              <div>
+                <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#9aa1ad] dark:text-[#697282]">
+                  {step.phase}
+                </span>
 
-            return (
-              <motion.div
-                key={step.number}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.5, delay: index * 0.15 }}
-                className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-[#e5e7eb] bg-white/80 p-7 shadow-xs backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-[#d2d6dc] hover:shadow-lg dark:border-[#242831] dark:bg-[#121417]/80 dark:hover:border-[#374151] dark:hover:bg-[#15181e]"
-              >
-                {/* Linha de Destaque Superior Sutil */}
-                <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#d2d6dc] to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:via-[#374151]" />
+                <h3 className="mt-3 text-xl sm:text-2xl font-black tracking-tight text-[#121417] dark:text-white">
+                  {step.title}
+                </h3>
 
-                <div>
-                  {/* Topo do Card: Número Gigante Editorial e Ícone */}
-                  <div className="flex items-start justify-between">
-                    <span className="font-mono text-4xl sm:text-5xl font-black tracking-tighter text-[#e5e7eb] transition-colors duration-300 group-hover:text-emerald-500/40 dark:text-[#20242b] dark:group-hover:text-emerald-400/30">
-                      {step.number}
-                    </span>
+                <p className="mt-4 text-sm sm:text-base leading-relaxed text-[#4b5563] dark:text-[#9aa1ad]">
+                  {step.description}
+                </p>
+              </div>
 
-                    <div
-                      className={`flex h-12 w-12 items-center justify-center rounded-2xl border ${step.pillColor} shadow-2xs transition-transform duration-300 group-hover:scale-105`}
-                    >
-                      <Icon className="h-6 w-6" />
-                    </div>
-                  </div>
-
-                  {/* Tag de identificação */}
-                  <div className="mt-4">
-                    <span className="text-[11px] font-bold tracking-wider uppercase text-[#9aa1ad] dark:text-[#697282]">
-                      Passo {index + 1} • {step.badge}
-                    </span>
-                    <h3 className="mt-1 text-xl font-bold tracking-tight text-[#121417] dark:text-white">
-                      {step.title}
-                    </h3>
-                  </div>
-
-                  {/* Descrição Humanizada */}
-                  <p className="mt-3.5 text-sm text-[#4b5563] dark:text-[#9aa1ad] leading-relaxed">
-                    {step.description}
-                  </p>
-                </div>
-
-                {/* Destaques / Benefícios no Rodapé do Card */}
-                <div className="mt-6 pt-5 border-t border-[#f1f3f6] dark:border-[#1e2229]">
-                  <ul className="space-y-1.5">
-                    {step.highlights.map((item) => (
-                      <li
-                        key={item}
-                        className="flex items-center gap-2 text-xs font-medium text-[#697282] dark:text-[#9aa1ad]"
-                      >
-                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </motion.div>
-            );
-          })}
+              <div className="mt-8 pt-6 border-t border-[#e5e7eb]/60 dark:border-[#242831]/40">
+                <span className="block text-xs font-mono leading-normal text-[#697282] dark:text-[#9aa1ad]">
+                  {step.detail}
+                </span>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>

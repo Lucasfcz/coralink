@@ -14,10 +14,6 @@ import {
   User as UserIcon,
   AlertCircle,
   Loader2,
-  Sparkles,
-  GraduationCap,
-  CheckCircle2,
-  Cpu,
 } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
 
@@ -99,67 +95,56 @@ function LoginContent() {
     if (!isLoading && user) {
       router.replace(safeRedirect);
     }
-  }, [user, isLoading, safeRedirect, router]);
-
-  // Alternar entre abas limpando mensagens
-  const handleSwitchMode = (newMode: 'login' | 'register') => {
-    setMode(newMode);
-    setErrorMessage(null);
-    setForgotSent(false);
-  };
+  }, [user, isLoading, router, safeRedirect]);
 
   // Inicialização do Google Identity Services (GIS)
   useEffect(() => {
-    const clientId =
-      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
-      '1080294900129-9kg4vcrbj3obfsq566gtsfjen9toar7i.apps.googleusercontent.com';
-
-    const handleGoogleResponse = async (response: GoogleCredentialResponse) => {
-      if (response?.credential) {
-        try {
-          setSubmitting(true);
-          setErrorMessage(null);
-          await loginWithGoogle(response.credential);
-          router.push(safeRedirect);
-        } catch (err: unknown) {
-          setErrorMessage(
-            getErrorMessage(err, 'Falha ao autenticar com Google. Tente novamente.')
-          );
-        } finally {
-          setSubmitting(false);
-        }
-      }
-    };
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      return;
+    }
 
     const setupGsi = () => {
-      if (typeof window === 'undefined') return;
-      const win = window as unknown as WindowWithGoogle;
-      if (win.google?.accounts?.id) {
-        try {
-          win.google.accounts.id.initialize({
-            client_id: clientId,
-            callback: handleGoogleResponse,
-            auto_select: false,
-            cancel_on_tap_outside: true,
-          });
+      const win = typeof window !== 'undefined' ? (window as unknown as WindowWithGoogle) : undefined;
+      if (!win?.google?.accounts?.id) return;
 
-          const btnElem = document.getElementById('google-login-btn-target');
-          if (btnElem) {
-            btnElem.innerHTML = '';
-            win.google.accounts.id.renderButton(btnElem, {
-              type: 'standard',
-              theme: 'filled_black',
-              size: 'large',
-              text: 'continue_with',
-              shape: 'pill',
-              logo_alignment: 'left',
-              width: 320,
-            });
-            setGoogleReady(true);
-          }
-        } catch {
-          // Fallback silencioso
+      try {
+        win.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: async (response: GoogleCredentialResponse) => {
+            if (response.credential) {
+              setSubmitting(true);
+              setErrorMessage(null);
+              try {
+                await loginWithGoogle(response.credential);
+                router.push(safeRedirect);
+              } catch (err: unknown) {
+                setErrorMessage(
+                  getErrorMessage(err, 'Falha ao autenticar com sua conta Google.')
+                );
+              } finally {
+                setSubmitting(false);
+              }
+            }
+          },
+        });
+
+        const targetDiv = document.getElementById('google-login-btn-target');
+        if (targetDiv) {
+          targetDiv.innerHTML = '';
+          win.google.accounts.id.renderButton(targetDiv, {
+            type: 'standard',
+            theme: 'filled_black',
+            size: 'large',
+            text: 'continue_with',
+            shape: 'pill',
+            logo_alignment: 'left',
+            width: 320,
+          });
+          setGoogleReady(true);
         }
+      } catch {
+        // Fallback silencioso
       }
     };
 
@@ -235,126 +220,49 @@ function LoginContent() {
     setErrorMessage(null);
   };
 
+  const handleSwitchMode = (nextMode: 'login' | 'register') => {
+    setMode(nextMode);
+    setErrorMessage(null);
+    setForgotSent(false);
+  };
+
   return (
-    <main className="relative min-h-screen w-full flex items-center justify-center p-3 sm:p-6 lg:p-10 bg-[#0a0b0d] text-white selection:bg-emerald-500/30 selection:text-emerald-200 overflow-x-hidden">
-      {/* Luzes de fundo atmosféricas iridescentes (Dark Tech Ambient Glows) */}
+    <main className="relative min-h-screen w-full flex items-center justify-center p-4 sm:p-6 lg:p-12 bg-[#0a0b0d] text-white selection:bg-emerald-500/30 selection:text-emerald-200 overflow-x-hidden">
+      {/* Luzes de fundo atmosféricas iridescentes (Dark Tech Ambient Mesh) */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-emerald-500/15 blur-[130px]" />
-        <div className="absolute top-1/3 -right-40 h-[550px] w-[550px] rounded-full bg-cyan-500/15 blur-[140px]" />
-        <div className="absolute -bottom-40 left-1/3 h-[500px] w-[500px] rounded-full bg-indigo-600/15 blur-[150px]" />
+        <div className="absolute -top-32 -left-32 h-[520px] w-[520px] rounded-full bg-emerald-500/10 blur-[140px]" />
+        <div className="absolute top-1/2 -right-32 h-[550px] w-[550px] rounded-full bg-cyan-500/10 blur-[150px]" />
+        <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 h-[450px] w-[450px] rounded-full bg-indigo-600/10 blur-[160px]" />
         {/* Padrão de micro-grid cibernético ultra discreto */}
-        <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:28px_28px] opacity-40" />
+        <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:32px_32px] opacity-40" />
       </div>
 
-      {/* Card Principal em Split-Screen com Glassmorphism Editorial */}
-      <div className="relative z-10 w-full max-w-[1100px] rounded-[30px] sm:rounded-[36px] border border-white/10 bg-[#0e1117]/80 backdrop-blur-2xl shadow-[0_24px_80px_rgba(0,0,0,0.85)] overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+      {/* Card Flutuante Principal em Split-Screen (Inspirado na Imagem 1) */}
+      <div className="relative z-10 w-full max-w-[1040px] rounded-[32px] sm:rounded-[36px] border border-white/10 bg-[#0f1218]/90 backdrop-blur-2xl shadow-[0_32px_96px_rgba(0,0,0,0.85)] overflow-hidden grid grid-cols-1 lg:grid-cols-12">
         {/* ======================================================== */}
-        {/* LADO ESQUERDO: Visual 3D Futurista Contextual Coralink   */}
+        {/* LADO ESQUERDO: Composição Arquitetônica Cinematográfica */}
         {/* ======================================================== */}
-        <div className="relative flex flex-col justify-between overflow-hidden bg-gradient-to-b from-[#0a0b0d] via-[#0d1015] to-[#121620] p-6 sm:p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-white/10 lg:col-span-5">
-          {/* Reflexo iridescente interno */}
-          <div className="pointer-events-none absolute -top-24 -left-24 h-64 w-64 rounded-full bg-emerald-500/20 blur-3xl" />
-          <div className="pointer-events-none absolute bottom-0 right-0 h-64 w-64 rounded-full bg-cyan-500/15 blur-3xl" />
-
-          {/* Topo: Marca e Badges Oficiais */}
-          <div className="relative z-10 space-y-4">
-            {/* Header da Marca */}
-            <div className="flex items-center gap-3">
-              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 border border-white/10 p-2 shadow-inner">
-                <Image
-                  src="/coralink-logo.png"
-                  alt="Coralink Logo"
-                  width={32}
-                  height={32}
-                  className="object-contain brightness-0 invert"
-                  priority
-                />
-              </div>
-              <div>
-                <span className="text-xl font-extrabold tracking-tight text-white block leading-none">
-                  CORALINK
-                </span>
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-stone-400">
-                  Pernambuco Acadêmico
-                </span>
-              </div>
-            </div>
-
-            {/* Badges de Destaque Tecnológico */}
-            <div className="flex flex-wrap gap-2 pt-1">
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-medium text-emerald-300 backdrop-blur-md shadow-xs">
-                <Sparkles className="h-3 w-3 text-emerald-400 shrink-0" />
-                <span>Ecossistema Acadêmico de Pernambuco</span>
-              </div>
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-[11px] font-medium text-cyan-300 backdrop-blur-md shadow-xs">
-                <Cpu className="h-3 w-3 text-cyan-400 shrink-0" />
-                <span>Inteligência Artificial & Oportunidades</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Centro: Arte 3D Futurista com Acabamento Dark-Tech */}
-          <div className="relative z-10 my-6 sm:my-8 flex flex-col items-center justify-center">
-            {/* Halo de luz iridescente em torno da arte */}
-            <div className="relative group w-full max-w-[320px] sm:max-w-[340px]">
-              <div className="absolute -inset-1 rounded-[28px] bg-gradient-to-r from-emerald-500/30 via-cyan-500/30 to-indigo-500/30 opacity-70 blur-xl transition-all duration-700 group-hover:opacity-100 group-hover:blur-2xl" />
-
-              <div className="relative overflow-hidden rounded-[24px] border border-white/15 bg-[#0a0b0d] shadow-2xl">
-                <Image
-                  src="/images/auth-visual.jpg"
-                  alt="Escultura 3D futurista de inteligência e oportunidades acadêmicas Coralink"
-                  width={680}
-                  height={906}
-                  className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
-                  priority
-                />
-
-                {/* Overlay gradiente inferior para suavizar integração */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0b0d] via-transparent to-transparent opacity-60" />
-
-                {/* Micro badge flutuante sobre a arte */}
-                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between rounded-xl border border-white/10 bg-[#0e1217]/80 p-2.5 backdrop-blur-md text-[11px]">
-                  <div className="flex items-center gap-2">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-                    </span>
-                    <span className="font-semibold text-stone-200">
-                      Radar Universitário Ativo
-                    </span>
-                  </div>
-                  <span className="text-[10px] text-stone-400 font-mono">
-                    24h / 7d
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Texto Editorial Inspirador */}
-            <div className="mt-5 text-center max-w-[320px]">
-              <p className="text-xs leading-relaxed text-stone-300">
-                O ponto de encontro entre pesquisadores, estagiários e as maiores instituições de ensino de Pernambuco.
-              </p>
-            </div>
-          </div>
-
-          {/* Rodapé do Card Esquerdo: Fontes e Comunidade */}
-          <div className="relative z-10 border-t border-white/10 pt-4">
-            <div className="flex items-center justify-between text-[11px] text-stone-400">
-              <span className="flex items-center gap-1.5">
-                <GraduationCap className="h-3.5 w-3.5 text-stone-400" />
-                UFPE • UPE • Porto Digital • CESAR • IFPE
-              </span>
-              <span className="text-emerald-400 font-medium">100% Gratuito</span>
-            </div>
+        <div className="relative hidden lg:block lg:col-span-5 overflow-hidden bg-black">
+          <div className="relative h-full min-h-[640px] w-full">
+            <Image
+              src="/images/recife-porto-digital-cinematic.jpg"
+              alt="Vista noturna cinematográfica do Porto Digital e pontes históricas do Recife"
+              fill
+              className="object-cover object-center brightness-95 contrast-105"
+              priority
+              sizes="(max-width: 1024px) 100vw, 45vw"
+            />
+            {/* Vinhetas gradientes sutis para fundir com as bordas do card */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
+            <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#0f1218] to-transparent pointer-events-none" />
           </div>
         </div>
 
         {/* ======================================================== */}
-        {/* LADO DIREITO: Card de Autenticação em Vidro Fosco       */}
+        {/* LADO DIREITO: Card de Autenticação Minimalista          */}
         {/* ======================================================== */}
-        <div className="relative flex flex-col justify-between p-6 sm:p-10 lg:p-12 lg:col-span-7 bg-[#12151c]/70 backdrop-blur-xl">
-          {/* Botão Superior Sutil: Voltar ao Coralink */}
+        <div className="relative flex flex-col justify-between p-6 sm:p-10 lg:p-12 lg:col-span-7 bg-[#0f1218]/60">
+          {/* Topo: Voltar ao Coralink (Sem selos redundantes) */}
           <div className="flex items-center justify-between mb-6">
             <Link
               href={safeRedirect}
@@ -363,10 +271,6 @@ function LoginContent() {
               <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1 text-stone-400 group-hover:text-white" />
               <span>Voltar ao Coralink</span>
             </Link>
-
-            <span className="text-[11px] font-mono text-stone-500">
-              Ambiente Seguro SSL
-            </span>
           </div>
 
           {/* Cabeçalho do Formulário */}
@@ -374,13 +278,13 @@ function LoginContent() {
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
               {mode === 'login' ? 'Bem-vindo de volta!' : 'Crie sua conta'}
             </h1>
-            <p className="mt-2 text-xs sm:text-sm leading-relaxed text-stone-300">
-              O portal definitivo de editais, bolsas e estágios universitários de Pernambuco.
+            <p className="mt-2 text-xs sm:text-sm leading-relaxed text-stone-400">
+              O portal unificado de editais, bolsas e estágios universitários de Pernambuco.
             </p>
           </div>
 
           {/* Alternador de Abas: Entrar / Criar Conta */}
-          <div className="mb-6 flex rounded-2xl border border-white/10 bg-[#090b0e] p-1.5 shadow-inner">
+          <div className="mb-6 flex rounded-2xl border border-white/10 bg-[#080a0e] p-1.5 shadow-inner">
             <button
               type="button"
               onClick={() => handleSwitchMode('login')}
@@ -428,20 +332,20 @@ function LoginContent() {
                 exit={{ opacity: 0, y: -6 }}
                 className="mb-5 flex items-start gap-2.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 text-xs font-medium text-emerald-300"
               >
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400 mt-0.5" />
+                <AlertCircle className="h-4 w-4 shrink-0 text-emerald-400 mt-0.5" />
                 <span>
-                  Instruções de recuperação foram enviadas para <strong>{email}</strong> caso o endereço esteja cadastrado.
+                  Instruções de redefinição enviadas para <strong>{email}</strong>.
                 </span>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Formulário de Autenticação */}
+          {/* Formulário Principal */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Campo: Nome Completo (Apenas no Modo Cadastro) */}
+            {/* Campo: Nome Completo (Modo Cadastro) */}
             {mode === 'register' && (
               <div>
-                <label className="block text-xs font-semibold text-stone-200 mb-1.5">
+                <label className="block text-xs font-semibold text-stone-300 mb-1.5">
                   Nome Completo
                 </label>
                 <div className="relative">
@@ -453,15 +357,15 @@ function LoginContent() {
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Ex: Gabriel Albuquerque"
                     autoComplete="name"
-                    className="w-full rounded-2xl border border-white/10 bg-[#0a0c10]/90 py-3 pr-4 pl-10 text-xs font-medium text-white placeholder:text-stone-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
+                    className="w-full rounded-2xl border border-white/10 bg-[#080a0e]/90 py-3 pr-4 pl-10 text-xs font-medium text-white placeholder:text-stone-500 focus:border-white focus:outline-none transition-colors"
                   />
                 </div>
               </div>
             )}
 
-            {/* Campo: Email Institucional ou Pessoal */}
+            {/* Campo: Email */}
             <div>
-              <label className="block text-xs font-semibold text-stone-200 mb-1.5">
+              <label className="block text-xs font-semibold text-stone-300 mb-1.5">
                 Email Institucional ou Pessoal
               </label>
               <div className="relative">
@@ -473,14 +377,14 @@ function LoginContent() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="seu.email@ufpe.br ou pessoal@gmail.com"
                   autoComplete="email"
-                  className="w-full rounded-2xl border border-white/10 bg-[#0a0c10]/90 py-3 pr-4 pl-10 text-xs font-medium text-white placeholder:text-stone-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
+                  className="w-full rounded-2xl border border-white/10 bg-[#080a0e]/90 py-3 pr-4 pl-10 text-xs font-medium text-white placeholder:text-stone-500 focus:border-white focus:outline-none transition-colors"
                 />
               </div>
             </div>
 
             {/* Campo: Senha */}
             <div>
-              <label className="block text-xs font-semibold text-stone-200 mb-1.5">
+              <label className="block text-xs font-semibold text-stone-300 mb-1.5">
                 Senha
               </label>
               <div className="relative">
@@ -492,7 +396,7 @@ function LoginContent() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Mínimo 6 caracteres"
                   autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                  className="w-full rounded-2xl border border-white/10 bg-[#0a0c10]/90 py-3 pr-11 pl-10 text-xs font-medium text-white placeholder:text-stone-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
+                  className="w-full rounded-2xl border border-white/10 bg-[#080a0e]/90 py-3 pr-11 pl-10 text-xs font-medium text-white placeholder:text-stone-500 focus:border-white focus:outline-none transition-colors"
                 />
                 <button
                   type="button"
@@ -508,7 +412,7 @@ function LoginContent() {
             {/* Campo: Confirmação de Senha (Modo Cadastro) */}
             {mode === 'register' && (
               <div>
-                <label className="block text-xs font-semibold text-stone-200 mb-1.5">
+                <label className="block text-xs font-semibold text-stone-300 mb-1.5">
                   Confirmar Senha
                 </label>
                 <div className="relative">
@@ -520,13 +424,13 @@ function LoginContent() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Repita sua senha"
                     autoComplete="new-password"
-                    className="w-full rounded-2xl border border-white/10 bg-[#0a0c10]/90 py-3 pr-4 pl-10 text-xs font-medium text-white placeholder:text-stone-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
+                    className="w-full rounded-2xl border border-white/10 bg-[#080a0e]/90 py-3 pr-4 pl-10 text-xs font-medium text-white placeholder:text-stone-500 focus:border-white focus:outline-none transition-colors"
                   />
                 </div>
               </div>
             )}
 
-            {/* Opções Utilitárias: Lembrar de mim & Esqueceu sua senha */}
+            {/* Opções: Lembrar de mim & Esqueceu sua senha */}
             <div className="flex items-center justify-between pt-1 text-xs text-stone-400">
               <label className="flex items-center gap-2 cursor-pointer select-none hover:text-stone-300">
                 <input
@@ -553,7 +457,7 @@ function LoginContent() {
             <button
               type="submit"
               disabled={submitting}
-              className="mt-2 w-full flex items-center justify-center gap-2.5 rounded-2xl bg-white py-3.5 px-6 text-xs font-bold text-[#0a0b0d] shadow-lg shadow-white/10 transition-all hover:bg-stone-200 hover:shadow-white/20 active:scale-[0.99] disabled:opacity-50 cursor-pointer"
+              className="mt-2 w-full flex items-center justify-center gap-2.5 rounded-2xl bg-white py-3.5 px-6 text-xs font-bold text-[#0a0b0d] shadow-lg shadow-white/10 transition-all hover:bg-stone-200 active:scale-[0.99] disabled:opacity-50 cursor-pointer"
             >
               {submitting ? (
                 <>
@@ -573,7 +477,7 @@ function LoginContent() {
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-white/10" />
             </div>
-            <span className="relative bg-[#12151c] px-3.5 text-[11px] font-medium uppercase tracking-wider text-stone-400">
+            <span className="relative bg-[#0f1218] px-3.5 text-[11px] font-medium uppercase tracking-wider text-stone-500">
               Ou continue com
             </span>
           </div>
@@ -582,7 +486,7 @@ function LoginContent() {
           <div className="flex flex-col items-center gap-2.5">
             <div id="google-login-btn-target" className="flex justify-center w-full min-h-[44px]" />
 
-            {/* Fallback de Botão de Alta Precisão caso o iframe ainda não tenha carregado */}
+            {/* Fallback de Botão caso o script GIS ainda esteja carregando */}
             {!googleReady && (
               <button
                 type="button"
@@ -593,7 +497,7 @@ function LoginContent() {
                     win.google.accounts.id.prompt();
                   }
                 }}
-                className="flex w-full items-center justify-center gap-3 rounded-full border border-white/15 bg-white/5 py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-white/10 hover:border-white/30 active:scale-[0.99]"
+                className="flex w-full items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/5 py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-white/10 hover:border-white/20 active:scale-[0.99]"
               >
                 <svg className="h-4 w-4" viewBox="0 0 24 24">
                   <path
@@ -617,7 +521,7 @@ function LoginContent() {
               </button>
             )}
 
-            {/* Atalho de teste Dev Mock */}
+            {/* Atalho Dev Mock em ambiente local */}
             {process.env.NODE_ENV === 'development' && (
               <button
                 type="button"

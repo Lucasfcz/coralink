@@ -1,8 +1,9 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { motion, type Variants } from 'framer-motion';
-import { ArrowRight, Building2, RefreshCw, Sparkles } from 'lucide-react';
+import { ArrowRight, ArrowDown } from 'lucide-react';
 
 export function SobreHero() {
   const containerVariants: Variants = {
@@ -10,148 +11,138 @@ export function SobreHero() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.12,
-        delayChildren: 0.1,
+        staggerChildren: 0.1,
+        delayChildren: 0.05,
       },
     },
   };
 
   const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 24 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: 'easeOut' },
+      transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] },
     },
   };
 
   return (
-    <section className="relative overflow-hidden pt-28 pb-16 md:pt-36 md:pb-24">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <section className="relative overflow-hidden pt-28 pb-16 md:pt-36 md:pb-24 border-b border-[#e5e7eb] dark:border-[#242831]/60">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
           className="flex flex-col items-center text-center"
         >
-          {/* Pílula Editorial com Indicador Pulsante */}
-          <motion.div variants={itemVariants} className="mb-6">
-            <div className="inline-flex items-center gap-2.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-semibold text-emerald-800 dark:text-emerald-300 shadow-xs backdrop-blur-md transition-colors hover:border-emerald-500/50">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-              </span>
-              <span className="tracking-wide">
-                100% Estudantil & Open Source • Feito em Pernambuco
-              </span>
-            </div>
+          {/* Eyebrow de Alto Impacto Editorial (Estilo Pôster Suíço) */}
+          <motion.div variants={itemVariants} className="mb-4">
+            <span className="text-[11px] sm:text-xs font-mono font-bold uppercase tracking-[0.25em] text-[#697282] dark:text-[#9aa1ad]">
+              OPORTUNIDADES REAIS • CRITÉRIOS CLAROS • FUTURO UNIVERSITÁRIO
+            </span>
           </motion.div>
 
-          {/* Título de Alto Padrão Editorial */}
-          <motion.h1
-            variants={itemVariants}
-            className="max-w-4xl text-4xl font-extrabold tracking-tight text-[#121417] sm:text-5xl md:text-6xl lg:text-7xl dark:text-white leading-[1.08]"
-          >
-            Conectando você às{' '}
-            <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent dark:from-emerald-400 dark:via-teal-300 dark:to-cyan-400">
-              melhores oportunidades
-            </span>{' '}
-            acadêmicas de Pernambuco.
-          </motion.h1>
+          {/* Letras Monumentais em Full-Width (Inspirado no Pôster MAFIA) */}
+          <motion.div variants={itemVariants} className="w-full select-none">
+            <h1 className="text-6xl sm:text-8xl md:text-9xl lg:text-[140px] xl:text-[168px] font-black tracking-tighter uppercase leading-[0.88] text-[#121417] dark:text-white transition-all">
+              CORALINK
+            </h1>
+          </motion.div>
 
-          {/* Subtítulo Humanizado */}
+          {/* Subtítulo Editorial com Foco em Estudantes */}
           <motion.p
             variants={itemVariants}
-            className="mt-6 max-w-2xl text-base text-[#4b5563] sm:text-lg md:text-xl dark:text-[#9aa1ad] leading-relaxed"
+            className="mt-6 max-w-2xl text-base sm:text-lg md:text-xl leading-relaxed text-[#4b5563] dark:text-[#9aa1ad]"
           >
-            Editais, bolsas de iniciação científica, estágios e eventos dos maiores centros de ensino
-            e tecnologia do estado, centralizados e organizados para você.
+            Editais, bolsas de iniciação científica, estágios e congressos dos maiores polos acadêmicos
+            e tecnológicos de Pernambuco, centralizados e curados para você.
           </motion.p>
 
-          {/* CTAs de Navegação Direta */}
+          {/* CTAs de Navegação Direta de Alto Contraste */}
           <motion.div
             variants={itemVariants}
-            className="mt-8 flex flex-wrap items-center justify-center gap-3.5 sm:gap-4"
+            className="mt-8 flex flex-wrap items-center justify-center gap-4"
           >
             <Link
-              href="/"
-              className="inline-flex items-center gap-2 rounded-full bg-[#121417] px-6 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-black hover:shadow-lg dark:bg-white dark:text-[#121417] dark:hover:bg-stone-100"
+              href="/#feed"
+              className="inline-flex items-center gap-2.5 rounded-full bg-[#121417] px-7 py-3.5 text-xs sm:text-sm font-bold text-white shadow-md transition-all hover:bg-black hover:scale-[1.02] active:scale-[0.98] dark:bg-white dark:text-[#121417] dark:hover:bg-stone-200"
             >
               <span>Explorar Oportunidades</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
 
             <a
-              href="#fontes"
-              className="inline-flex items-center gap-2 rounded-full border border-[#e5e7eb] bg-white/80 px-6 py-3 text-sm font-semibold text-[#121417] shadow-xs backdrop-blur-md transition-all hover:border-[#121417] hover:bg-white dark:border-[#242831] dark:bg-[#15181e]/80 dark:text-white dark:hover:border-stone-500 dark:hover:bg-[#181b22]"
+              href="#como-funciona"
+              className="inline-flex items-center gap-2 rounded-full border border-[#e5e7eb] bg-white/70 px-6 py-3.5 text-xs sm:text-sm font-bold text-[#121417] shadow-xs backdrop-blur-md transition-all hover:border-[#121417] hover:bg-white dark:border-[#242831] dark:bg-[#121417]/80 dark:text-white dark:hover:border-white/40 dark:hover:bg-[#181b22]"
             >
-              <Building2 className="h-4 w-4 text-[#697282] dark:text-[#9aa1ad]" />
-              <span>Ver Fontes Monitoradas</span>
+              <span>Como Funciona</span>
+              <ArrowDown className="h-4 w-4 opacity-70" />
             </a>
           </motion.div>
-
-          {/* Métricas em Destaque (3 Pilares Fundamentais) */}
-          <motion.div
-            variants={itemVariants}
-            className="mt-14 sm:mt-18 w-full max-w-5xl"
-          >
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              {/* Métrica 1: 12 instituições monitoradas */}
-              <div className="group relative overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white/70 p-6 text-left shadow-xs backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-[#d2d6dc] hover:shadow-md dark:border-[#242831] dark:bg-[#121417]/70 dark:hover:border-[#374151] dark:hover:bg-[#15181e]">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-3xl font-extrabold tracking-tight text-[#121417] dark:text-white">
-                    12
-                  </span>
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                    <Building2 className="h-5 w-5" />
-                  </div>
-                </div>
-                <h3 className="mt-3 text-base font-bold text-[#121417] dark:text-white">
-                  Instituições monitoradas
-                </h3>
-                <p className="mt-1.5 text-xs text-[#697282] dark:text-[#9aa1ad] leading-relaxed">
-                  Centros de excelência, universidades e polos de tecnologia de Pernambuco em um único feed.
-                </p>
-              </div>
-
-              {/* Métrica 2: Coleta diária autônoma */}
-              <div className="group relative overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white/70 p-6 text-left shadow-xs backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-[#d2d6dc] hover:shadow-md dark:border-[#242831] dark:bg-[#121417]/70 dark:hover:border-[#374151] dark:hover:bg-[#15181e]">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-3xl font-extrabold tracking-tight text-[#121417] dark:text-white">
-                    Diária
-                  </span>
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-500/20 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
-                    <RefreshCw className="h-5 w-5" />
-                  </div>
-                </div>
-                <h3 className="mt-3 text-base font-bold text-[#121417] dark:text-white">
-                  Coleta diária autônoma
-                </h3>
-                <p className="mt-1.5 text-xs text-[#697282] dark:text-[#9aa1ad] leading-relaxed">
-                  Robôs exploradores escaneiam os canais oficiais para catalogar novas oportunidades pontualmente.
-                </p>
-              </div>
-
-              {/* Métrica 3: Curadoria assistida por IA */}
-              <div className="group relative overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white/70 p-6 text-left shadow-xs backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-[#d2d6dc] hover:shadow-md dark:border-[#242831] dark:bg-[#121417]/70 dark:hover:border-[#374151] dark:hover:bg-[#15181e]">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-3xl font-extrabold tracking-tight text-[#121417] dark:text-white">
-                    IA Ativa
-                  </span>
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
-                    <Sparkles className="h-5 w-5" />
-                  </div>
-                </div>
-                <h3 className="mt-3 text-base font-bold text-[#121417] dark:text-white">
-                  Curadoria assistida por IA
-                </h3>
-                <p className="mt-1.5 text-xs text-[#697282] dark:text-[#9aa1ad] leading-relaxed">
-                  Modelos de linguagem analisam os editais, extraindo requisitos, prazos e benefícios com precisão.
-                </p>
-              </div>
-            </div>
-          </motion.div>
         </motion.div>
+
+        {/* Fotografia Arquitetônica Cinematográfica Integrada ao Hero */}
+        <div className="relative mt-12 sm:mt-16 w-full h-[280px] sm:h-[400px] md:h-[480px] rounded-[28px] sm:rounded-[36px] overflow-hidden border border-[#e5e7eb] dark:border-[#242831] shadow-2xl bg-black">
+          <Image
+            src="/images/coralink-editorial-hero.jpg"
+            alt="Arquitetura contemporânea de pesquisa e inovação universitária em Pernambuco"
+            fill
+            className="object-cover object-center brightness-90 contrast-105"
+            priority
+            sizes="(max-width: 1280px) 100vw, 1200px"
+          />
+          {/* Vinheta atmosférica superior e inferior para fusão com a página */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
+
+          {/* Legenda Editorial Sutil no Canto Inferior */}
+          <div className="absolute bottom-5 left-5 right-5 sm:bottom-6 sm:left-8 sm:right-8 flex items-center justify-between text-white/90 text-xs font-mono">
+            <span className="uppercase tracking-wider">
+              Ecossistema Universitário de Pernambuco
+            </span>
+            <span className="hidden sm:inline-block text-white/60">
+              Recife • Agreste • Sertão
+            </span>
+          </div>
+        </div>
+
+        {/* Régua Tipográfica de Métricas Suíças (Sem nenhum card flutuante!) */}
+        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-[#e5e7eb] dark:border-[#242831]/60">
+          <div>
+            <span className="block text-2xl sm:text-3xl font-black tracking-tight text-[#121417] dark:text-white">
+              12
+            </span>
+            <span className="mt-1 block text-xs font-medium uppercase tracking-wider text-[#697282] dark:text-[#9aa1ad]">
+              Fontes Oficiais Ativas
+            </span>
+          </div>
+
+          <div>
+            <span className="block text-2xl sm:text-3xl font-black tracking-tight text-[#121417] dark:text-white">
+              24h
+            </span>
+            <span className="mt-1 block text-xs font-medium uppercase tracking-wider text-[#697282] dark:text-[#9aa1ad]">
+              Varredura Autônoma
+            </span>
+          </div>
+
+          <div>
+            <span className="block text-2xl sm:text-3xl font-black tracking-tight text-[#121417] dark:text-white">
+              100%
+            </span>
+            <span className="mt-1 block text-xs font-medium uppercase tracking-wider text-[#697282] dark:text-[#9aa1ad]">
+              Links Oficiais Diretos
+            </span>
+          </div>
+
+          <div>
+            <span className="block text-2xl sm:text-3xl font-black tracking-tight text-[#121417] dark:text-white">
+              Grátis
+            </span>
+            <span className="mt-1 block text-xs font-medium uppercase tracking-wider text-[#697282] dark:text-[#9aa1ad]">
+              Para Qualquer Estudante
+            </span>
+          </div>
+        </div>
       </div>
     </section>
   );
