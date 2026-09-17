@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Check, Mail, Share2 } from 'lucide-react';
 import { InstitutionLogo } from './InstitutionLogo';
 import { formatSourceName } from '@/lib/utils';
+import { useModalScrollLock } from '@/hooks/useModalScrollLock';
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -18,28 +19,22 @@ interface ShareModalProps {
 }
 
 export function ShareModal({ isOpen, onClose, opportunity }: ShareModalProps) {
+  useModalScrollLock(isOpen);
   const [copied, setCopied] = useState(false);
-  const [shareUrl, setShareUrl] = useState('');
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setShareUrl(`${window.location.origin}/oportunidades/${opportunity.id}`);
-    }
-  }, [opportunity.id]);
+  const shareUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/oportunidades/${opportunity.id}`
+      : `https://coralink.com.br/oportunidades/${opportunity.id}`;
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Escape') onClose();
       };
       window.addEventListener('keydown', handleKeyDown);
       return () => {
-        document.body.style.overflow = 'unset';
         window.removeEventListener('keydown', handleKeyDown);
       };
-    } else {
-      document.body.style.overflow = 'unset';
     }
   }, [isOpen, onClose]);
 
@@ -134,7 +129,8 @@ export function ShareModal({ isOpen, onClose, opportunity }: ShareModalProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="relative z-10 w-full max-w-md overflow-hidden rounded-3xl border border-[#e5e7eb] bg-white p-6 shadow-2xl transition-colors dark:border-[#242831] dark:bg-[#15181e]"
+            data-lenis-prevent="true"
+            className="relative z-10 w-full max-w-md max-h-[90vh] overflow-y-auto rounded-3xl border border-[#e5e7eb] bg-white p-6 shadow-2xl transition-colors dark:border-[#242831] dark:bg-[#15181e]"
           >
             {/* Header */}
             <div className="flex items-center justify-between pb-4 border-b border-[#f1f3f6] dark:border-[#242831]">

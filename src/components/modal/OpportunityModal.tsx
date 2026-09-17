@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { SafeImage } from '@/components/common/SafeImage';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -10,7 +10,6 @@ import {
   Calendar,
   MapPin,
   ShieldCheck,
-  GraduationCap,
   Users,
   ArrowRight,
   Share2,
@@ -20,6 +19,7 @@ import {
   formatDate,
   formatDeadlineBadge,
   getCleanImageUrl,
+  getFallbackImageUrl,
   getOpportunityTypeLabel,
   getModalityLabel,
   formatSourceName,
@@ -27,6 +27,8 @@ import {
 } from '@/lib/utils';
 import { InstitutionLogo } from '@/components/common/InstitutionLogo';
 import { ShareModal } from '@/components/common/ShareModal';
+
+import { useModalScrollLock } from '@/hooks/useModalScrollLock';
 
 interface OpportunityModalProps {
   opportunity: Opportunity | null;
@@ -37,8 +39,9 @@ export function OpportunityModal({
   opportunity,
   onClose,
 }: OpportunityModalProps) {
+  useModalScrollLock(!!opportunity);
   const [shareModalOpen, setShareModalOpen] = useState(false);
-  // Controle de scroll: Pausar Lenis e travar scroll do body enquanto o modal estiver aberto
+
   useEffect(() => {
     if (!opportunity) return;
 
@@ -47,21 +50,8 @@ export function OpportunityModal({
     };
 
     window.addEventListener('keydown', handleKeyDown);
-
-    // Pausar Lenis para que a rolagem do mouse funcione livremente dentro do modal
-    const lenis = (
-      window as unknown as {
-        __lenis?: { stop: () => void; start: () => void };
-      }
-    ).__lenis;
-
-    lenis?.stop();
-    document.body.style.overflow = 'hidden';
-
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-      lenis?.start();
-      document.body.style.overflow = 'unset';
     };
   }, [opportunity, onClose]);
 
@@ -93,13 +83,14 @@ export function OpportunityModal({
             className="fixed inset-0 bg-black/65 backdrop-blur-md"
           />
 
-          {/* Modal Container com animação fluida de entrada e saída (impeccable animate) */}
+          {/* Modal Container com expansão fluida a partir do card (Shared Element Transition via layoutId) */}
           <motion.div
-            key="modal-content"
-            initial={{ opacity: 0, scale: 0.94, y: 24 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.94, y: 16 }}
-            transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
+            layoutId={`opportunity-card-${opportunity.id}`}
+            transition={{
+              type: 'spring',
+              damping: 28,
+              stiffness: 280,
+            }}
             data-lenis-prevent="true"
             className="relative z-10 flex max-h-[90vh] sm:max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-[32px] sm:rounded-[28px] border border-[#e5e7eb] bg-white shadow-2xl dark:border-[#242831] dark:bg-[#15181e]"
           >
@@ -136,8 +127,9 @@ export function OpportunityModal({
             >
               {/* Cover Banner */}
               <div className="relative h-56 sm:h-64 w-full bg-[#121417]">
-                <Image
+                <SafeImage
                   src={imageUrl}
+                  fallbackSrc={getFallbackImageUrl(opportunity.id)}
                   alt={opportunity.title}
                   fill
                   className="object-cover opacity-90"

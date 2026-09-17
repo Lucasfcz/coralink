@@ -249,10 +249,24 @@ const CURATED_FALLBACK_IMAGES = [
   'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80',
 ];
 
+export function getFallbackImageUrl(id: number): string {
+  const index = Math.abs(id || 0) % CURATED_FALLBACK_IMAGES.length;
+  return CURATED_FALLBACK_IMAGES[index];
+}
+
 export function getCleanImageUrl(imageUrl: string | null | undefined, id: number): string {
-  if (!imageUrl || imageUrl.trim() === '' || imageUrl.endsWith('.svg')) {
-    const index = Math.abs(id) % CURATED_FALLBACK_IMAGES.length;
-    return CURATED_FALLBACK_IMAGES[index];
+  const fallback = getFallbackImageUrl(id);
+  if (!imageUrl) return fallback;
+
+  const trimmed = imageUrl.trim();
+  if (
+    trimmed === '' ||
+    trimmed.toLowerCase() === 'null' ||
+    trimmed.toLowerCase() === 'undefined' ||
+    trimmed.endsWith('.svg') ||
+    (!trimmed.startsWith('http://') && !trimmed.startsWith('https://') && !trimmed.startsWith('/'))
+  ) {
+    return fallback;
   }
-  return imageUrl;
+  return trimmed;
 }

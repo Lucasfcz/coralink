@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
+import { SafeImage } from '@/components/common/SafeImage';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -9,10 +9,8 @@ import {
   MapPin,
   ExternalLink,
   Share2,
-  Check,
   ShieldCheck,
   Users,
-  Building2,
   Clock,
   Sparkles,
 } from 'lucide-react';
@@ -21,6 +19,7 @@ import {
   formatDate,
   formatDeadlineBadge,
   getCleanImageUrl,
+  getFallbackImageUrl,
   getOpportunityTypeLabel,
   getModalityLabel,
   formatSourceName,
@@ -83,8 +82,9 @@ export function OpportunityDetailView({
         <article className="overflow-hidden rounded-3xl border border-[#e5e7eb] bg-white shadow-sm dark:border-[#242831] dark:bg-[#15181e]">
           {/* Banner de Mídia em Alta Resolução */}
           <div className="relative h-64 sm:h-80 md:h-[420px] w-full overflow-hidden bg-[#121417]">
-            <Image
+            <SafeImage
               src={imageUrl}
+              fallbackSrc={getFallbackImageUrl(opportunity.id)}
               alt={opportunity.title}
               fill
               priority

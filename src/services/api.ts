@@ -17,26 +17,41 @@ export async function fetchApi<T>(
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
 
-  const defaultHeaders: HeadersInit = {
+  const defaultHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
   };
 
+  // Se executado no cliente, adiciona o Bearer Token salvo na sessão caso não fornecido explicitamente
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('coralink_token');
+    if (token) {
+      defaultHeaders['Authorization'] = `Bearer ${token}`;
+    }
+  }
+
   try {
+    const isGet = !options.method || options.method.toUpperCase() === 'GET';
+    const hasAuth = defaultHeaders['Authorization'] || (options.headers && 'Authorization' in options.headers);
+    const shouldRevalidate = isGet && !hasAuth && !options.cache && !endpoint.startsWith('/admin');
+
     const response = await fetch(url, {
       ...options,
       headers: {
         ...defaultHeaders,
-        ...options.headers,
+        ...(options.headers as Record<string, string> | undefined),
       },
-      next: { revalidate: 120 }, // 2 minutos de cache ISR no Next.js
+      ...(shouldRevalidate ? { next: { revalidate: 120 } } : { cache: 'no-store' }),
     });
 
     if (!response.ok) {
-      throw new ApiError(
-        response.status,
-        `Erro na requisição para ${endpoint}: ${response.statusText}`
-      );
+      const errorBody = await response.json().catch(() => null);
+      const errorMessage = errorBody?.message || response.statusText || 'Erro inesperado';
+      throw new ApiError(response.status, `Erro na requisição para ${endpoint}: ${errorMessage}`);
+    }
+
+    if (response.status === 204) {
+      return undefined as unknown as T;
     }
 
     return (await response.json()) as T;

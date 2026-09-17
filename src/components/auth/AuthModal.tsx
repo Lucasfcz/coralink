@@ -11,11 +11,54 @@ import {
   Lock,
   Mail,
   User as UserIcon,
-  Sparkles,
   AlertCircle,
   Loader2,
 } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
+import { useModalScrollLock } from '@/hooks/useModalScrollLock';
+
+interface GoogleCredentialResponse {
+  credential?: string;
+  select_by?: string;
+}
+
+interface GoogleAccountsId {
+  initialize: (config: {
+    client_id: string;
+    callback: (response: GoogleCredentialResponse) => void;
+    auto_select?: boolean;
+    cancel_on_tap_outside?: boolean;
+  }) => void;
+  renderButton: (
+    parent: HTMLElement,
+    options: {
+      type?: string;
+      theme?: string;
+      size?: string;
+      text?: string;
+      shape?: string;
+      logo_alignment?: string;
+      width?: number;
+    }
+  ) => void;
+  prompt: () => void;
+}
+
+interface WindowWithGoogle extends Window {
+  google?: {
+    accounts?: {
+      id?: GoogleAccountsId;
+    };
+  };
+  __coralink_gsi_initialized?: boolean;
+}
+
+function getErrorMessage(err: unknown, fallback: string): string {
+  if (err instanceof Error) {
+    return err.message;
+  }
+  return fallback;
+}
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -23,6 +66,7 @@ interface AuthModalProps {
 }
 
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
+  useModalScrollLock(isOpen);
   const { loginWithGoogle, loginWithEmail, registerWithEmail } = useAuth();
 
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -35,10 +79,10 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [googleReady, setGoogleReady] = useState(false);
 
-  // Resetar erros ao alternar abas
-  useEffect(() => {
+  const handleSwitchMode = (newMode: 'login' | 'register') => {
+    setMode(newMode);
     setErrorMessage(null);
-  }, [mode]);
+  };
 
   // Inicializar Google Identity Services (GSI)
   useEffect(() => {
@@ -48,16 +92,16 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
       process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
       '1080294900129-9kg4vcrbj3obfsq566gtsfjen9toar7i.apps.googleusercontent.com';
 
-    const handleGoogleResponse = async (response: any) => {
+    const handleGoogleResponse = async (response: GoogleCredentialResponse) => {
       if (response?.credential) {
         try {
           setSubmitting(true);
           setErrorMessage(null);
           await loginWithGoogle(response.credential);
           onClose();
-        } catch (err: any) {
+        } catch (err: unknown) {
           setErrorMessage(
-            err?.message || 'Falha ao autenticar com Google. Tente novamente.'
+            getErrorMessage(err, 'Falha ao autenticar com Google. Tente novamente.')
           );
         } finally {
           setSubmitting(false);
@@ -66,22 +110,24 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     };
 
     const setupGsi = () => {
-      if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
+      if (typeof window === 'undefined') return;
+      const win = window as unknown as WindowWithGoogle;
+      if (win.google?.accounts?.id) {
         try {
-          if (!(window as any).__coralink_gsi_initialized) {
-            (window as any).google.accounts.id.initialize({
+          if (!win.__coralink_gsi_initialized) {
+            win.google.accounts.id.initialize({
               client_id: clientId,
               callback: handleGoogleResponse,
               auto_select: false,
               cancel_on_tap_outside: true,
             });
-            (window as any).__coralink_gsi_initialized = true;
+            win.__coralink_gsi_initialized = true;
           }
 
           const btnElem = document.getElementById('google-gis-btn-container');
           if (btnElem) {
             btnElem.innerHTML = '';
-            (window as any).google.accounts.id.renderButton(btnElem, {
+            win.google.accounts.id.renderButton(btnElem, {
               type: 'standard',
               theme: 'outline',
               size: 'large',
@@ -98,11 +144,13 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
       }
     };
 
-    if ((window as any).google?.accounts?.id) {
+    const win = typeof window !== 'undefined' ? (window as unknown as WindowWithGoogle) : undefined;
+    if (win?.google?.accounts?.id) {
       setupGsi();
     } else {
       const timer = setInterval(() => {
-        if ((window as any).google?.accounts?.id) {
+        const currentWin = typeof window !== 'undefined' ? (window as unknown as WindowWithGoogle) : undefined;
+        if (currentWin?.google?.accounts?.id) {
           clearInterval(timer);
           setupGsi();
         }
@@ -110,8 +158,6 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
       return () => clearInterval(timer);
     }
   }, [isOpen, loginWithGoogle, onClose]);
-
-  if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,8 +171,8 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         await registerWithEmail(name, email, password);
       }
       onClose();
-    } catch (err: any) {
-      setErrorMessage(err?.message || 'Ocorreu um erro ao processar sua solicitação.');
+    } catch (err: unknown) {
+      setErrorMessage(getErrorMessage(err, 'Ocorreu um erro ao processar sua solicitação.'));
     } finally {
       setSubmitting(false);
     }
@@ -138,8 +184,8 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
       setErrorMessage(null);
       await loginWithGoogle('dev-mock-lucas@coralink.test');
       onClose();
-    } catch (err: any) {
-      setErrorMessage(err?.message || 'O servidor de produção não aceita tokens de mock.');
+    } catch (err: unknown) {
+      setErrorMessage(getErrorMessage(err, 'O servidor de produção não aceita tokens de mock.'));
     } finally {
       setSubmitting(false);
     }
@@ -147,70 +193,71 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6">
-        {/* Backdrop escuro com desfoque */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity"
-        />
-
-        {/* Container Principal Split Modal */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96, y: 14 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.96, y: 14 }}
-          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className="relative z-10 flex w-full max-w-[920px] flex-col overflow-hidden rounded-[28px] border border-white/20 bg-white shadow-2xl md:flex-row dark:border-[#242831] dark:bg-[#15181e]"
-        >
-          {/* Botão Fechar */}
-          <button
-            type="button"
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6">
+          {/* Backdrop escuro com desfoque */}
+          <motion.div
+            key="auth-modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             onClick={onClose}
-            aria-label="Fechar"
-            className="absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-[#e5e7eb] bg-white/80 text-[#64748b] backdrop-blur-md transition-all hover:bg-[#121417] hover:text-white dark:border-[#242831] dark:bg-[#1c2027]/80 dark:text-[#9aa1ad] dark:hover:bg-white dark:hover:text-[#121417]"
+            className="fixed inset-0 bg-black/60 backdrop-blur-md"
+          />
+
+          {/* Container Principal Split Modal */}
+          <motion.div
+            key="auth-modal-container"
+            initial={{ opacity: 0, scale: 0.95, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 12 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            data-lenis-prevent="true"
+            className="relative z-10 flex w-full max-w-[920px] max-h-[92vh] flex-col overflow-hidden rounded-[28px] border border-white/20 bg-white shadow-2xl md:flex-row dark:border-[#242831] dark:bg-[#15181e]"
           >
-            <X className="h-4 w-4" />
-          </button>
+            {/* Botão Fechar */}
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Fechar"
+              className="absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-[#e5e7eb] bg-white/80 text-[#64748b] backdrop-blur-md transition-all hover:bg-[#121417] hover:text-white dark:border-[#242831] dark:bg-[#1c2027]/80 dark:text-[#9aa1ad] dark:hover:bg-white dark:hover:text-[#121417]"
+            >
+              <X className="h-4 w-4" />
+            </button>
 
-          {/* LADO ESQUERDO: Visual Conceitual e Editorial da Marca */}
-          <div className="relative flex flex-col justify-between overflow-hidden bg-gradient-to-br from-[#0c0e12] via-[#12151c] to-[#1a1f29] p-7 sm:p-10 text-white md:w-[45%]">
-            {/* Elementos gráficos abstratos no fundo */}
-            <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-blue-500/10 blur-3xl" />
+            {/* LADO ESQUERDO: Visual Conceitual e Editorial da Marca */}
+            <div className="relative flex flex-col justify-between overflow-hidden bg-gradient-to-br from-[#0c0e12] via-[#12151c] to-[#1a1f29] p-7 sm:p-10 text-white md:w-[45%]">
+              {/* Elementos gráficos abstratos no fundo */}
+              <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-blue-500/10 blur-3xl" />
 
-            {/* Círculos e curvas orgânicas */}
-            <div className="pointer-events-none absolute right-0 bottom-0 translate-x-12 translate-y-12 opacity-20">
-              <svg width="280" height="280" viewBox="0 0 200 200" fill="none">
-                <circle cx="100" cy="100" r="80" stroke="white" strokeWidth="1.5" strokeDasharray="6 6" />
-                <circle cx="100" cy="100" r="60" stroke="white" strokeWidth="1.5" />
-                <circle cx="100" cy="100" r="40" stroke="white" strokeWidth="1" />
-              </svg>
-            </div>
-
-            {/* Top: Logo & Badge */}
-            <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold tracking-wide text-white/90 backdrop-blur-md">
-                <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
-                <span>Ecossistema Acadêmico & Tech</span>
+              {/* Círculos e curvas orgânicas */}
+              <div className="pointer-events-none absolute right-0 bottom-0 translate-x-12 translate-y-12 opacity-20">
+                <svg width="280" height="280" viewBox="0 0 200 200" fill="none">
+                  <circle cx="100" cy="100" r="80" stroke="white" strokeWidth="1.5" strokeDasharray="6 6" />
+                  <circle cx="100" cy="100" r="60" stroke="white" strokeWidth="1.5" />
+                  <circle cx="100" cy="100" r="40" stroke="white" strokeWidth="1" />
+                </svg>
               </div>
-              <div className="mt-6 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center">
-                  <Image
-                    src="/coralink-logo.png"
-                    alt="Coralink Logo"
-                    width={36}
-                    height={36}
-                    className="object-contain brightness-0 invert"
-                  />
+
+              {/* Top: Logo Coralink Limpa */}
+              <div className="relative z-10">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center">
+                    <Image
+                      src="/coralink-logo.png"
+                      alt="Coralink Logo"
+                      width={36}
+                      height={36}
+                      className="object-contain brightness-0 invert"
+                    />
+                  </div>
+                  <span className="text-2xl font-extrabold tracking-tight text-white">
+                    CORALINK
+                  </span>
                 </div>
-                <span className="text-2xl font-extrabold tracking-tight text-white">
-                  CORALINK
-                </span>
               </div>
-            </div>
 
             {/* Middle: Manifesto Visual */}
             <div className="relative z-10 my-8">
@@ -229,12 +276,12 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </div>
 
           {/* LADO DIREITO: Formulário Clean & Editorial */}
-          <div className="flex flex-1 flex-col justify-center p-6 sm:p-8 md:p-10">
+          <div className="flex flex-1 flex-col justify-start md:justify-center overflow-y-auto p-6 sm:p-8 md:p-10">
             {/* Alternador de Abas: Entrar / Cadastrar */}
             <div className="mb-6 flex rounded-xl border border-[#e5e7eb] bg-[#f8f9fa] p-1 dark:border-[#242831] dark:bg-[#181b22]">
               <button
                 type="button"
-                onClick={() => setMode('login')}
+                onClick={() => handleSwitchMode('login')}
                 className={`flex-1 rounded-lg py-2 text-xs font-bold transition-all ${
                   mode === 'login'
                     ? 'bg-white text-[#121417] shadow-xs dark:bg-[#20242b] dark:text-white'
@@ -245,7 +292,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
               </button>
               <button
                 type="button"
-                onClick={() => setMode('register')}
+                onClick={() => handleSwitchMode('register')}
                 className={`flex-1 rounded-lg py-2 text-xs font-bold transition-all ${
                   mode === 'register'
                     ? 'bg-white text-[#121417] shadow-xs dark:bg-[#20242b] dark:text-white'
@@ -398,8 +445,9 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   type="button"
                   disabled={submitting}
                   onClick={() => {
-                    if ((window as any).google?.accounts?.id) {
-                      (window as any).google.accounts.id.prompt();
+                    const win = typeof window !== 'undefined' ? (window as unknown as WindowWithGoogle) : undefined;
+                    if (win?.google?.accounts?.id) {
+                      win.google.accounts.id.prompt();
                     }
                   }}
                   className="flex w-full items-center justify-center gap-2.5 rounded-full border border-[#e5e7eb] bg-white py-2.5 text-xs font-semibold text-[#121417] shadow-2xs transition-all hover:bg-[#f8f9fa] hover:border-[#d1d5db] dark:border-[#242831] dark:bg-[#181b22] dark:text-white dark:hover:bg-[#1e232b]"
@@ -463,6 +511,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </div>
         </motion.div>
       </div>
-    </AnimatePresence>
-  );
+    )}
+  </AnimatePresence>
+);
 }

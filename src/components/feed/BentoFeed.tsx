@@ -4,21 +4,24 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Opportunity } from '@/types/opportunity';
 import { BentoCard } from './BentoCard';
 import { FeedSkeleton } from './FeedSkeleton';
+import { FeedPeekSkeleton } from './FeedPeekSkeleton';
 import { FilterOption } from './CategoryFilter';
+import { AdvancedFilterState } from './FilterDrawer';
 import { getOpportunities } from '@/services/opportunities';
 import { Flame, CheckCircle2 } from 'lucide-react';
 
 interface BentoFeedProps {
   initialOpportunities: Opportunity[];
-  totalElements: number;
+  totalElements?: number;
   selectedFilter: FilterOption;
+  advancedFilters?: AdvancedFilterState;
   onSelectOpportunity: (opp: Opportunity) => void;
 }
 
 export function BentoFeed({
   initialOpportunities,
-  totalElements,
   selectedFilter,
+  advancedFilters,
   onSelectOpportunity,
 }: BentoFeedProps) {
   const [opportunities, setOpportunities] = useState<Opportunity[]>(initialOpportunities);
@@ -29,7 +32,7 @@ export function BentoFeed({
 
   const sentinelRef = useRef<HTMLDivElement>(null);
 
-  // Efeito ao trocar o filtro: resetar página e buscar novos dados
+  // Efeito ao trocar os filtros: resetar página e buscar novos dados
   useEffect(() => {
     let isCancelled = false;
 
@@ -37,9 +40,12 @@ export function BentoFeed({
       setIsFilterLoading(true);
       try {
         const res = await getOpportunities({
-          type: selectedFilter.type,
-          isFree: selectedFilter.isFree,
-          isForAll: selectedFilter.isForAll,
+          type: advancedFilters?.type || selectedFilter.type,
+          targetCourseAudience: advancedFilters?.course,
+          sourceName: advancedFilters?.institution,
+          modality: advancedFilters?.modality,
+          isFree: advancedFilters?.isFree !== undefined ? advancedFilters.isFree : selectedFilter.isFree,
+          isForAll: advancedFilters?.isForAll !== undefined ? advancedFilters.isForAll : selectedFilter.isForAll,
           page: 0,
           size: 9,
         });
@@ -63,9 +69,9 @@ export function BentoFeed({
     return () => {
       isCancelled = true;
     };
-  }, [selectedFilter]);
+  }, [selectedFilter, advancedFilters]);
 
-  // Função para carregar próxima página (Scroll Infinito estilo YouTube)
+  // Função para carregar próxima página (Scroll Infinito com peek discreto)
   const loadNextPage = useCallback(async () => {
     if (isLoadingMore || !hasMore || isFilterLoading) return;
 
@@ -75,14 +81,17 @@ export function BentoFeed({
     try {
       const [res] = await Promise.all([
         getOpportunities({
-          type: selectedFilter.type,
-          isFree: selectedFilter.isFree,
-          isForAll: selectedFilter.isForAll,
+          type: advancedFilters?.type || selectedFilter.type,
+          targetCourseAudience: advancedFilters?.course,
+          sourceName: advancedFilters?.institution,
+          modality: advancedFilters?.modality,
+          isFree: advancedFilters?.isFree !== undefined ? advancedFilters.isFree : selectedFilter.isFree,
+          isForAll: advancedFilters?.isForAll !== undefined ? advancedFilters.isForAll : selectedFilter.isForAll,
           page: nextPage,
           size: 9,
         }),
-        // Garante que a rodinha de carregamento seja claramente visível antes de injetar os cards
-        new Promise((resolve) => setTimeout(resolve, 400)),
+        // Garante que a prévia discreta apareça com suavidade
+        new Promise((resolve) => setTimeout(resolve, 350)),
       ]);
 
       if (res.content && res.content.length > 0) {
@@ -102,7 +111,7 @@ export function BentoFeed({
     } finally {
       setIsLoadingMore(false);
     }
-  }, [page, hasMore, isLoadingMore, isFilterLoading, selectedFilter]);
+  }, [page, hasMore, isLoadingMore, isFilterLoading, selectedFilter, advancedFilters]);
 
   // Observer do Sentinel para disparar automaticamente antes de chegar ao fim
   useEffect(() => {
@@ -117,7 +126,7 @@ export function BentoFeed({
         }
       },
       {
-        rootMargin: '120px', // Aciona ao se aproximar do final da página
+        rootMargin: '80px', // Aciona suavemente ao se aproximar do final da página
         threshold: 0.1,
       }
     );
@@ -228,15 +237,8 @@ export function BentoFeed({
         <div className="flex flex-col gap-8">
           {renderBentoBlocks()}
 
-          {/* Rodelinha discreta de carregamento com o layout das notícias embaixo */}
-          {isLoadingMore && (
-            <div className="flex flex-col gap-6 pt-2">
-              <div className="flex justify-center items-center py-6">
-                <div className="h-7 w-7 animate-spin rounded-full border-2 border-[#e5e7eb] border-t-[#121417] dark:border-[#2b303a] dark:border-t-white" />
-              </div>
-              <FeedSkeleton />
-            </div>
-          )}
+          {/* Prévia discreta (peek) dos cards seguintes durante o carregamento */}
+          {isLoadingMore && <FeedPeekSkeleton />}
 
           {/* Sentinel do IntersectionObserver para scroll infinito */}
           <div ref={sentinelRef} className="h-6 w-full" />

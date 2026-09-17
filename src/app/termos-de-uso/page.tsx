@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, ShieldCheck, Scale, FileText, AlertCircle, ExternalLink, Mail } from 'lucide-react';
+import { ArrowLeft, Scale, AlertCircle, Mail } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
@@ -67,7 +67,7 @@ export default function TermosDeUsoPage() {
           {/* Seção 2 */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-[#121417] dark:text-white">
-              2. Limitação Expressa de Responsabilidade ("As-Is")
+              2. Limitação Expressa de Responsabilidade (&quot;As-Is&quot;)
             </h2>
             <div className="rounded-2xl border-l-4 border-[#121417] bg-[#f8f9fa] p-4.5 dark:border-white dark:bg-[#181b22]">
               <div className="flex items-start gap-2.5">
@@ -77,7 +77,7 @@ export default function TermosDeUsoPage() {
                     O Coralink não é organizador, gestor nem emissor dos editais publicados por terceiros.
                   </p>
                   <p>
-                    O serviço é fornecido no estado em que se encontra (<em>"as-is"</em> e <em>"as available"</em>), sem garantias expressas ou implícitas de qualquer natureza.
+                    O serviço é fornecido no estado em que se encontra (<em>&quot;as-is&quot;</em> e <em>&quot;as available&quot;</em>), sem garantias expressas ou implícitas de qualquer natureza.
                   </p>
                 </div>
               </div>

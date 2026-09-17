@@ -1,16 +1,18 @@
 'use client';
 
-import Image from 'next/image';
-import { ArrowRight, MapPin } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 import { Opportunity } from '@/types/opportunity';
 import {
   formatDate,
   getCleanImageUrl,
+  getFallbackImageUrl,
   getOpportunityTypeLabel,
   getModalityLabel,
   formatSourceName,
 } from '@/lib/utils';
 import { InstitutionLogo } from '@/components/common/InstitutionLogo';
+import { SafeImage } from '@/components/common/SafeImage';
 
 interface FeaturedCardProps {
   opportunity: Opportunity;
@@ -19,6 +21,7 @@ interface FeaturedCardProps {
 
 export function FeaturedCard({ opportunity, onSelect }: FeaturedCardProps) {
   const imageUrl = getCleanImageUrl(opportunity.imageUrl, opportunity.id);
+  const fallbackUrl = getFallbackImageUrl(opportunity.id);
   const typeLabel = getOpportunityTypeLabel(opportunity.type);
   const modalityLabel = getModalityLabel(opportunity.modality);
 
@@ -29,14 +32,16 @@ export function FeaturedCard({ opportunity, onSelect }: FeaturedCardProps) {
     : 'Inscrições Abertas';
 
   return (
-    <article
+    <motion.article
+      layoutId={`opportunity-card-${opportunity.id}`}
       onClick={() => onSelect(opportunity)}
       className="group relative flex flex-col w-[420px] sm:w-[480px] md:w-[520px] shrink-0 cursor-pointer pt-1 pb-6 transition-transform duration-300 hover:-translate-y-1"
     >
       {/* 1. Retângulo Maior: Imagem da Oportunidade (Conforme esboço) */}
       <div className="relative h-[250px] sm:h-[280px] w-full overflow-hidden rounded-[24px] sm:rounded-[28px] border border-[#e5e7eb] bg-[#121417] shadow-sm dark:border-[#242831]">
-        <Image
+        <SafeImage
           src={imageUrl}
+          fallbackSrc={fallbackUrl}
           alt={opportunity.title}
           fill
           sizes="(max-width: 768px) 420px, 520px"
@@ -98,6 +103,6 @@ export function FeaturedCard({ opportunity, onSelect }: FeaturedCardProps) {
           </div>
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }

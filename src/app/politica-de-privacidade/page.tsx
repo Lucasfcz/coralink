@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, ShieldCheck, Lock, CheckCircle2, AlertCircle, Mail, UserCheck, Trash2 } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Lock, CheckCircle2, Mail, UserCheck, Trash2 } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
@@ -203,7 +203,7 @@ export default function PoliticaDePrivacidadePage() {
               </p>
               <ol className="list-decimal pl-5 mt-2 space-y-1.5 text-xs text-[#374151] dark:text-[#d2d6dc]">
                 <li>
-                  Envie um e-mail para <strong className="text-[#121417] dark:text-white">{supportEmail}</strong> com o assunto <code>"Exclusão de Conta e Dados - Coralink"</code> a partir do mesmo e-mail cadastrado na plataforma;
+                  Envie um e-mail para <strong className="text-[#121417] dark:text-white">{supportEmail}</strong> com o assunto <code>&quot;Exclusão de Conta e Dados - Coralink&quot;</code> a partir do mesmo e-mail cadastrado na plataforma;
                 </li>
                 <li>
                   Nossa equipe efetuará a confirmação da titularidade e a purgação irreversível do registro de usuário, revogação de tokens e desvinculação completa no banco de dados;

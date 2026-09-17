@@ -49,18 +49,12 @@ export default async function OpportunityDetailPage({ params }: PageProps) {
       notFound();
     }
 
-    // Buscar oportunidades relacionadas (mesmo tipo, mesma fonte ou mesma área temática)
-    const listRes = await getOpportunities({ size: 20 });
+    // Buscar oportunidades relacionadas otimizadas diretamente pelo tipo da oportunidade
+    const listRes = await getOpportunities({ type: opportunity.type, size: 4 });
     const all = listRes.content || [];
 
     relatedOpportunities = all
-      .filter(
-        (item) =>
-          item.id !== oppId &&
-          (item.type === opportunity!.type ||
-            item.sourceName === opportunity!.sourceName ||
-            item.thematicArea === opportunity!.thematicArea)
-      )
+      .filter((item) => item.id !== oppId)
       .slice(0, 3);
   } catch (error) {
     console.error(`Erro ao carregar oportunidade ${oppId}:`, error);

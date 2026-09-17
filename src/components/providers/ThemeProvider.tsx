@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useSyncExternalStore } from 'react';
 
 type Theme = 'light' | 'dark';
 
@@ -12,33 +12,44 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+function subscribe(callback: () => void) {
+  window.addEventListener('storage', callback);
+  return () => window.removeEventListener('storage', callback);
+}
+
+function getThemeSnapshot(): Theme {
+  try {
+    const savedTheme = localStorage.getItem('coralink-theme');
+    return savedTheme === 'dark' ? 'dark' : 'light';
+  } catch {
+    return 'light';
+  }
+}
+
+function getServerSnapshot(): Theme {
+  return 'light';
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('light');
-  const [mounted, setMounted] = useState(false);
+  const [userTheme, setUserTheme] = useState<Theme | null>(null);
+  const storedTheme = useSyncExternalStore(subscribe, getThemeSnapshot, getServerSnapshot);
+  const theme = userTheme ?? storedTheme;
 
   useEffect(() => {
-    setMounted(true);
-    const savedTheme = localStorage.getItem('coralink-theme') as Theme | null;
-    if (savedTheme === 'dark' || savedTheme === 'light') {
-      setThemeState(savedTheme);
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    } else {
-      // Default: light mode as requested
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
-
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-    localStorage.setItem('coralink-theme', newTheme);
-    if (newTheme === 'dark') {
+    if (theme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
+
+  const setTheme = (newTheme: Theme) => {
+    setUserTheme(newTheme);
+    try {
+      localStorage.setItem('coralink-theme', newTheme);
+      window.dispatchEvent(new Event('storage'));
+    } catch {
+      // Ignora erro de escrita no localStorage
     }
   };
 

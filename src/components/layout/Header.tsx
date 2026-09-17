@@ -3,10 +3,9 @@
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, Menu, X, User, Sun, Moon, LogOut } from 'lucide-react';
+import { Search, Menu, X, User, Sun, Moon, LogOut, ShieldAlert } from 'lucide-react';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { AuthModal } from '@/components/auth/AuthModal';
 
 interface HeaderProps {
   onSearchClick?: () => void;
@@ -15,10 +14,9 @@ interface HeaderProps {
 export function Header({ onSearchClick }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-  const [authModalOpen, setAuthModalOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const { theme, toggleTheme } = useTheme();
-  const { user, logout } = useAuth();
+  const { user, logout, openAuthModal } = useAuth();
 
   // Fechar menu de perfil ao clicar fora
   useEffect(() => {
@@ -103,9 +101,12 @@ export function Header({ onSearchClick }: HeaderProps) {
                 }`}
               >
                 {user?.avatarUrl ? (
-                  <img
+                  <Image
                     src={user.avatarUrl}
                     alt={user.name}
+                    width={40}
+                    height={40}
+                    unoptimized
                     className="h-full w-full object-cover"
                   />
                 ) : user ? (
@@ -166,6 +167,23 @@ export function Header({ onSearchClick }: HeaderProps) {
                   {/* Linha Divisória */}
                   <div className="my-2 border-t border-[#f1f3f6] dark:border-[#242831]" />
 
+                  {/* Atalho Restrito: Painel Administrativo (Apenas ROLE_ADMIN) */}
+                  {user?.role === 'ROLE_ADMIN' && (
+                    <Link
+                      href="/admin"
+                      onClick={() => setProfileMenuOpen(false)}
+                      className="mb-2 flex w-full items-center justify-between rounded-xl border border-amber-500/20 bg-amber-500/5 px-3 py-2.5 text-xs font-bold text-amber-700 transition-all hover:bg-amber-500/10 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-300 dark:hover:bg-amber-400/15"
+                    >
+                      <div className="flex items-center gap-2">
+                        <ShieldAlert className="h-4 w-4 text-amber-500" />
+                        <span>Painel Admin</span>
+                      </div>
+                      <span className="rounded-md bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                        Admin
+                      </span>
+                    </Link>
+                  )}
+
                   {/* Botão de Ação: Entrar ou Logout */}
                   {user ? (
                     <button
@@ -184,7 +202,7 @@ export function Header({ onSearchClick }: HeaderProps) {
                       type="button"
                       onClick={() => {
                         setProfileMenuOpen(false);
-                        setAuthModalOpen(true);
+                        openAuthModal();
                       }}
                       className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#121417] py-2.5 px-3 text-xs font-bold text-white shadow-xs transition-all hover:bg-black dark:bg-white dark:text-[#121417] dark:hover:bg-stone-200"
                     >
@@ -250,7 +268,7 @@ export function Header({ onSearchClick }: HeaderProps) {
                     type="button"
                     onClick={() => {
                       setMobileMenuOpen(false);
-                      setAuthModalOpen(true);
+                      openAuthModal();
                     }}
                     className="flex items-center justify-center gap-2 rounded-xl bg-[#121417] py-3 text-sm font-semibold text-white dark:bg-white dark:text-[#121417]"
                   >
@@ -263,9 +281,6 @@ export function Header({ onSearchClick }: HeaderProps) {
           </div>
         )}
       </header>
-
-      {/* Modal Split de Autenticação */}
-      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </>
   );
 }

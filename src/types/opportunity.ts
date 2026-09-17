@@ -98,7 +98,9 @@ export interface PageResponse<T> {
 export interface OpportunityFilters {
   title?: string;
   type?: OpportunityType;
+  targetCourseAudience?: TargetCourseAudience;
   modality?: Modality;
+  sourceName?: string;
   isFree?: boolean;
   isForAll?: boolean;
   page?: number;

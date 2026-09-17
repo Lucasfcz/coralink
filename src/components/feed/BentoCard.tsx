@@ -1,11 +1,13 @@
 'use client';
 
-import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { SafeImage } from '@/components/common/SafeImage';
 import { ArrowRight, MapPin, Calendar } from 'lucide-react';
 import { Opportunity } from '@/types/opportunity';
 import {
   formatDeadlineBadge,
   getCleanImageUrl,
+  getFallbackImageUrl,
   getOpportunityTypeLabel,
   getModalityLabel,
   formatSourceName,
@@ -24,6 +26,7 @@ export function BentoCard({
   onSelect,
 }: BentoCardProps) {
   const imageUrl = getCleanImageUrl(opportunity.imageUrl, opportunity.id);
+  const fallbackUrl = getFallbackImageUrl(opportunity.id);
   const deadlineBadge = formatDeadlineBadge(opportunity.registrationDeadline);
   const typeLabel = getOpportunityTypeLabel(opportunity.type);
   const modalityLabel = getModalityLabel(opportunity.modality);
@@ -32,13 +35,15 @@ export function BentoCard({
   // 1. VARIANT: HERO (Card Amplo com overlay flutuante inferior)
   if (variant === 'hero') {
     return (
-      <article
+      <motion.article
+        layoutId={`opportunity-card-${opportunity.id}`}
         onClick={() => onSelect(opportunity)}
-        className="group relative min-h-[420px] sm:min-h-[480px] w-full cursor-pointer overflow-hidden rounded-3xl border border-[#e5e7eb] bg-[#121417] shadow-sm transition-all duration-300 hover:shadow-xl lg:col-span-2 dark:border-[#242831]"
+        className="group relative min-h-[420px] sm:min-h-[480px] w-full cursor-pointer overflow-hidden rounded-3xl border border-[#e5e7eb] bg-[#121417] shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl lg:col-span-2 dark:border-[#242831] will-change-transform"
       >
         <div className="relative h-full w-full min-h-[420px] sm:min-h-[480px] overflow-hidden">
-          <Image
+          <SafeImage
             src={imageUrl}
+            fallbackSrc={fallbackUrl}
             alt={opportunity.title}
             fill
             sizes="(max-width: 1024px) 100vw, 66vw"
@@ -100,20 +105,22 @@ export function BentoCard({
             </div>
           </div>
         </div>
-      </article>
+      </motion.article>
     );
   }
 
   // 2. VARIANT: STACKED (Cards compactos empilhados)
   if (variant === 'stacked') {
     return (
-      <article
+      <motion.article
+        layoutId={`opportunity-card-${opportunity.id}`}
         onClick={() => onSelect(opportunity)}
-        className="group flex flex-col sm:flex-row h-full w-full cursor-pointer overflow-hidden rounded-3xl border border-[#e5e7eb] bg-white p-4 shadow-sm transition-all duration-300 hover:border-[#d1d5db] hover:shadow-md dark:border-[#242831] dark:bg-[#15181e] dark:hover:border-stone-600"
+        className="group flex flex-col sm:flex-row h-full w-full cursor-pointer overflow-hidden rounded-3xl border border-[#e5e7eb] bg-white p-4 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#d1d5db] hover:shadow-lg dark:border-[#242831] dark:bg-[#15181e] dark:hover:border-stone-600 will-change-transform"
       >
         <div className="relative h-44 sm:h-auto sm:w-44 shrink-0 overflow-hidden rounded-2xl bg-[#f1f3f6] dark:bg-[#20242b]">
-          <Image
+          <SafeImage
             src={imageUrl}
+            fallbackSrc={fallbackUrl}
             alt={opportunity.title}
             fill
             sizes="(max-width: 640px) 100vw, 180px"
@@ -157,15 +164,16 @@ export function BentoCard({
             </div>
           </div>
         </div>
-      </article>
+      </motion.article>
     );
   }
 
   // 3. VARIANT: EDITORIAL (Cards com foto da universidade/empresa no rodapé e sem botão de salvar)
   return (
-    <article
+    <motion.article
+      layoutId={`opportunity-card-${opportunity.id}`}
       onClick={() => onSelect(opportunity)}
-      className="group flex flex-col justify-between w-full cursor-pointer overflow-hidden rounded-3xl border border-[#e5e7eb] bg-white p-5 sm:p-6 shadow-sm transition-all duration-300 hover:border-[#d1d5db] hover:shadow-lg dark:border-[#242831] dark:bg-[#15181e] dark:hover:border-stone-600"
+      className="group flex flex-col justify-between w-full cursor-pointer overflow-hidden rounded-3xl border border-[#e5e7eb] bg-white p-5 sm:p-6 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#d1d5db] hover:shadow-xl dark:border-[#242831] dark:bg-[#15181e] dark:hover:border-stone-600 will-change-transform"
     >
       <div>
         {/* Header Tags */}
@@ -196,8 +204,9 @@ export function BentoCard({
 
         {/* Framed 16:9 Media Preview */}
         <div className="relative mt-4 h-48 sm:h-56 w-full overflow-hidden rounded-2xl bg-[#f1f3f6] dark:bg-[#20242b]">
-          <Image
+          <SafeImage
             src={imageUrl}
+            fallbackSrc={fallbackUrl}
             alt={opportunity.title}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
@@ -231,6 +240,6 @@ export function BentoCard({
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }

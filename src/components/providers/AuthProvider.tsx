@@ -2,11 +2,16 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, authService } from '@/services/auth';
+import { AuthModal } from '@/components/auth/AuthModal';
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
   isLoading: boolean;
+  isAuthModalOpen: boolean;
+  openAuthModal: () => void;
+  closeAuthModal: () => void;
+  requireAuth: (callback: () => void) => void;
   loginWithGoogle: (idToken: string) => Promise<void>;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
   registerWithEmail: (name: string, email: string, pass: string) => Promise<void>;
@@ -19,22 +24,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const openAuthModal = () => setIsAuthModalOpen(true);
+  const closeAuthModal = () => setIsAuthModalOpen(false);
+
+  const requireAuth = (callback: () => void) => {
+    if (user) {
+      callback();
+    } else {
+      setIsAuthModalOpen(true);
+    }
+  };
 
   useEffect(() => {
-    // Hidratação da sessão persistida
-    try {
-      const storedUser = localStorage.getItem('coralink_user');
-      const storedToken = localStorage.getItem('coralink_token');
-      if (storedUser && storedToken) {
-        setUser(JSON.parse(storedUser));
-        setToken(storedToken);
+    // Hidratação da sessão persistida em microtask para evitar cascading renders síncronos
+    queueMicrotask(() => {
+      try {
+        const storedUser = localStorage.getItem('coralink_user');
+        const storedToken = localStorage.getItem('coralink_token');
+        if (storedUser && storedToken) {
+          setUser(JSON.parse(storedUser));
+          setToken(storedToken);
+        }
+      } catch {
+        localStorage.removeItem('coralink_user');
+        localStorage.removeItem('coralink_token');
+      } finally {
+        setIsLoading(false);
       }
-    } catch {
-      localStorage.removeItem('coralink_user');
-      localStorage.removeItem('coralink_token');
-    } finally {
-      setIsLoading(false);
-    }
+    });
   }, []);
 
   const handleAuthSuccess = (res: { accessToken: string; user: User }) => {
@@ -97,6 +116,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         token,
         isLoading,
+        isAuthModalOpen,
+        openAuthModal,
+        closeAuthModal,
+        requireAuth,
         loginWithGoogle,
         loginWithEmail,
         registerWithEmail,
@@ -104,6 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }}
     >
       {children}
+      <AuthModal isOpen={isAuthModalOpen} onClose={closeAuthModal} />
     </AuthContext.Provider>
   );
 }

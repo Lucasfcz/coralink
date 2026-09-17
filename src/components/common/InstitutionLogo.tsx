@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { GraduationCap } from 'lucide-react';
 import { getSourceLogoUrl } from '@/lib/utils';
 
@@ -32,13 +33,12 @@ export function InstitutionLogo({
         } ${className}`}
         style={{ width: size, height: size }}
       >
-        <img
+        <Image
           src={logoUrl}
           alt={sourceName}
           width={isFullBleed ? size : size - 8}
           height={isFullBleed ? size : size - 8}
-          loading="eager"
-          decoding="async"
+          priority
           className={`h-full w-full ${isFullBleed ? 'object-cover' : 'object-contain'}`}
           onError={() => setHasError(true)}
         />

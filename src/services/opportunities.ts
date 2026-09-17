@@ -9,7 +9,9 @@ export async function getOpportunities(
 
   if (filters.title) params.append('title', filters.title);
   if (filters.type) params.append('type', filters.type);
+  if (filters.targetCourseAudience) params.append('targetCourseAudience', filters.targetCourseAudience);
   if (filters.modality) params.append('modality', filters.modality);
+  if (filters.sourceName) params.append('sourceName', filters.sourceName);
   if (filters.isFree !== undefined) params.append('isFree', String(filters.isFree));
   if (filters.isForAll !== undefined) params.append('isForAll', String(filters.isForAll));
 
