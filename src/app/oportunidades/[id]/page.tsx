@@ -40,15 +40,21 @@ export default async function OpportunityDetailPage({ params }: PageProps) {
   }
 
   let opportunity: Opportunity | null = null;
-  let relatedOpportunities: Opportunity[] = [];
 
   try {
     opportunity = await getOpportunityById(oppId);
+  } catch (error) {
+    console.error(`Erro ao carregar oportunidade ${oppId}:`, error);
+    notFound();
+  }
 
-    if (!opportunity) {
-      notFound();
-    }
+  if (!opportunity) {
+    notFound();
+  }
 
+  let relatedOpportunities: Opportunity[] = [];
+
+  try {
     // Buscar oportunidades relacionadas otimizadas diretamente pelo tipo da oportunidade
     const listRes = await getOpportunities({ type: opportunity.type, size: 4 });
     const all = listRes.content || [];
@@ -56,9 +62,8 @@ export default async function OpportunityDetailPage({ params }: PageProps) {
     relatedOpportunities = all
       .filter((item) => item.id !== oppId)
       .slice(0, 3);
-  } catch (error) {
-    console.error(`Erro ao carregar oportunidade ${oppId}:`, error);
-    notFound();
+  } catch (err) {
+    console.warn(`Não foi possível carregar oportunidades relacionadas para ${oppId}:`, err);
   }
 
   return (

@@ -33,7 +33,6 @@ export function FeaturedCard({ opportunity, onSelect }: FeaturedCardProps) {
 
   return (
     <motion.article
-      layoutId={`opportunity-card-${opportunity.id}`}
       onClick={() => onSelect(opportunity)}
       className="group relative flex flex-col w-[420px] sm:w-[480px] md:w-[520px] shrink-0 cursor-pointer pt-1 pb-6 transition-transform duration-300 hover:-translate-y-1"
     >

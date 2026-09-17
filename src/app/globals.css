@@ -53,9 +53,10 @@ body {
   display: flex;
   width: max-content;
   animation: marquee-right 75s linear infinite;
+  animation-fill-mode: both;
   will-change: transform;
   backface-visibility: hidden;
-  transform: translate3d(0, 0, 0);
+  transform: translate3d(-50%, 0, 0);
 }
 
 .animate-marquee-right:hover,

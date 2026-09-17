@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { fetchApi } from './api';
 import { Opportunity, OpportunityFilters, PageResponse } from '@/types/opportunity';
 import { selectFeaturedOpportunities } from '@/lib/algorithms';
@@ -23,9 +24,9 @@ export async function getOpportunities(
   return fetchApi<PageResponse<Opportunity>>(endpoint);
 }
 
-export async function getOpportunityById(id: number): Promise<Opportunity> {
+export const getOpportunityById = cache(async (id: number): Promise<Opportunity> => {
   return fetchApi<Opportunity>(`/opportunities/${id}`);
-}
+});
 
 export async function getFeaturedOpportunities(): Promise<Opportunity[]> {
   try {

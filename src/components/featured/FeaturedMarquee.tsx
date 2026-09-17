@@ -27,20 +27,20 @@ export function FeaturedMarquee({
     <section
       id="destaques"
       aria-label="Oportunidades em Destaque"
-      className="relative w-full overflow-hidden pt-4 pb-10 transition-all"
+      className="relative w-full max-w-full overflow-hidden pt-4 pb-10 min-h-[380px] sm:min-h-[420px]"
     >
 
       {/* Marquee Track (Smooth Continuous Slide to the Right com espaçamento 20-30% maior) */}
       <div
         ref={scrollContainerRef}
-        className="relative w-full overflow-hidden select-none"
+        className="relative w-full max-w-full overflow-hidden select-none [contain:paint]"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onTouchStart={() => setIsPaused(true)}
         onTouchEnd={() => setIsPaused(false)}
       >
         <div
-          className={`animate-marquee-right flex gap-8 sm:gap-9 md:gap-10 px-4 sm:px-6 md:px-8 py-3 ${
+          className={`animate-marquee-right flex flex-nowrap shrink-0 gap-8 sm:gap-9 md:gap-10 px-4 sm:px-6 md:px-8 py-3 ${
             isPaused ? '[animation-play-state:paused!important]' : ''
           }`}
         >
