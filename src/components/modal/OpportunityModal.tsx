@@ -83,14 +83,13 @@ export function OpportunityModal({
             className="fixed inset-0 bg-black/65 backdrop-blur-md"
           />
 
-          {/* Modal Container com expansão fluida a partir do card (Shared Element Transition via layoutId) */}
+          {/* Modal Container com animação fluida acelerada por hardware */}
           <motion.div
-            layoutId={`opportunity-card-${opportunity.id}`}
-            transition={{
-              type: 'spring',
-              damping: 28,
-              stiffness: 280,
-            }}
+            key="modal-content"
+            initial={{ opacity: 0, scale: 0.95, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 16 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
             data-lenis-prevent="true"
             className="relative z-10 flex max-h-[90vh] sm:max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-[32px] sm:rounded-[28px] border border-[#e5e7eb] bg-white shadow-2xl dark:border-[#242831] dark:bg-[#15181e]"
           >

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowUp, ArrowUpRight } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
 
 export function Footer() {
   const scrollToTop = () => {
@@ -36,24 +36,12 @@ export function Footer() {
 
           {/* Quick links & Back to Top */}
           <div className="flex flex-wrap items-center gap-6 text-xs font-semibold text-[#4b5563] dark:text-[#9aa1ad]">
-            <a
-              href="https://coralink-api.onrender.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 hover:text-[#121417] dark:hover:text-white"
+            <Link
+              href="/sobre"
+              className="hover:text-[#121417] dark:hover:text-white transition-colors"
             >
-              <span>API em Produção</span>
-              <ArrowUpRight className="h-3 w-3" />
-            </a>
-            <a
-              href="https://coralink-api.onrender.com/swagger-ui/index.html"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 hover:text-[#121417] dark:hover:text-white"
-            >
-              <span>Swagger / OpenAPI</span>
-              <ArrowUpRight className="h-3 w-3" />
-            </a>
+              Sobre o Coralink
+            </Link>
             <button
               type="button"
               onClick={scrollToTop}

@@ -1,8 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { User, authService } from '@/services/auth';
-import { AuthModal } from '@/components/auth/AuthModal';
 
 interface AuthContextType {
   user: User | null;
@@ -21,19 +21,25 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const isAuthModalOpen = false;
 
-  const openAuthModal = () => setIsAuthModalOpen(true);
-  const closeAuthModal = () => setIsAuthModalOpen(false);
+  const openAuthModal = () => {
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/';
+    router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+  };
+
+  const closeAuthModal = () => {};
 
   const requireAuth = (callback: () => void) => {
     if (user) {
       callback();
     } else {
-      setIsAuthModalOpen(true);
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/';
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
     }
   };
 
@@ -127,7 +133,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }}
     >
       {children}
-      <AuthModal isOpen={isAuthModalOpen} onClose={closeAuthModal} />
     </AuthContext.Provider>
   );
 }

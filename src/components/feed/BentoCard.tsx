@@ -36,7 +36,6 @@ export function BentoCard({
   if (variant === 'hero') {
     return (
       <motion.article
-        layoutId={`opportunity-card-${opportunity.id}`}
         onClick={() => onSelect(opportunity)}
         className="group relative min-h-[420px] sm:min-h-[480px] w-full cursor-pointer overflow-hidden rounded-3xl border border-[#e5e7eb] bg-[#121417] shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl lg:col-span-2 dark:border-[#242831] will-change-transform"
       >
@@ -113,7 +112,6 @@ export function BentoCard({
   if (variant === 'stacked') {
     return (
       <motion.article
-        layoutId={`opportunity-card-${opportunity.id}`}
         onClick={() => onSelect(opportunity)}
         className="group flex flex-col sm:flex-row h-full w-full cursor-pointer overflow-hidden rounded-3xl border border-[#e5e7eb] bg-white p-4 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#d1d5db] hover:shadow-lg dark:border-[#242831] dark:bg-[#15181e] dark:hover:border-stone-600 will-change-transform"
       >
@@ -171,7 +169,6 @@ export function BentoCard({
   // 3. VARIANT: EDITORIAL (Cards com foto da universidade/empresa no rodapé e sem botão de salvar)
   return (
     <motion.article
-      layoutId={`opportunity-card-${opportunity.id}`}
       onClick={() => onSelect(opportunity)}
       className="group flex flex-col justify-between w-full cursor-pointer overflow-hidden rounded-3xl border border-[#e5e7eb] bg-white p-5 sm:p-6 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#d1d5db] hover:shadow-xl dark:border-[#242831] dark:bg-[#15181e] dark:hover:border-stone-600 will-change-transform"
     >

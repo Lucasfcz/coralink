@@ -1,12 +1,13 @@
 'use client';
 
 import React from 'react';
-import { notFound } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
 
 export default function AdminPage() {
   const { user, isLoading } = useAuth();
+  const router = useRouter();
 
   // Enquanto a sessão do usuário está sendo verificada via localStorage/token
   if (isLoading) {
@@ -22,9 +23,14 @@ export default function AdminPage() {
     );
   }
 
-  // Se o usuário não estiver logado ou não possuir papel ROLE_ADMIN, renderiza 404 silenciosamente
-  // para que nenhum usuário comum ou scanner de URLs saiba sequer que esta rota existe.
-  if (!user || user.role !== 'ROLE_ADMIN') {
+  // Se não houver usuário logado, redireciona para a página de login preservando o redirect
+  if (!user) {
+    router.push('/login?redirect=/admin');
+    return null;
+  }
+
+  // Se o usuário estiver logado porém não possuir papel ROLE_ADMIN, renderiza 404 silenciosamente
+  if (user.role !== 'ROLE_ADMIN') {
     notFound();
     return null;
   }

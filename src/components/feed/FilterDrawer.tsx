@@ -35,31 +35,46 @@ interface FilterDrawerProps {
   onResetFilters: () => void;
 }
 
-// Lista curada de cursos mais frequentes na plataforma
+// Lista curada de cursos mais frequentes na plataforma com distribuição equilibrada
 export const COURSE_OPTIONS: { id: TargetCourseAudience; label: string }[] = [
+  { id: 'UNIVERSITY_STUDENTS', label: '🎓 Todos os Universitários (Geral)' },
+  { id: 'TECHNOLOGY_STUDENTS', label: '💻 Estudantes de Tecnologia (Geral)' },
+  { id: 'ENGINEERING_STUDENTS', label: '⚙️ Estudantes de Engenharia (Geral)' },
+  { id: 'LAW', label: 'Direito' },
+  { id: 'BUSINESS_ADMINISTRATION', label: 'Administração & Gestão' },
+  { id: 'MEDICINE', label: 'Medicina' },
+  { id: 'NURSING', label: 'Enfermagem' },
+  { id: 'PSYCHOLOGY', label: 'Psicologia' },
   { id: 'COMPUTER_SCIENCE', label: 'Ciência da Computação' },
   { id: 'SOFTWARE_ENGINEERING', label: 'Engenharia de Software' },
-  { id: 'ADS', label: 'Análise e Desenv. de Sistemas' },
-  { id: 'INFORMATION_SYSTEMS', label: 'Sistemas de Informação' },
-  { id: 'COMPUTER_ENGINEERING', label: 'Engenharia da Computação' },
-  { id: 'DATA_SCIENCE', label: 'Ciência de Dados' },
+  { id: 'ADS', label: 'Análise e Desenv. de Sistemas (ADS)' },
+  { id: 'CIVIL_ENGINEERING', label: 'Engenharia Civil' },
+  { id: 'ARCHITECTURE_AND_URBANISM', label: 'Arquitetura e Urbanismo' },
+  { id: 'ACCOUNTING', label: 'Ciências Contábeis' },
   { id: 'DESIGN', label: 'Design & UX' },
-  { id: 'BUSINESS_ADMINISTRATION', label: 'Administração & Negócios' },
-  { id: 'LAW', label: 'Direito' },
-  { id: 'MEDICINE', label: 'Medicina & Saúde' },
-  { id: 'TECHNOLOGY_STUDENTS', label: 'Estudantes de Tecnologia (Geral)' },
-  { id: 'UNIVERSITY_STUDENTS', label: 'Todos os Universitários' },
+  { id: 'NUTRITION', label: 'Nutrição' },
+  { id: 'PHARMACY', label: 'Farmácia' },
+  { id: 'PHYSICAL_THERAPY', label: 'Fisioterapia' },
+  { id: 'PEDAGOGY', label: 'Pedagogia' },
+  { id: 'MARKETING', label: 'Marketing & Comunicação' },
+  { id: 'BIOMEDICINE', label: 'Biomedicina' },
+  { id: 'DENTISTRY', label: 'Odontologia' },
 ];
 
-// Lista de fontes / instituições monitoradas
+// Lista de fontes / instituições monitoradas (12 fontes oficiais da API)
 export const INSTITUTION_OPTIONS = [
   { id: 'UFPE', label: 'UFPE' },
   { id: 'CIN_UFPE', label: 'CIn-UFPE' },
-  { id: 'CESAR_SCHOOL', label: 'CESAR School' },
-  { id: 'CESAR', label: 'CESAR' },
-  { id: 'UPE', label: 'UPE' },
   { id: 'IFPE', label: 'IFPE' },
+  { id: 'UPE', label: 'UPE' },
   { id: 'PORTO_DIGITAL', label: 'Porto Digital' },
+  { id: 'CESAR', label: 'CESAR' },
+  { id: 'CESAR_SCHOOL', label: 'CESAR School' },
+  { id: 'FACEPE', label: 'FACEPE' },
+  { id: 'SENAC_PE', label: 'Senac PE' },
+  { id: 'SYMPLA', label: 'Sympla Tech' },
+  { id: 'UNIBRA', label: 'UNIBRA' },
+  { id: 'UNIFAFIRE', label: 'UNIFAFIRE / Fafire' },
 ];
 
 // Tipos de oportunidade

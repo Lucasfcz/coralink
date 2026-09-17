@@ -25,13 +25,18 @@ export function AdminDashboard() {
   const [currentTab, setCurrentTab] = useState<AdminTab>('METRICS');
   const [metrics, setMetrics] = useState<DashboardMetricsResponse | null>(null);
   const [isLoadingMetrics, setIsLoadingMetrics] = useState(true);
+  const [isUnauthorized, setIsUnauthorized] = useState(false);
 
   const fetchMetrics = async () => {
     setIsLoadingMetrics(true);
+    setIsUnauthorized(false);
     try {
       const data = await adminService.getDashboardMetrics();
       setMetrics(data);
     } catch (err) {
+      if ((err as { status?: number })?.status === 401) {
+        setIsUnauthorized(true);
+      }
       console.error('Erro ao buscar métricas do dashboard:', err);
     } finally {
       setIsLoadingMetrics(false);
@@ -146,6 +151,26 @@ export function AdminDashboard() {
 
       {/* Conteúdo Principal da Aba Selecionada */}
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+        {isUnauthorized && (
+          <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-5 text-rose-700 dark:border-rose-500/30 dark:bg-rose-950/30 dark:text-rose-300">
+            <div className="flex items-center gap-3">
+              <Shield className="h-5 w-5 text-rose-500 shrink-0" />
+              <div>
+                <h2 className="text-sm font-bold">Sessão Expirada ou Não Autorizada (HTTP 401)</h2>
+                <p className="text-xs text-rose-600/90 dark:text-rose-400/90 mt-0.5">
+                  Seu token de acesso expirou (validade de 15 minutos) ou sua conta não possui privilégios de administrador no servidor.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/login?redirect=/admin"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-rose-700 transition"
+            >
+              Fazer Login Novamente
+            </Link>
+          </div>
+        )}
+
         {currentTab === 'METRICS' && (
           <AdminMetricsView metrics={metrics} isLoading={isLoadingMetrics} />
         )}

@@ -118,6 +118,30 @@ export const authService = {
   },
 
   /**
+   * Renovação de Access Token via Refresh Token Cookie
+   */
+  async refreshToken(): Promise<AuthResponse> {
+    const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new AuthError(
+        res.status,
+        errData.message || 'Sessão expirada. Faça login novamente.'
+      );
+    }
+
+    return (await res.json()) as AuthResponse;
+  },
+
+  /**
    * Obter perfil autenticado
    */
   async getMe(accessToken: string): Promise<User> {

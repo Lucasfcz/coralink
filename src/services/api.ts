@@ -45,6 +45,50 @@ export async function fetchApi<T>(
     });
 
     if (!response.ok) {
+      // Se receber 401 em rota autenticada no cliente, tenta renovar a sessão silenciosamente via refresh token cookie
+      if (response.status === 401 && typeof window !== 'undefined' && !endpoint.includes('/auth/')) {
+        try {
+          const refreshRes = await fetch(`${API_BASE_URL}/auth/refresh`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+            credentials: 'include',
+          });
+
+          if (refreshRes.ok) {
+            const refreshData = await refreshRes.json();
+            if (refreshData?.accessToken) {
+              localStorage.setItem('coralink_token', refreshData.accessToken);
+              if (refreshData.user) {
+                localStorage.setItem('coralink_user', JSON.stringify(refreshData.user));
+              }
+
+              // Repete a requisição original com o novo token de acesso
+              const retryResponse = await fetch(url, {
+                ...options,
+                headers: {
+                  ...defaultHeaders,
+                  ...(options.headers as Record<string, string> | undefined),
+                  Authorization: `Bearer ${refreshData.accessToken}`,
+                },
+                cache: 'no-store',
+              });
+
+              if (retryResponse.ok) {
+                if (retryResponse.status === 204) {
+                  return undefined as unknown as T;
+                }
+                return (await retryResponse.json()) as T;
+              }
+            }
+          }
+        } catch {
+          // Falha ao renovar token
+        }
+      }
+
       const errorBody = await response.json().catch(() => null);
       const errorMessage = errorBody?.message || response.statusText || 'Erro inesperado';
       throw new ApiError(response.status, `Erro na requisição para ${endpoint}: ${errorMessage}`);
