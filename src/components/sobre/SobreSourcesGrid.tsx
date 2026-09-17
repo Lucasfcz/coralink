@@ -127,7 +127,7 @@ export function SobreSourcesGrid() {
                   alt={`Logo oficial da instituição ${source.name}`}
                   width={140}
                   height={60}
-                  className={`max-h-14 w-auto object-contain transition-all duration-300 filter grayscale contrast-125 opacity-70 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 ${
+                  className={`max-h-14 w-auto object-contain transition-all duration-300 group-hover:scale-105 ${
                     source.isFullBleed ? 'scale-110' : ''
                   }`}
                 />

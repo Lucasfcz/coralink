@@ -1,5 +1,4 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'https://coralink-api.onrender.com';
+import { getApiBaseUrl } from './api';
 
 export interface User {
   id: string;
@@ -31,7 +30,8 @@ export const authService = {
    * Login Social com Google OAuth2 (ID Token)
    */
   async loginWithGoogle(idToken: string): Promise<AuthResponse> {
-    const res = await fetch(`${API_BASE_URL}/auth/google`, {
+    const baseUrl = getApiBaseUrl();
+    const res = await fetch(`${baseUrl}/auth/google`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -56,7 +56,8 @@ export const authService = {
    * Login Local por E-mail e Senha
    */
   async login(email: string, password: string): Promise<AuthResponse> {
-    const res = await fetch(`${API_BASE_URL}/auth/login`, {
+    const baseUrl = getApiBaseUrl();
+    const res = await fetch(`${baseUrl}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -81,7 +82,8 @@ export const authService = {
    * Cadastro Local de Usuário
    */
   async register(name: string, email: string, password: string): Promise<AuthResponse> {
-    const res = await fetch(`${API_BASE_URL}/auth/register`, {
+    const baseUrl = getApiBaseUrl();
+    const res = await fetch(`${baseUrl}/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -107,7 +109,8 @@ export const authService = {
    */
   async logout(): Promise<void> {
     try {
-      await fetch(`${API_BASE_URL}/auth/logout`, {
+      const baseUrl = getApiBaseUrl();
+      await fetch(`${baseUrl}/auth/logout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -121,7 +124,8 @@ export const authService = {
    * Renovação de Access Token via Refresh Token Cookie
    */
   async refreshToken(): Promise<AuthResponse> {
-    const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
+    const baseUrl = getApiBaseUrl();
+    const res = await fetch(`${baseUrl}/auth/refresh`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -145,7 +149,8 @@ export const authService = {
    * Obter perfil autenticado
    */
   async getMe(accessToken: string): Promise<User> {
-    const res = await fetch(`${API_BASE_URL}/auth/me`, {
+    const baseUrl = getApiBaseUrl();
+    const res = await fetch(`${baseUrl}/auth/me`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${accessToken}`,

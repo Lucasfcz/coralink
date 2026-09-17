@@ -1,5 +1,4 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'https://coralink-api.onrender.com';
+import { getApiBaseUrl } from './api';
 
 export type SuggestionType = 'FEATURE' | 'BUG' | 'OPINION' | 'OTHER';
 
@@ -41,7 +40,8 @@ export async function createUserHelp(
     );
   }
 
-  const response = await fetch(`${API_BASE_URL}/suggestion/create`, {
+  const baseUrl = getApiBaseUrl();
+  const response = await fetch(`${baseUrl}/suggestion/create`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -31,9 +31,18 @@ export function BentoFeed({
   const [isFilterLoading, setIsFilterLoading] = useState(false);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const isInitialMount = useRef(true);
+  const hasInitialData = useRef(initialOpportunities && initialOpportunities.length > 0);
 
   // Efeito ao trocar os filtros: resetar página e buscar novos dados
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      if (hasInitialData.current) {
+        return;
+      }
+    }
+
     let isCancelled = false;
 
     async function applyFilter() {

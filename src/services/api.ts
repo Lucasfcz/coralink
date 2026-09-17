@@ -1,5 +1,16 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'https://coralink-api.onrender.com';
+export function getApiBaseUrl(): string {
+  // No navegador do cliente, roteia através do proxy de reescrita da Vercel (/api-backend)
+  // para blindar cookies HttpOnly e torná-los First-Party, evitando bloqueios no Safari/iOS (ITP) e Firefox
+  if (typeof window !== 'undefined') {
+    return '/api-backend';
+  }
+  // No servidor (SSR, ISR e build), comunica-se diretamente com o backend
+  return (
+    process.env.INTERNAL_API_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    'https://coralink-api.onrender.com'
+  );
+}
 
 export class ApiError extends Error {
   constructor(
@@ -15,7 +26,8 @@ export async function fetchApi<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const url = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+  const baseUrl = getApiBaseUrl();
+  const url = `${baseUrl}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
 
   const defaultHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -48,7 +60,7 @@ export async function fetchApi<T>(
       // Se receber 401 em rota autenticada no cliente, tenta renovar a sessão silenciosamente via refresh token cookie
       if (response.status === 401 && typeof window !== 'undefined' && !endpoint.includes('/auth/')) {
         try {
-          const refreshRes = await fetch(`${API_BASE_URL}/auth/refresh`, {
+          const refreshRes = await fetch(`${baseUrl}/auth/refresh`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

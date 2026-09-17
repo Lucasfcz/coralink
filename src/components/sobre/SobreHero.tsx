@@ -27,24 +27,59 @@ export function SobreHero() {
   };
 
   return (
-    <section className="relative overflow-hidden pt-28 pb-16 md:pt-36 md:pb-24 border-b border-[#e5e7eb] dark:border-[#242831]/60">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="relative overflow-hidden pt-28 pb-20 md:pt-40 md:pb-28 border-b border-[#e5e7eb] dark:border-[#242831]/60">
+      {/* Background Dinâmico de Recife (Cais da Aurora - Dia no modo claro / Noite no modo escuro) */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
+        {/* Imagem Diurna (Modo Claro) */}
+        <div className="relative h-full w-full dark:hidden">
+          <Image
+            src="/images/recife-cais-day.jpg"
+            alt="Vista matutina do Cais da Aurora e pontes históricas do Recife"
+            fill
+            priority
+            className="object-cover object-center scale-105 transition-transform duration-1000"
+            sizes="100vw"
+          />
+          {/* Overlays editoriais para legibilidade e fusão com a página */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/92 via-white/80 to-[#fbfbfb]" />
+          <div className="absolute inset-0 bg-radial-gradient from-transparent via-white/30 to-white/70" />
+        </div>
+
+        {/* Imagem Noturna (Modo Escuro) */}
+        <div className="relative h-full w-full hidden dark:block">
+          <Image
+            src="/images/recife-cais-night.jpg"
+            alt="Vista noturna cinematográfica do Cais da Aurora e pontes iluminadas do Recife"
+            fill
+            priority
+            className="object-cover object-center scale-105 transition-transform duration-1000"
+            sizes="100vw"
+          />
+          {/* Overlays cinematográficos para legibilidade e fusão com o modo escuro */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0b0d]/92 via-[#0a0b0d]/80 to-[#0a0b0d]" />
+          <div className="absolute inset-0 bg-radial-gradient from-transparent via-[#0a0b0d]/30 to-[#0a0b0d]/70" />
+        </div>
+      </div>
+
+      {/* Conteúdo Editorial Sobreposto */}
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
           className="flex flex-col items-center text-center"
         >
-          {/* Eyebrow de Alto Impacto Editorial (Estilo Pôster Suíço) */}
+          {/* Tag de Contexto Geográfico & Acadêmico */}
           <motion.div variants={itemVariants} className="mb-4">
-            <span className="text-[11px] sm:text-xs font-mono font-bold uppercase tracking-[0.25em] text-[#697282] dark:text-[#9aa1ad]">
-              OPORTUNIDADES REAIS • CRITÉRIOS CLAROS • FUTURO UNIVERSITÁRIO
+            <span className="inline-flex items-center gap-2 rounded-full border border-black/10 dark:border-white/10 bg-white/70 dark:bg-white/5 px-4 py-1.5 text-[11px] sm:text-xs font-mono font-bold uppercase tracking-[0.2em] text-[#4b5563] dark:text-[#9aa1ad] backdrop-blur-md shadow-xs">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              ECOSSISTEMA UNIVERSITÁRIO DE PERNAMBUCO
             </span>
           </motion.div>
 
-          {/* Letras Monumentais em Full-Width (Inspirado no Pôster MAFIA) */}
+          {/* Letras Monumentais em Full-Width */}
           <motion.div variants={itemVariants} className="w-full select-none">
-            <h1 className="text-6xl sm:text-8xl md:text-9xl lg:text-[140px] xl:text-[168px] font-black tracking-tighter uppercase leading-[0.88] text-[#121417] dark:text-white transition-all">
+            <h1 className="text-6xl sm:text-8xl md:text-9xl lg:text-[140px] xl:text-[168px] font-black tracking-tighter uppercase leading-[0.88] text-[#121417] dark:text-white transition-colors">
               CORALINK
             </h1>
           </motion.div>
@@ -52,7 +87,7 @@ export function SobreHero() {
           {/* Subtítulo Editorial com Foco em Estudantes */}
           <motion.p
             variants={itemVariants}
-            className="mt-6 max-w-2xl text-base sm:text-lg md:text-xl leading-relaxed text-[#4b5563] dark:text-[#9aa1ad]"
+            className="mt-6 max-w-2xl text-base sm:text-lg md:text-xl leading-relaxed text-[#374151] dark:text-[#d1d5db] font-normal drop-shadow-xs"
           >
             Editais, bolsas de iniciação científica, estágios e congressos dos maiores polos acadêmicos
             e tecnológicos de Pernambuco, centralizados e curados para você.
@@ -65,7 +100,7 @@ export function SobreHero() {
           >
             <Link
               href="/#feed"
-              className="inline-flex items-center gap-2.5 rounded-full bg-[#121417] px-7 py-3.5 text-xs sm:text-sm font-bold text-white shadow-md transition-all hover:bg-black hover:scale-[1.02] active:scale-[0.98] dark:bg-white dark:text-[#121417] dark:hover:bg-stone-200"
+              className="inline-flex items-center gap-2.5 rounded-full bg-[#121417] px-7 py-3.5 text-xs sm:text-sm font-bold text-white shadow-lg transition-all hover:bg-black hover:scale-[1.02] active:scale-[0.98] dark:bg-white dark:text-[#121417] dark:hover:bg-stone-200"
             >
               <span>Explorar Oportunidades</span>
               <ArrowRight className="h-4 w-4" />
@@ -73,7 +108,7 @@ export function SobreHero() {
 
             <a
               href="#como-funciona"
-              className="inline-flex items-center gap-2 rounded-full border border-[#e5e7eb] bg-white/70 px-6 py-3.5 text-xs sm:text-sm font-bold text-[#121417] shadow-xs backdrop-blur-md transition-all hover:border-[#121417] hover:bg-white dark:border-[#242831] dark:bg-[#121417]/80 dark:text-white dark:hover:border-white/40 dark:hover:bg-[#181b22]"
+              className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/80 px-6 py-3.5 text-xs sm:text-sm font-bold text-[#121417] shadow-xs backdrop-blur-md transition-all hover:border-[#121417] hover:bg-white dark:border-white/20 dark:bg-[#121417]/80 dark:text-white dark:hover:border-white/40 dark:hover:bg-[#181b22]"
             >
               <span>Como Funciona</span>
               <ArrowDown className="h-4 w-4 opacity-70" />
@@ -81,37 +116,13 @@ export function SobreHero() {
           </motion.div>
         </motion.div>
 
-        {/* Fotografia Arquitetônica Cinematográfica Integrada ao Hero */}
-        <div className="relative mt-12 sm:mt-16 w-full h-[280px] sm:h-[400px] md:h-[480px] rounded-[28px] sm:rounded-[36px] overflow-hidden border border-[#e5e7eb] dark:border-[#242831] shadow-2xl bg-black">
-          <Image
-            src="/images/coralink-editorial-hero.jpg"
-            alt="Arquitetura contemporânea de pesquisa e inovação universitária em Pernambuco"
-            fill
-            className="object-cover object-center brightness-90 contrast-105"
-            priority
-            sizes="(max-width: 1280px) 100vw, 1200px"
-          />
-          {/* Vinheta atmosférica superior e inferior para fusão com a página */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
-
-          {/* Legenda Editorial Sutil no Canto Inferior */}
-          <div className="absolute bottom-5 left-5 right-5 sm:bottom-6 sm:left-8 sm:right-8 flex items-center justify-between text-white/90 text-xs font-mono">
-            <span className="uppercase tracking-wider">
-              Ecossistema Universitário de Pernambuco
-            </span>
-            <span className="hidden sm:inline-block text-white/60">
-              Recife • Agreste • Sertão
-            </span>
-          </div>
-        </div>
-
-        {/* Régua Tipográfica de Métricas Suíças (Sem nenhum card flutuante!) */}
-        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-[#e5e7eb] dark:border-[#242831]/60">
+        {/* Régua Tipográfica de Métricas Suíças */}
+        <div className="mt-16 sm:mt-20 grid grid-cols-2 md:grid-cols-4 gap-6 pt-10 border-t border-black/10 dark:border-white/10 backdrop-blur-xs">
           <div>
             <span className="block text-2xl sm:text-3xl font-black tracking-tight text-[#121417] dark:text-white">
               12
             </span>
-            <span className="mt-1 block text-xs font-medium uppercase tracking-wider text-[#697282] dark:text-[#9aa1ad]">
+            <span className="mt-1 block text-xs font-medium uppercase tracking-wider text-[#4b5563] dark:text-[#9aa1ad]">
               Fontes Oficiais Ativas
             </span>
           </div>
@@ -120,7 +131,7 @@ export function SobreHero() {
             <span className="block text-2xl sm:text-3xl font-black tracking-tight text-[#121417] dark:text-white">
               24h
             </span>
-            <span className="mt-1 block text-xs font-medium uppercase tracking-wider text-[#697282] dark:text-[#9aa1ad]">
+            <span className="mt-1 block text-xs font-medium uppercase tracking-wider text-[#4b5563] dark:text-[#9aa1ad]">
               Varredura Autônoma
             </span>
           </div>
@@ -129,7 +140,7 @@ export function SobreHero() {
             <span className="block text-2xl sm:text-3xl font-black tracking-tight text-[#121417] dark:text-white">
               100%
             </span>
-            <span className="mt-1 block text-xs font-medium uppercase tracking-wider text-[#697282] dark:text-[#9aa1ad]">
+            <span className="mt-1 block text-xs font-medium uppercase tracking-wider text-[#4b5563] dark:text-[#9aa1ad]">
               Links Oficiais Diretos
             </span>
           </div>
@@ -138,7 +149,7 @@ export function SobreHero() {
             <span className="block text-2xl sm:text-3xl font-black tracking-tight text-[#121417] dark:text-white">
               Grátis
             </span>
-            <span className="mt-1 block text-xs font-medium uppercase tracking-wider text-[#697282] dark:text-[#9aa1ad]">
+            <span className="mt-1 block text-xs font-medium uppercase tracking-wider text-[#4b5563] dark:text-[#9aa1ad]">
               Para Qualquer Estudante
             </span>
           </div>

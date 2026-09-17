@@ -14,8 +14,11 @@ import {
   User as UserIcon,
   AlertCircle,
   Loader2,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
+import { useTheme } from '@/components/providers/ThemeProvider';
 
 interface GoogleCredentialResponse {
   credential?: string;
@@ -70,6 +73,7 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, isLoading, loginWithGoogle, loginWithEmail, registerWithEmail } = useAuth();
+  const { toggleTheme } = useTheme();
 
   // Preservação de Retorno seguro
   const rawRedirect = searchParams.get('redirect') || '/';
@@ -88,7 +92,6 @@ function LoginContent() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [googleReady, setGoogleReady] = useState(false);
-  const [forgotSent, setForgotSent] = useState(false);
 
   // Redireciona imediatamente se já estiver logado
   useEffect(() => {
@@ -166,7 +169,6 @@ function LoginContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
-    setForgotSent(false);
 
     if (mode === 'register') {
       if (password.length < 6) {
@@ -211,87 +213,164 @@ function LoginContent() {
     }
   };
 
-  const handleForgotPassword = () => {
-    if (!email) {
-      setErrorMessage('Por favor, preencha o campo de e-mail para recuperar sua senha.');
-      return;
-    }
-    setForgotSent(true);
-    setErrorMessage(null);
-  };
-
   const handleSwitchMode = (nextMode: 'login' | 'register') => {
     setMode(nextMode);
     setErrorMessage(null);
-    setForgotSent(false);
   };
 
   return (
-    <main className="relative min-h-screen w-full flex items-center justify-center p-4 sm:p-6 lg:p-12 bg-[#0a0b0d] text-white selection:bg-emerald-500/30 selection:text-emerald-200 overflow-x-hidden">
-      {/* Luzes de fundo atmosféricas iridescentes (Dark Tech Ambient Mesh) */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-32 -left-32 h-[520px] w-[520px] rounded-full bg-emerald-500/10 blur-[140px]" />
-        <div className="absolute top-1/2 -right-32 h-[550px] w-[550px] rounded-full bg-cyan-500/10 blur-[150px]" />
-        <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 h-[450px] w-[450px] rounded-full bg-indigo-600/10 blur-[160px]" />
-        {/* Padrão de micro-grid cibernético ultra discreto */}
-        <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:32px_32px] opacity-40" />
+    <div className="relative min-h-screen w-full flex flex-col justify-between text-[#121417] dark:text-white selection:bg-emerald-500/30 selection:text-emerald-200 overflow-x-hidden">
+      {/* Background Fotográfico Dinâmico (Cais da Aurora - Dia no modo claro / Noite no modo escuro) */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none select-none">
+        {/* Imagem Diurna (Modo Claro) */}
+        <div className="relative h-full w-full dark:hidden">
+          <Image
+            src="/images/recife-cais-day.jpg"
+            alt="Cais da Aurora ensolarado no Recife"
+            fill
+            priority
+            className="object-cover object-center scale-105 transition-transform duration-1000"
+            sizes="100vw"
+          />
+          {/* Overlays suaves para garantir contraste no modo claro */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white/75 via-white/55 to-white/90" />
+          <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]" />
+        </div>
+
+        {/* Imagem Noturna (Modo Escuro) */}
+        <div className="relative h-full w-full hidden dark:block">
+          <Image
+            src="/images/recife-cais-night.jpg"
+            alt="Cais da Aurora iluminado à noite no Recife"
+            fill
+            priority
+            className="object-cover object-center scale-105 transition-transform duration-1000"
+            sizes="100vw"
+          />
+          {/* Overlays cinematográficos no modo escuro */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0a0b0d]/85 via-[#0a0b0d]/65 to-[#0a0b0d]/90" />
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
+        </div>
       </div>
 
-      {/* Card Flutuante Principal em Split-Screen (Inspirado na Imagem 1) */}
-      <div className="relative z-10 w-full max-w-[1040px] rounded-[32px] sm:rounded-[36px] border border-white/10 bg-[#0f1218]/90 backdrop-blur-2xl shadow-[0_32px_96px_rgba(0,0,0,0.85)] overflow-hidden grid grid-cols-1 lg:grid-cols-12">
-        {/* ======================================================== */}
-        {/* LADO ESQUERDO: Composição Arquitetônica Cinematográfica */}
-        {/* ======================================================== */}
-        <div className="relative hidden lg:block lg:col-span-5 overflow-hidden bg-black">
-          <div className="relative h-full min-h-[640px] w-full">
-            <Image
-              src="/images/recife-porto-digital-cinematic.jpg"
-              alt="Vista noturna cinematográfica do Porto Digital e pontes históricas do Recife"
-              fill
-              className="object-cover object-center brightness-95 contrast-105"
-              priority
-              sizes="(max-width: 1024px) 100vw, 45vw"
-            />
-            {/* Vinhetas gradientes sutis para fundir com as bordas do card */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
-            <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#0f1218] to-transparent pointer-events-none" />
+      {/* 1. Header / Navbar Superior (Seguindo o padrão do Header existente) */}
+      <header className="sticky top-0 z-30 w-full border-b border-black/5 dark:border-white/10 bg-white/70 dark:bg-[#0a0b0d]/70 backdrop-blur-md transition-colors">
+        <div className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between px-4 sm:px-6 md:px-8 lg:px-10">
+          {/* Logo Coralink */}
+          <Link href="/" className="group flex items-center gap-3">
+            <div className="relative flex h-9 w-9 items-center justify-center transition-transform duration-300 group-hover:scale-105">
+              <Image
+                src="/coralink-logo.png"
+                alt="Coralink Logo"
+                width={36}
+                height={36}
+                className="h-9 w-9 object-contain"
+                priority
+              />
+            </div>
+            <span className="text-xl font-black tracking-tight text-[#121417] dark:text-white">
+              Coralink
+            </span>
+          </Link>
+
+          {/* Links e Ações */}
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Link
+              href="/"
+              className="hidden sm:inline-flex text-xs font-bold text-[#4b5563] hover:text-[#121417] dark:text-[#9aa1ad] dark:hover:text-white transition-colors px-2 py-1"
+            >
+              Início
+            </Link>
+            <Link
+              href="/#destaques"
+              className="hidden md:inline-flex text-xs font-bold text-[#4b5563] hover:text-[#121417] dark:text-[#9aa1ad] dark:hover:text-white transition-colors px-2 py-1"
+            >
+              Destaques
+            </Link>
+            <Link
+              href="/#feed"
+              className="hidden md:inline-flex text-xs font-bold text-[#4b5563] hover:text-[#121417] dark:text-[#9aa1ad] dark:hover:text-white transition-colors px-2 py-1"
+            >
+              Feed
+            </Link>
+            <Link
+              href="/sobre"
+              className="hidden sm:inline-flex text-xs font-bold text-[#4b5563] hover:text-[#121417] dark:text-[#9aa1ad] dark:hover:text-white transition-colors px-2 py-1"
+            >
+              Sobre
+            </Link>
+
+            {/* Alternador de Tema Claro / Escuro */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-black/10 dark:border-white/15 bg-white/80 dark:bg-white/10 text-[#121417] dark:text-white shadow-xs backdrop-blur-md transition-all hover:scale-105 cursor-pointer"
+              title="Alternar entre modo claro e escuro"
+              aria-label="Alternar tema"
+            >
+              <Sun className="h-4 w-4 hidden dark:block text-amber-300 transition-transform" />
+              <Moon className="h-4 w-4 block dark:hidden text-[#121417] transition-transform" />
+            </button>
+
+            {/* Botão "Voltar ao Início" */}
+            <Link
+              href={safeRedirect}
+              className="inline-flex items-center gap-2 rounded-full border border-black/10 dark:border-white/15 bg-white/80 dark:bg-white/10 px-3.5 py-2 text-xs font-bold text-[#121417] dark:text-white shadow-xs backdrop-blur-md transition-all hover:bg-white dark:hover:bg-white/20 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span className="hidden xs:inline">Voltar ao Início</span>
+              <span className="xs:hidden">Início</span>
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* 2. Conteúdo Principal: Composição com Panorama à Esquerda e Card Flutuante à Direita (Inspirado na Referência) */}
+      <main className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 items-center justify-between px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+        {/* Coluna Esquerda: Mensagem Editorial Flutuante sobre o Recife */}
+        <div className="hidden lg:flex flex-col justify-center max-w-lg pr-8">
+          <span className="inline-flex items-center gap-2 self-start rounded-full border border-black/10 dark:border-white/15 bg-white/80 dark:bg-black/50 px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-[0.2em] text-[#4b5563] dark:text-stone-300 backdrop-blur-md shadow-xs mb-6">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Cais da Aurora • Rio Capibaribe
+          </span>
+
+          <h2 className="text-4xl xl:text-5xl font-black tracking-tight text-[#121417] dark:text-white leading-[1.1] drop-shadow-xs">
+            Conectando você às maiores oportunidades de Pernambuco.
+          </h2>
+
+          <p className="mt-4 text-base text-[#4b5563] dark:text-stone-300 leading-relaxed font-medium">
+            Editais acadêmicos, bolsas de pesquisa, estágios e eventos dos maiores polos universitários e tecnológicos centralizados em um só lugar.
+          </p>
+
+          <div className="mt-8 flex items-center gap-3 text-xs font-mono text-[#697282] dark:text-[#9aa1ad]">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            <span>12 Fontes Oficiais Monitoradas em Tempo Real</span>
           </div>
         </div>
 
-        {/* ======================================================== */}
-        {/* LADO DIREITO: Card de Autenticação Minimalista          */}
-        {/* ======================================================== */}
-        <div className="relative flex flex-col justify-between p-6 sm:p-10 lg:p-12 lg:col-span-7 bg-[#0f1218]/60">
-          {/* Topo: Voltar ao Coralink (Sem selos redundantes) */}
-          <div className="flex items-center justify-between mb-6">
-            <Link
-              href={safeRedirect}
-              className="inline-flex items-center gap-2 text-xs font-semibold text-stone-400 hover:text-white transition-colors duration-200 group"
-            >
-              <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1 text-stone-400 group-hover:text-white" />
-              <span>Voltar ao Coralink</span>
-            </Link>
-          </div>
-
+        {/* Coluna Direita: Card Flutuante Translúcido (Glassmorphism de Alto Nível) */}
+        <div className="w-full max-w-md mx-auto lg:mx-0 lg:ml-auto rounded-[28px] sm:rounded-[32px] border border-black/10 dark:border-white/15 bg-white/90 dark:bg-[#0c0f17]/90 backdrop-blur-2xl p-6 sm:p-9 shadow-[0_24px_80px_rgba(0,0,0,0.14)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.85)]">
           {/* Cabeçalho do Formulário */}
           <div className="mb-6">
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-              {mode === 'login' ? 'Bem-vindo de volta!' : 'Crie sua conta'}
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#121417] dark:text-white">
+              {mode === 'login' ? 'Olá! Bem-vindo de volta' : 'Crie sua conta'}
             </h1>
-            <p className="mt-2 text-xs sm:text-sm leading-relaxed text-stone-400">
-              O portal unificado de editais, bolsas e estágios universitários de Pernambuco.
+            <p className="mt-2 text-xs sm:text-sm leading-relaxed text-[#697282] dark:text-stone-400">
+              {mode === 'login'
+                ? 'Informe suas credenciais para acessar a plataforma.'
+                : 'Junte-se à maior rede de oportunidades acadêmicas de PE.'}
             </p>
           </div>
 
           {/* Alternador de Abas: Entrar / Criar Conta */}
-          <div className="mb-6 flex rounded-2xl border border-white/10 bg-[#080a0e] p-1.5 shadow-inner">
+          <div className="mb-6 flex rounded-2xl border border-black/10 dark:border-white/10 bg-[#f3f4f6] dark:bg-[#080a0e] p-1.5 shadow-inner">
             <button
               type="button"
               onClick={() => handleSwitchMode('login')}
-              className={`flex-1 rounded-xl py-2.5 text-xs font-bold transition-all duration-200 ${
+              className={`flex-1 rounded-xl py-2.5 text-xs font-bold transition-all duration-200 cursor-pointer ${
                 mode === 'login'
-                  ? 'bg-white text-[#0a0b0d] shadow-md'
-                  : 'text-stone-400 hover:text-white'
+                  ? 'bg-white text-[#121417] shadow-sm dark:bg-white dark:text-[#0a0b0d]'
+                  : 'text-[#697282] hover:text-[#121417] dark:text-stone-400 dark:hover:text-white'
               }`}
             >
               Entrar
@@ -299,10 +378,10 @@ function LoginContent() {
             <button
               type="button"
               onClick={() => handleSwitchMode('register')}
-              className={`flex-1 rounded-xl py-2.5 text-xs font-bold transition-all duration-200 ${
+              className={`flex-1 rounded-xl py-2.5 text-xs font-bold transition-all duration-200 cursor-pointer ${
                 mode === 'register'
-                  ? 'bg-white text-[#0a0b0d] shadow-md'
-                  : 'text-stone-400 hover:text-white'
+                  ? 'bg-white text-[#121417] shadow-sm dark:bg-white dark:text-[#0a0b0d]'
+                  : 'text-[#697282] hover:text-[#121417] dark:text-stone-400 dark:hover:text-white'
               }`}
             >
               Criar Conta
@@ -317,25 +396,10 @@ function LoginContent() {
                 initial={{ opacity: 0, y: -6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
-                className="mb-5 flex items-start gap-2.5 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-3.5 text-xs font-medium text-rose-300"
+                className="mb-5 flex items-start gap-2.5 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-3.5 text-xs font-medium text-rose-600 dark:text-rose-300"
               >
-                <AlertCircle className="h-4 w-4 shrink-0 text-rose-400 mt-0.5" />
+                <AlertCircle className="h-4 w-4 shrink-0 text-rose-500 dark:text-rose-400 mt-0.5" />
                 <span>{errorMessage}</span>
-              </motion.div>
-            )}
-
-            {forgotSent && (
-              <motion.div
-                key="forgot-alert"
-                initial={{ opacity: 0, y: -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                className="mb-5 flex items-start gap-2.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 text-xs font-medium text-emerald-300"
-              >
-                <AlertCircle className="h-4 w-4 shrink-0 text-emerald-400 mt-0.5" />
-                <span>
-                  Instruções de redefinição enviadas para <strong>{email}</strong>.
-                </span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -345,19 +409,19 @@ function LoginContent() {
             {/* Campo: Nome Completo (Modo Cadastro) */}
             {mode === 'register' && (
               <div>
-                <label className="block text-xs font-semibold text-stone-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[#374151] dark:text-stone-300 mb-1.5">
                   Nome Completo
                 </label>
                 <div className="relative">
-                  <UserIcon className="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-stone-400" />
+                  <UserIcon className="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#9ca3af] dark:text-stone-400" />
                   <input
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Ex: Gabriel Albuquerque"
+                    placeholder="Seu nome completo"
                     autoComplete="name"
-                    className="w-full rounded-2xl border border-white/10 bg-[#080a0e]/90 py-3 pr-4 pl-10 text-xs font-medium text-white placeholder:text-stone-500 focus:border-white focus:outline-none transition-colors"
+                    className="w-full rounded-2xl border border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#080a0e]/90 py-3 pr-4 pl-10 text-xs font-medium text-[#121417] dark:text-white placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:border-[#121417] dark:focus:border-white focus:outline-none transition-colors"
                   />
                 </div>
               </div>
@@ -365,11 +429,11 @@ function LoginContent() {
 
             {/* Campo: Email */}
             <div>
-              <label className="block text-xs font-semibold text-stone-300 mb-1.5">
+              <label className="block text-xs font-semibold text-[#374151] dark:text-stone-300 mb-1.5">
                 Email Institucional ou Pessoal
               </label>
               <div className="relative">
-                <Mail className="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-stone-400" />
+                <Mail className="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#9ca3af] dark:text-stone-400" />
                 <input
                   type="email"
                   required
@@ -377,18 +441,18 @@ function LoginContent() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="seu.email@ufpe.br ou pessoal@gmail.com"
                   autoComplete="email"
-                  className="w-full rounded-2xl border border-white/10 bg-[#080a0e]/90 py-3 pr-4 pl-10 text-xs font-medium text-white placeholder:text-stone-500 focus:border-white focus:outline-none transition-colors"
+                  className="w-full rounded-2xl border border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#080a0e]/90 py-3 pr-4 pl-10 text-xs font-medium text-[#121417] dark:text-white placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:border-[#121417] dark:focus:border-white focus:outline-none transition-colors"
                 />
               </div>
             </div>
 
             {/* Campo: Senha */}
             <div>
-              <label className="block text-xs font-semibold text-stone-300 mb-1.5">
+              <label className="block text-xs font-semibold text-[#374151] dark:text-stone-300 mb-1.5">
                 Senha
               </label>
               <div className="relative">
-                <Lock className="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-stone-400" />
+                <Lock className="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#9ca3af] dark:text-stone-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
@@ -396,13 +460,13 @@ function LoginContent() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Mínimo 6 caracteres"
                   autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                  className="w-full rounded-2xl border border-white/10 bg-[#080a0e]/90 py-3 pr-11 pl-10 text-xs font-medium text-white placeholder:text-stone-500 focus:border-white focus:outline-none transition-colors"
+                  className="w-full rounded-2xl border border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#080a0e]/90 py-3 pr-11 pl-10 text-xs font-medium text-[#121417] dark:text-white placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:border-[#121417] dark:focus:border-white focus:outline-none transition-colors"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Ocultar senha' : 'Exibir senha'}
-                  className="absolute top-1/2 right-3.5 -translate-y-1/2 text-stone-400 hover:text-white transition-colors"
+                  className="absolute top-1/2 right-3.5 -translate-y-1/2 text-[#9ca3af] hover:text-[#121417] dark:text-stone-400 dark:hover:text-white transition-colors cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -412,11 +476,11 @@ function LoginContent() {
             {/* Campo: Confirmação de Senha (Modo Cadastro) */}
             {mode === 'register' && (
               <div>
-                <label className="block text-xs font-semibold text-stone-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[#374151] dark:text-stone-300 mb-1.5">
                   Confirmar Senha
                 </label>
                 <div className="relative">
-                  <Lock className="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-stone-400" />
+                  <Lock className="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#9ca3af] dark:text-stone-400" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
@@ -424,44 +488,34 @@ function LoginContent() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Repita sua senha"
                     autoComplete="new-password"
-                    className="w-full rounded-2xl border border-white/10 bg-[#080a0e]/90 py-3 pr-4 pl-10 text-xs font-medium text-white placeholder:text-stone-500 focus:border-white focus:outline-none transition-colors"
+                    className="w-full rounded-2xl border border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#080a0e]/90 py-3 pr-4 pl-10 text-xs font-medium text-[#121417] dark:text-white placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:border-[#121417] dark:focus:border-white focus:outline-none transition-colors"
                   />
                 </div>
               </div>
             )}
 
-            {/* Opções: Lembrar de mim & Esqueceu sua senha */}
-            <div className="flex items-center justify-between pt-1 text-xs text-stone-400">
-              <label className="flex items-center gap-2 cursor-pointer select-none hover:text-stone-300">
+            {/* Opções: Lembrar de mim */}
+            <div className="flex items-center justify-between pt-1 text-xs text-[#697282] dark:text-stone-400">
+              <label className="flex items-center gap-2 cursor-pointer select-none hover:text-[#121417] dark:hover:text-stone-300">
                 <input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 rounded-md border-white/20 bg-white/5 text-emerald-500 focus:ring-0 focus:ring-offset-0"
+                  className="h-4 w-4 rounded-md border-black/20 dark:border-white/20 bg-black/5 dark:bg-white/5 text-emerald-500 focus:ring-0 focus:ring-offset-0"
                 />
                 <span>Lembrar de mim</span>
               </label>
-
-              {mode === 'login' && (
-                <button
-                  type="button"
-                  onClick={handleForgotPassword}
-                  className="font-medium text-stone-300 hover:text-white underline underline-offset-2 transition-colors"
-                >
-                  Esqueceu sua senha?
-                </button>
-              )}
             </div>
 
             {/* Botão de Ação Primário de Alto Contraste */}
             <button
               type="submit"
               disabled={submitting}
-              className="mt-2 w-full flex items-center justify-center gap-2.5 rounded-2xl bg-white py-3.5 px-6 text-xs font-bold text-[#0a0b0d] shadow-lg shadow-white/10 transition-all hover:bg-stone-200 active:scale-[0.99] disabled:opacity-50 cursor-pointer"
+              className="mt-2 w-full flex items-center justify-center gap-2.5 rounded-2xl bg-[#121417] text-white py-3.5 px-6 text-xs font-bold shadow-md transition-all hover:bg-black active:scale-[0.99] disabled:opacity-50 dark:bg-white dark:text-[#0a0b0d] dark:shadow-white/10 dark:hover:bg-stone-200 cursor-pointer"
             >
               {submitting ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin text-[#0a0b0d]" />
+                  <Loader2 className="h-4 w-4 animate-spin text-white dark:text-[#0a0b0d]" />
                   <span>Processando...</span>
                 </>
               ) : mode === 'login' ? (
@@ -475,15 +529,15 @@ function LoginContent() {
           {/* Divisor Estilizado */}
           <div className="relative my-6 text-center text-xs">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10" />
+              <div className="w-full border-t border-black/10 dark:border-white/10" />
             </div>
-            <span className="relative bg-[#0f1218] px-3.5 text-[11px] font-medium uppercase tracking-wider text-stone-500">
+            <span className="relative bg-white/95 dark:bg-[#0c0f17] px-3.5 text-[11px] font-semibold uppercase tracking-wider text-[#697282] dark:text-stone-400">
               Ou continue com
             </span>
           </div>
 
-          {/* Botão Oficial de Login com o Google via GIS */}
-          <div className="flex flex-col items-center gap-2.5">
+          {/* Container de Botões Sociais */}
+          <div className="space-y-3">
             <div id="google-login-btn-target" className="flex justify-center w-full min-h-[44px]" />
 
             {/* Fallback de Botão caso o script GIS ainda esteja carregando */}
@@ -497,7 +551,7 @@ function LoginContent() {
                     win.google.accounts.id.prompt();
                   }
                 }}
-                className="flex w-full items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/5 py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-white/10 hover:border-white/20 active:scale-[0.99]"
+                className="flex w-full items-center justify-center gap-3 rounded-2xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 py-3 text-xs font-semibold text-[#121417] dark:text-white shadow-xs transition-all hover:bg-black/10 dark:hover:bg-white/10 active:scale-[0.99] cursor-pointer"
               >
                 <svg className="h-4 w-4" viewBox="0 0 24 24">
                   <path
@@ -526,7 +580,7 @@ function LoginContent() {
               <button
                 type="button"
                 onClick={handleDevMockLogin}
-                className="mt-1 text-[11px] text-stone-500 hover:text-stone-300 hover:underline transition-colors"
+                className="mt-1 text-[11px] text-stone-500 hover:text-stone-800 dark:hover:text-stone-300 hover:underline transition-colors cursor-pointer block mx-auto"
               >
                 ⚡ Simular login de teste (Mock Dev)
               </button>
@@ -534,25 +588,25 @@ function LoginContent() {
           </div>
 
           {/* Rodapé do Formulário: Alternador Rápido */}
-          <div className="mt-6 pt-5 border-t border-white/10 text-center">
+          <div className="mt-6 pt-5 border-t border-black/10 dark:border-white/10 text-center">
             {mode === 'login' ? (
-              <p className="text-xs text-stone-400">
+              <p className="text-xs text-[#697282] dark:text-stone-400">
                 Não tem uma conta?{' '}
                 <button
                   type="button"
                   onClick={() => handleSwitchMode('register')}
-                  className="font-bold text-white underline underline-offset-4 hover:text-emerald-400 transition-colors"
+                  className="font-bold text-[#121417] dark:text-white underline underline-offset-4 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer"
                 >
                   Cadastre-se gratuitamente
                 </button>
               </p>
             ) : (
-              <p className="text-xs text-stone-400">
+              <p className="text-xs text-[#697282] dark:text-stone-400">
                 Já tem uma conta?{' '}
                 <button
                   type="button"
                   onClick={() => handleSwitchMode('login')}
-                  className="font-bold text-white underline underline-offset-4 hover:text-emerald-400 transition-colors"
+                  className="font-bold text-[#121417] dark:text-white underline underline-offset-4 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer"
                 >
                   Entrar
                 </button>
@@ -560,13 +614,13 @@ function LoginContent() {
             )}
 
             {/* Links Institucionais e Legais */}
-            <p className="mt-3 text-[11px] leading-relaxed text-stone-500">
+            <p className="mt-3 text-[11px] leading-relaxed text-[#697282] dark:text-stone-500">
               Ao continuar, você concorda com nossos{' '}
               <Link
                 href="/termos-de-uso"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-stone-400 underline underline-offset-2 hover:text-white transition-colors"
+                className="text-[#4b5563] dark:text-stone-400 underline underline-offset-2 hover:text-[#121417] dark:hover:text-white transition-colors"
               >
                 Termos de Uso
               </Link>{' '}
@@ -575,7 +629,7 @@ function LoginContent() {
                 href="/politica-de-privacidade"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-stone-400 underline underline-offset-2 hover:text-white transition-colors"
+                className="text-[#4b5563] dark:text-stone-400 underline underline-offset-2 hover:text-[#121417] dark:hover:text-white transition-colors"
               >
                 Política de Privacidade
               </Link>
@@ -583,17 +637,17 @@ function LoginContent() {
             </p>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
 
 function LoginLoadingSkeleton() {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#0a0b0d] text-white">
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#fbfbfb] text-[#121417] dark:bg-[#0a0b0d] dark:text-white">
       <div className="flex flex-col items-center gap-3">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />
-        <span className="text-xs text-stone-400 font-mono tracking-wider">
+        <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+        <span className="text-xs text-[#697282] dark:text-stone-400 font-mono tracking-wider">
           Carregando portal de acesso...
         </span>
       </div>

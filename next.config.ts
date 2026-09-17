@@ -41,6 +41,14 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api-backend/:path*',
+        destination: `${process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://coralink-api.onrender.com'}/:path*`,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
