@@ -6,23 +6,23 @@ export function SobrePipelineSteps() {
   const steps = [
     {
       phase: 'FASE 01',
-      title: 'Varredura Autônoma',
+      title: 'Coleta das oportunidades',
       description:
-        'Robôs de coleta visitam os canais oficiais de universidades, centros de pesquisa e parques tecnológicos de Pernambuco diariamente, identificando novos editais e notícias no exato momento da publicação.',
-      detail: 'UFPE, UPE, IFPE, Porto Digital e mais 8 fontes oficiais monitoradas 24 horas por dia.',
+        'Bots de coleta visitam os portais oficiais de universidades, centros de pesquisa e parques tecnológicos de Pernambuco diariamente, identificando novos editais, eventos, bolsas, competições, programas de extensão... Tudo que o universitário não pode perder.',
+      detail: 'todas as fontes são monitoradas 24 horas por dia.',
     },
     {
       phase: 'FASE 02',
-      title: 'Curadoria com Inteligência Artificial',
+      title: 'Classificação com Inteligência Artificial',
       description:
-        'Modelos de linguagem avançados analisam o edital completo: extraem datas críticas de inscrição, valor de bolsas, vagas, benefícios, pré-requisitos e o público de cursos elegíveis.',
-      detail: 'Elimina burocracia e transforma PDFs de 30 páginas em resumos objetivos e auditados.',
+        'Modelos de inteligência artificial analisam a oportunidade por completo: extraem datas críticas de inscrição, valor de bolsas, vagas, benefícios, pré-requisitos e o público de cursos elegíveis.',
+      detail: 'Elimina burocracia e transforma PDFs de 30 páginas em resumos objetivos. Facilitando que o universitário ache as informações mais importantes logo de cara.',
     },
     {
       phase: 'FASE 03',
       title: 'Entrega Direta no Feed',
       description:
-        'As oportunidades catalogadas chegam instantaneamente à sua tela, com filtros por curso e instituição, permitindo que você encontre sua próxima bolsa ou estágio em poucos segundos.',
+        'As oportunidades catalogadas chegam instantaneamente à sua tela, com filtros por curso e instituição, permitindo que você encontre eventos em poucos segundos. Sem precisar entrar em 15 sites diferentes todos os dias.',
       detail: 'Links diretos para o edital oficial e canais de inscrição verificados pela comunidade.',
     },
   ];
@@ -33,14 +33,16 @@ export function SobrePipelineSteps() {
         {/* Cabeçalho Editorial com Tipografia de Grande Porte */}
         <div className="max-w-3xl">
           <span className="text-[11px] sm:text-xs font-mono font-bold uppercase tracking-[0.2em] text-[#697282] dark:text-[#9aa1ad]">
-            O MECANISMO DE BUSCA
+            O COMO A MÁGICA ACONTECE
           </span>
           <h2 className="mt-3 text-3xl sm:text-5xl md:text-6xl font-black tracking-tight uppercase text-[#121417] dark:text-white leading-[1.02]">
-            VARREDURA. CURADORIA. ENTREGA.
+            <span className="block">COLETA</span>
+            <span className="block">CLASSIFICAÇÃO</span>
+            <span className="block">ENTREGA</span>
           </h2>
           <p className="mt-4 text-base sm:text-lg text-[#4b5563] dark:text-[#9aa1ad] leading-relaxed">
-            Como o ecossistema Coralink monitora, processa e disponibiliza oportunidades de forma 100%
-            autônoma e sem jargões técnicos para os estudantes.
+            Como o Coralink monitora, processa e disponibiliza oportunidades de forma 100%
+            autônoma para os estudantes.
           </p>
         </div>
 
