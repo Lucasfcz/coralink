@@ -222,8 +222,8 @@ function LoginContent() {
     <div className="relative min-h-screen w-full flex flex-col justify-between text-[#121417] dark:text-white selection:bg-emerald-500/30 selection:text-emerald-200 overflow-x-hidden">
       {/* Background Fotográfico Dinâmico (Cais da Aurora - Dia no modo claro / Noite no modo escuro) */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none select-none">
-        {/* Imagem Diurna (Modo Claro) */}
-        <div className="relative h-full w-full dark:hidden">
+        {/* Imagem Diurna (Modo Claro) - Crossfade Suave */}
+        <div className="absolute inset-0 transition-opacity duration-700 ease-in-out opacity-100 dark:opacity-0 pointer-events-none">
           <Image
             src="/images/recife-cais-day.jpg"
             alt="Cais da Aurora ensolarado no Recife"
@@ -237,8 +237,8 @@ function LoginContent() {
           <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]" />
         </div>
 
-        {/* Imagem Noturna (Modo Escuro) */}
-        <div className="relative h-full w-full hidden dark:block">
+        {/* Imagem Noturna (Modo Escuro) - Crossfade Suave */}
+        <div className="absolute inset-0 transition-opacity duration-700 ease-in-out opacity-0 dark:opacity-100 pointer-events-none">
           <Image
             src="/images/recife-cais-night.jpg"
             alt="Cais da Aurora iluminado à noite no Recife"
@@ -304,12 +304,12 @@ function LoginContent() {
             <button
               type="button"
               onClick={toggleTheme}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-black/10 dark:border-white/15 bg-white/80 dark:bg-white/10 text-[#121417] dark:text-white shadow-xs backdrop-blur-md transition-all hover:scale-105 cursor-pointer"
+              className="relative flex h-9 w-9 items-center justify-center rounded-full border border-black/10 dark:border-white/15 bg-white/80 dark:bg-white/10 text-[#121417] dark:text-white shadow-xs backdrop-blur-md transition-all hover:scale-105 cursor-pointer overflow-hidden"
               title="Alternar entre modo claro e escuro"
               aria-label="Alternar tema"
             >
-              <Sun className="h-4 w-4 hidden dark:block text-amber-300 transition-transform" />
-              <Moon className="h-4 w-4 block dark:hidden text-[#121417] transition-transform" />
+              <Sun className="h-4 w-4 text-amber-400 transition-all duration-300 transform scale-0 rotate-90 dark:scale-100 dark:rotate-0" />
+              <Moon className="absolute h-4 w-4 text-[#121417] transition-all duration-300 transform scale-100 rotate-0 dark:scale-0 dark:-rotate-90" />
             </button>
 
             {/* Botão "Voltar ao Início" */}

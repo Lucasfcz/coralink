@@ -71,7 +71,6 @@ export function Footer() {
               Política de Privacidade
             </Link>
           </div>
-          <p>Feito com foco em design editorial e inteligência artificial.</p>
         </div>
       </div>
     </footer>

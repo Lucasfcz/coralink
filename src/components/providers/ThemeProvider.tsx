@@ -30,26 +30,52 @@ function getServerSnapshot(): Theme {
   return 'light';
 }
 
+function applyThemeClass(t: Theme) {
+  if (typeof document === 'undefined') return;
+  if (t === 'dark') {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [userTheme, setUserTheme] = useState<Theme | null>(null);
   const storedTheme = useSyncExternalStore(subscribe, getThemeSnapshot, getServerSnapshot);
   const theme = userTheme ?? storedTheme;
 
   useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    applyThemeClass(theme);
   }, [theme]);
 
   const setTheme = (newTheme: Theme) => {
-    setUserTheme(newTheme);
-    try {
-      localStorage.setItem('coralink-theme', newTheme);
-      window.dispatchEvent(new Event('storage'));
-    } catch {
-      // Ignora erro de escrita no localStorage
+    const isReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const changeTheme = () => {
+      applyThemeClass(newTheme);
+      setUserTheme(newTheme);
+      try {
+        localStorage.setItem('coralink-theme', newTheme);
+        window.dispatchEvent(new Event('storage'));
+      } catch {
+        // Ignora erro de escrita no localStorage
+      }
+    };
+
+    if (
+      typeof document !== 'undefined' &&
+      'startViewTransition' in document &&
+      typeof (document as { startViewTransition?: (cb: () => void) => void }).startViewTransition ===
+        'function' &&
+      !isReducedMotion
+    ) {
+      (document as { startViewTransition: (cb: () => void) => void }).startViewTransition(() => {
+        changeTheme();
+      });
+    } else {
+      changeTheme();
     }
   };
 

@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, type Variants } from 'framer-motion';
-import { ArrowRight, ArrowDown } from 'lucide-react';
 
 export function SobreHero() {
   const containerVariants: Variants = {
@@ -30,8 +29,8 @@ export function SobreHero() {
     <section className="relative overflow-hidden pt-28 pb-20 md:pt-40 md:pb-28 border-b border-[#e5e7eb] dark:border-[#242831]/60">
       {/* Background Dinâmico de Recife (Cais da Aurora - Dia no modo claro / Noite no modo escuro) */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
-        {/* Imagem Diurna (Modo Claro) */}
-        <div className="relative h-full w-full dark:hidden">
+        {/* Imagem Diurna (Modo Claro) - Crossfade Suave */}
+        <div className="absolute inset-0 transition-opacity duration-700 ease-in-out opacity-100 dark:opacity-0 pointer-events-none">
           <Image
             src="/images/recife-cais-day.jpg"
             alt="Vista matutina do Cais da Aurora e pontes históricas do Recife"
@@ -45,8 +44,8 @@ export function SobreHero() {
           <div className="absolute inset-0 bg-radial-gradient from-transparent via-white/30 to-white/70" />
         </div>
 
-        {/* Imagem Noturna (Modo Escuro) */}
-        <div className="relative h-full w-full hidden dark:block">
+        {/* Imagem Noturna (Modo Escuro) - Crossfade Suave */}
+        <div className="absolute inset-0 transition-opacity duration-700 ease-in-out opacity-0 dark:opacity-100 pointer-events-none">
           <Image
             src="/images/recife-cais-night.jpg"
             alt="Vista noturna cinematográfica do Cais da Aurora e pontes iluminadas do Recife"
@@ -100,18 +99,16 @@ export function SobreHero() {
           >
             <Link
               href="/#feed"
-              className="inline-flex items-center gap-2.5 rounded-full bg-[#121417] px-7 py-3.5 text-xs sm:text-sm font-bold text-white shadow-lg transition-all hover:bg-black hover:scale-[1.02] active:scale-[0.98] dark:bg-white dark:text-[#121417] dark:hover:bg-stone-200"
+              className="inline-flex items-center justify-center rounded-full bg-[#121417] px-7 py-3.5 text-xs sm:text-sm font-bold text-white shadow-lg transition-all hover:bg-black hover:scale-[1.02] active:scale-[0.98] dark:bg-white dark:text-[#121417] dark:hover:bg-stone-200"
             >
               <span>Explorar Oportunidades</span>
-              <ArrowRight className="h-4 w-4" />
             </Link>
 
             <a
               href="#como-funciona"
-              className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/80 px-6 py-3.5 text-xs sm:text-sm font-bold text-[#121417] shadow-xs backdrop-blur-md transition-all hover:border-[#121417] hover:bg-white dark:border-white/20 dark:bg-[#121417]/80 dark:text-white dark:hover:border-white/40 dark:hover:bg-[#181b22]"
+              className="inline-flex items-center justify-center rounded-full border border-black/15 bg-white/80 px-6 py-3.5 text-xs sm:text-sm font-bold text-[#121417] shadow-xs backdrop-blur-md transition-all hover:border-[#121417] hover:bg-white dark:border-white/20 dark:bg-[#121417]/80 dark:text-white dark:hover:border-white/40 dark:hover:bg-[#181b22]"
             >
               <span>Como Funciona</span>
-              <ArrowDown className="h-4 w-4 opacity-70" />
             </a>
           </motion.div>
         </motion.div>

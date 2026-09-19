@@ -13,7 +13,7 @@ export function SobreManifesto() {
           transition={{ duration: 0.6 }}
         >
           <span className="text-[11px] sm:text-xs font-mono font-bold uppercase tracking-[0.25em] text-[#697282] dark:text-[#9aa1ad]">
-            O MANIFESTO
+            NOSSO OBJETIVO
           </span>
 
           <blockquote className="mt-8 text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-[#121417] dark:text-white leading-[1.18] sm:leading-[1.15]">
@@ -21,7 +21,9 @@ export function SobreManifesto() {
           </blockquote>
 
           <div className="mt-10 flex items-center justify-center gap-4 text-xs font-mono uppercase tracking-widest text-[#697282] dark:text-[#9aa1ad]">
-            <span>Recife, Pernambuco</span>
+            <span>Recife</span>
+            <span>•</span>
+            <span>Pernambuco</span>
             <span>•</span>
             <span>Feito por Estudantes</span>
           </div>
