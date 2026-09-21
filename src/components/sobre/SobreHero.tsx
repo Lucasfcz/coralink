@@ -68,14 +68,6 @@ export function SobreHero() {
           animate="visible"
           className="flex flex-col items-center text-center"
         >
-          {/* Tag de Contexto Geográfico & Acadêmico */}
-          <motion.div variants={itemVariants} className="mb-4">
-            <span className="inline-flex items-center gap-2 rounded-full border border-black/10 dark:border-white/10 bg-white/70 dark:bg-white/5 px-4 py-1.5 text-[11px] sm:text-xs font-mono font-bold uppercase tracking-[0.2em] text-[#4b5563] dark:text-[#9aa1ad] backdrop-blur-md shadow-xs">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              ECOSSISTEMA UNIVERSITÁRIO DE PERNAMBUCO
-            </span>
-          </motion.div>
-
           {/* Letras Monumentais em Full-Width */}
           <motion.div variants={itemVariants} className="w-full select-none">
             <h1 className="text-6xl sm:text-8xl md:text-9xl lg:text-[140px] xl:text-[168px] font-black tracking-tighter uppercase leading-[0.88] text-[#121417] dark:text-white transition-colors">
@@ -129,7 +121,7 @@ export function SobreHero() {
               24h
             </span>
             <span className="mt-1 block text-xs font-medium uppercase tracking-wider text-[#4b5563] dark:text-[#9aa1ad]">
-              Varredura Autônoma
+              Coleta Autônoma
             </span>
           </div>
 

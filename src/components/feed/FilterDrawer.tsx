@@ -35,11 +35,18 @@ interface FilterDrawerProps {
   onResetFilters: () => void;
 }
 
-// Lista curada de cursos mais frequentes na plataforma com distribuição equilibrada
+// Lista curada de cursos e públicos mais frequentes na plataforma
 export const COURSE_OPTIONS: { id: TargetCourseAudience; label: string }[] = [
-  { id: 'UNIVERSITY_STUDENTS', label: '🎓 Todos os Universitários (Geral)' },
-  { id: 'TECHNOLOGY_STUDENTS', label: '💻 Estudantes de Tecnologia (Geral)' },
-  { id: 'ENGINEERING_STUDENTS', label: '⚙️ Estudantes de Engenharia (Geral)' },
+  // Categorias amplas / gerais (sem emojis)
+  { id: 'UNIVERSITY_STUDENTS', label: 'Todos os Universitários (Geral)' },
+  { id: 'TECHNOLOGY_STUDENTS', label: 'Estudantes de Tecnologia (Geral)' },
+  { id: 'ENGINEERING_STUDENTS', label: 'Estudantes de Engenharia (Geral)' },
+  { id: 'EXACT_SCIENCES_STUDENTS', label: 'Estudantes de Ciências Exatas (Geral)' },
+  { id: 'HEALTH_STUDENTS', label: 'Estudantes de Saúde (Geral)' },
+  { id: 'HUMANITIES_STUDENTS', label: 'Estudantes de Humanas (Geral)' },
+  { id: 'BUSINESS_STUDENTS', label: 'Estudantes de Negócios (Geral)' },
+
+  // Cursos e formações específicas
   { id: 'LAW', label: 'Direito' },
   { id: 'BUSINESS_ADMINISTRATION', label: 'Administração & Gestão' },
   { id: 'MEDICINE', label: 'Medicina' },
