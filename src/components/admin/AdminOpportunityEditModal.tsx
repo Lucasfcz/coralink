@@ -14,6 +14,7 @@ interface AdminOpportunityEditModalProps {
 }
 
 const ALL_TYPES: OpportunityType[] = [
+  'INNOVATION',
   'EVENT',
   'WORKSHOP',
   'COURSE',
@@ -25,6 +26,8 @@ const ALL_TYPES: OpportunityType[] = [
   'RESEARCH',
   'EXCHANGE_PROGRAM',
   'VOLUNTEERING',
+  'EXTENSION_PROGRAM',
+  'NOTICE',
   'OTHER',
 ];
 

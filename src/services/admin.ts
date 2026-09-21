@@ -135,6 +135,16 @@ export const adminService = {
   },
 
   /**
+   * Atualização rápida do tipo/categoria de uma oportunidade diretamente pelo painel
+   */
+  async quickUpdateType(id: number, type: OpportunityType): Promise<Opportunity> {
+    return fetchApi<Opportunity>(`/admin/opportunities/${id}/type`, {
+      method: 'PATCH',
+      body: JSON.stringify({ type }),
+    });
+  },
+
+  /**
    * Executa soft delete expirando a oportunidade para ontem (oculta do feed público)
    */
   async softDeleteOpportunity(id: number): Promise<void> {

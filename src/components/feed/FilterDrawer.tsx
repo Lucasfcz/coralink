@@ -79,12 +79,15 @@ export const INSTITUTION_OPTIONS = [
 
 // Tipos de oportunidade
 export const TYPE_OPTIONS: { id: OpportunityType; label: string }[] = [
+  { id: 'INNOVATION', label: 'Inovação & Startups' },
   { id: 'INTERNSHIP', label: 'Estágios & Vagas' },
   { id: 'HACKATHON', label: 'Hackathons & Desafios' },
   { id: 'RESEARCH', label: 'Pesquisa & Iniciação' },
   { id: 'SCHOLARSHIP', label: 'Bolsas de Estudo' },
   { id: 'EVENT', label: 'Eventos & Congressos' },
   { id: 'WORKSHOP', label: 'Workshops & Cursos' },
+  { id: 'EXTENSION_PROGRAM', label: 'Extensão Universitária' },
+  { id: 'NOTICE', label: 'Comunicados' },
 ];
 
 // Modalidades

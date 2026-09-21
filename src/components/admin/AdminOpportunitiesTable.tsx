@@ -12,10 +12,29 @@ import {
   AlertTriangle,
   CheckCircle2,
 } from 'lucide-react';
-import { Opportunity } from '@/types/opportunity';
+import { Opportunity, OpportunityType } from '@/types/opportunity';
+import { getOpportunityTypeLabel } from '@/lib/utils';
 import { getOpportunities } from '@/services/opportunities';
 import { adminService } from '@/services/admin';
 import { AdminOpportunityEditModal } from './AdminOpportunityEditModal';
+
+const ALL_TYPES: OpportunityType[] = [
+  'INNOVATION',
+  'EVENT',
+  'WORKSHOP',
+  'COURSE',
+  'GRADUATION',
+  'HACKATHON',
+  'COMPETITION',
+  'INTERNSHIP',
+  'SCHOLARSHIP',
+  'RESEARCH',
+  'EXCHANGE_PROGRAM',
+  'VOLUNTEERING',
+  'EXTENSION_PROGRAM',
+  'NOTICE',
+  'OTHER',
+];
 
 export function AdminOpportunitiesTable() {
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
@@ -25,6 +44,8 @@ export function AdminOpportunitiesTable() {
   const [pageSize] = useState(15);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'EXPIRED'>('ALL');
+  const [typeFilter, setTypeFilter] = useState<OpportunityType | 'ALL'>('ALL');
+  const [updatingTypeId, setUpdatingTypeId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOpportunity, setSelectedOpportunity] = useState<Opportunity | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -35,6 +56,7 @@ export function AdminOpportunitiesTable() {
     try {
       const res = await getOpportunities({
         title: searchTerm.trim() || undefined,
+        type: typeFilter !== 'ALL' ? typeFilter : undefined,
         page: currentPage,
         size: pageSize,
         sort: 'id,desc',
@@ -47,7 +69,7 @@ export function AdminOpportunitiesTable() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, pageSize, searchTerm]);
+  }, [currentPage, pageSize, searchTerm, typeFilter]);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -59,6 +81,29 @@ export function AdminOpportunitiesTable() {
     e.preventDefault();
     setCurrentPage(0);
     fetchList();
+  };
+
+  const handleQuickTypeChange = async (id: number, newType: OpportunityType) => {
+    setUpdatingTypeId(id);
+    try {
+      const updated = await adminService.quickUpdateType(id, newType);
+      setOpportunities((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, type: updated.type } : item))
+      );
+      setActionNotice({
+        type: 'success',
+        message: `Tipo da oportunidade #${id} alterado para "${getOpportunityTypeLabel(newType)}" com sucesso!`,
+      });
+      setTimeout(() => setActionNotice(null), 4000);
+    } catch (err) {
+      setActionNotice({
+        type: 'error',
+        message: (err as Error).message || `Falha ao alterar o tipo da oportunidade #${id}`,
+      });
+      setTimeout(() => setActionNotice(null), 4000);
+    } finally {
+      setUpdatingTypeId(null);
+    }
   };
 
   const handleOpenEdit = (opp: Opportunity) => {
@@ -150,7 +195,24 @@ export function AdminOpportunitiesTable() {
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#64748b] dark:text-[#9aa1ad]" />
         </form>
 
-        <div className="flex w-full sm:w-auto items-center justify-between sm:justify-end gap-2">
+        <div className="flex w-full sm:w-auto flex-wrap items-center justify-between sm:justify-end gap-2">
+          {/* Filtro por Categoria / Tipo */}
+          <select
+            value={typeFilter}
+            onChange={(e) => {
+              setTypeFilter(e.target.value as OpportunityType | 'ALL');
+              setCurrentPage(0);
+            }}
+            className="rounded-xl border border-[#e5e7eb] bg-[#f8f9fa] px-3 py-1.5 text-xs font-bold text-[#121417] focus:border-[#121417] focus:outline-none dark:border-[#242831] dark:bg-[#181b22] dark:text-[#f3f4f6] cursor-pointer hover:border-[#121417] dark:hover:border-stone-500 transition-colors"
+          >
+            <option value="ALL" className="bg-white dark:bg-[#15181e]">Todos os Tipos</option>
+            {ALL_TYPES.map((t) => (
+              <option key={t} value={t} className="bg-white dark:bg-[#15181e]">
+                {getOpportunityTypeLabel(t)}
+              </option>
+            ))}
+          </select>
+
           {/* Status Filter Tabs */}
           <div className="flex rounded-xl bg-[#f1f3f6] p-1 dark:bg-[#1c2027]">
             <button
@@ -249,8 +311,26 @@ export function AdminOpportunitiesTable() {
                           {opp.sourceName}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 whitespace-nowrap text-[#64748b] dark:text-[#9aa1ad]">
-                        {opp.type}
+                      <td className="py-2.5 px-4 whitespace-nowrap">
+                        <select
+                          value={opp.type}
+                          disabled={updatingTypeId === opp.id}
+                          onChange={(e) =>
+                            handleQuickTypeChange(opp.id, e.target.value as OpportunityType)
+                          }
+                          className="rounded-lg border border-[#e5e7eb] bg-[#f8f9fa] px-2.5 py-1 text-xs font-bold text-[#121417] focus:border-[#121417] focus:outline-none dark:border-[#242831] dark:bg-[#181b22] dark:text-[#f3f4f6] cursor-pointer hover:border-[#121417] dark:hover:border-stone-500 transition-colors disabled:opacity-50"
+                          title="Alterar tipo da oportunidade"
+                        >
+                          {ALL_TYPES.map((t) => (
+                            <option
+                              key={t}
+                              value={t}
+                              className="bg-white dark:bg-[#15181e] text-[#121417] dark:text-[#f3f4f6]"
+                            >
+                              {getOpportunityTypeLabel(t)}
+                            </option>
+                          ))}
+                        </select>
                       </td>
                       <td className="py-3.5 px-4 whitespace-nowrap font-mono text-[11px] text-[#64748b] dark:text-[#9aa1ad]">
                         {opp.expiresAt}

@@ -77,6 +77,9 @@ export function getOpportunityTypeLabel(type: OpportunityType): string {
     RESEARCH: 'Pesquisa',
     EXCHANGE_PROGRAM: 'Intercâmbio',
     VOLUNTEERING: 'Voluntariado',
+    EXTENSION_PROGRAM: 'Extensão',
+    INNOVATION: 'Inovação & Startups',
+    NOTICE: 'Comunicado',
     OTHER: 'Oportunidade',
   };
   return map[type] || 'Oportunidade';

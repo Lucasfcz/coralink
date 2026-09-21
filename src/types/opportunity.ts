@@ -10,6 +10,9 @@ export type OpportunityType =
   | 'RESEARCH'
   | 'EXCHANGE_PROGRAM'
   | 'VOLUNTEERING'
+  | 'EXTENSION_PROGRAM'
+  | 'INNOVATION'
+  | 'NOTICE'
   | 'OTHER';
 
 export type Modality = 'IN_PERSON' | 'ONLINE' | 'HYBRID';
