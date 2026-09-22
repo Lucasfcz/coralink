@@ -11,6 +11,7 @@ import {
   SobreHero,
   SobrePipelineSteps,
   SobreSourcesGrid,
+  SobrePWASection,
   SobreOpenSourceCall,
   SobreManifesto,
   SobreSuggestionForm,
@@ -33,6 +34,7 @@ export default function SobrePage() {
         <SobreHero />
         <SobrePipelineSteps />
         <SobreSourcesGrid />
+        <SobrePWASection />
         <SobreOpenSourceCall />
         <SobreManifesto />
         <SobreSuggestionForm />

@@ -4,9 +4,10 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, X, User, Sun, Moon, LogOut, ShieldAlert } from 'lucide-react';
+import { Search, X, User, Sun, Moon, LogOut, ShieldAlert, Download } from 'lucide-react';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { useAuth } from '@/components/providers/AuthProvider';
+import { InstallModal } from '@/components/pwa/InstallModal';
 
 interface HeaderProps {
   onSearchClick?: () => void;
@@ -15,6 +16,7 @@ interface HeaderProps {
 export function Header({ onSearchClick }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const { theme, toggleTheme } = useTheme();
   const { user, logout, openAuthModal } = useAuth();
@@ -225,6 +227,24 @@ export function Header({ onSearchClick }: HeaderProps) {
                   {/* Linha Divisória */}
                   <div className="my-2 border-t border-[#f1f3f6] dark:border-[#242831]" />
 
+                  {/* Instalar Aplicativo (PWA) */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProfileMenuOpen(false);
+                      setIsInstallModalOpen(true);
+                    }}
+                    className="mb-2 flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-xs font-semibold text-[#121417] transition-all hover:bg-[#f8f9fa] dark:text-[#f3f4f6] dark:hover:bg-[#1c2027]"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Download className="h-4 w-4 text-emerald-500" />
+                      <span>Instalar aplicativo</span>
+                    </div>
+                    <span className="rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                      App
+                    </span>
+                  </button>
+
                   {/* Atalho Restrito: Painel Administrativo (Apenas ROLE_ADMIN) */}
                   {user?.role === 'ROLE_ADMIN' && (
                     <Link
@@ -359,6 +379,24 @@ export function Header({ onSearchClick }: HeaderProps) {
                   </button>
                 </div>
 
+                {/* Instalar Aplicativo no Mobile */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setIsInstallModalOpen(true);
+                  }}
+                  className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-xs font-semibold text-[#121417] bg-[#f8f9fa] transition-all dark:bg-[#1c2027] dark:text-[#f3f4f6]"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Download className="h-4 w-4 text-emerald-500" />
+                    <span>Instalar aplicativo</span>
+                  </div>
+                  <span className="rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                    App
+                  </span>
+                </button>
+
                 {/* Atalho Restrito: Painel Admin no Mobile */}
                 {user?.role === 'ROLE_ADMIN' && (
                   <Link
@@ -416,6 +454,12 @@ export function Header({ onSearchClick }: HeaderProps) {
           </div>
         )}
       </header>
+
+      {/* Modal de Instalação PWA */}
+      <InstallModal
+        isOpen={isInstallModalOpen}
+        onClose={() => setIsInstallModalOpen(false)}
+      />
     </>
   );
 }

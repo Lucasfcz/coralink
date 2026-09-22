@@ -5,6 +5,8 @@ import './globals.css';
 import { SmoothScrollProvider } from '@/components/providers/SmoothScrollProvider';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { AuthProvider } from '@/components/providers/AuthProvider';
+import { ServiceWorkerRegister } from '@/components/pwa/ServiceWorkerRegister';
+import { OfflineIndicator } from '@/components/pwa/OfflineIndicator';
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -17,6 +19,15 @@ export const metadata: Metadata = {
   title: 'Coralink | Oportunidades Acadêmicas & Tech',
   description:
     'Ecossistema inteligente de agregação e distribuição de editais, estágios, bolsas de pesquisa e eventos acadêmicos e profissionais.',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Coralink',
+  },
+  formatDetection: {
+    telephone: false,
+  },
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
@@ -39,6 +50,8 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <SmoothScrollProvider>{children}</SmoothScrollProvider>
+            <OfflineIndicator />
+            <ServiceWorkerRegister />
           </AuthProvider>
         </ThemeProvider>
         <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
