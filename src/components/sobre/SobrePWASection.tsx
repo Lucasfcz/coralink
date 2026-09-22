@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Download, Search } from 'lucide-react';
+import { Download, Search, User, SlidersHorizontal, Sparkles } from 'lucide-react';
 import { InstallModal } from '@/components/pwa/InstallModal';
 
 export function SobrePWASection() {
@@ -113,8 +113,8 @@ export function SobrePWASection() {
                     </div>
                   </div>
 
-                  {/* Micro Header Coralink */}
-                  <div className="px-3.5 pt-1.5 pb-2 shrink-0 border-b border-white/10 flex items-center justify-between">
+                  {/* Micro Header Coralink (Fiel à captura mobile) */}
+                  <div className="px-3.5 pt-1.5 pb-2 shrink-0 border-b border-white/10 flex items-center justify-between bg-[#0a0b0d]">
                     <div className="flex items-center gap-1.5">
                       <div className="relative h-3.5 w-3.5">
                         <Image
@@ -124,38 +124,84 @@ export function SobrePWASection() {
                           className="object-contain invert"
                         />
                       </div>
-                      <span className="font-extrabold text-[10.5px] tracking-tight">CORALINK</span>
+                      <span className="font-extrabold text-[10px] tracking-tight text-white">CORALINK</span>
                     </div>
 
-                    <div className="flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[8.5px] text-stone-300">
-                      <Search className="h-2 w-2 text-stone-400" />
-                      <span>Buscar...</span>
+                    <div className="flex items-center gap-1.5">
+                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-stone-300">
+                        <Search className="h-2.5 w-2.5" />
+                      </div>
+                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-stone-800 border border-white/15 text-stone-400">
+                        <User className="h-2.5 w-2.5" />
+                      </div>
                     </div>
                   </div>
 
-                  {/* Feed com Cadência Alternada: Hero Amplo + Cards Laterais (Fiel a media_1790115048519.jpg) */}
-                  <div className="px-3 py-1.5 space-y-2 overflow-hidden flex-1 flex flex-col justify-between">
-                    {/* 1. Card Amplo (Hero com foto de capa e overlay de informações) */}
+                  {/* Barra de Filtros idêntica ao feed mobile real */}
+                  <div className="px-3 py-1.5 shrink-0 border-b border-white/10 flex items-center gap-1.5 bg-[#0a0b0d] overflow-hidden">
+                    {/* Botão Filtros com ícone */}
+                    <div className="flex shrink-0 items-center gap-1 rounded-full border border-white/20 bg-white/5 px-2 py-0.5 text-[7.5px] font-bold text-white">
+                      <SlidersHorizontal className="h-2 w-2" />
+                      <span>Filtros</span>
+                    </div>
+
+                    <div className="h-3.5 w-px bg-white/15 shrink-0" />
+
+                    {/* Pílulas de Categoria com Máscara de Fade Lateral */}
+                    <div className="flex flex-1 items-center gap-1 overflow-x-hidden [mask-image:linear-gradient(to_right,black_calc(100%-16px),transparent)]">
+                      <div className="flex shrink-0 items-center gap-0.5 rounded-full bg-white px-2 py-0.5 text-[7.5px] font-bold text-[#121417]">
+                        <span>Todas as Oportunidades</span>
+                        <span className="text-[6.5px] text-stone-600 font-semibold">(89)</span>
+                      </div>
+
+                      <div className="flex shrink-0 items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[7.5px] font-medium text-stone-300">
+                        <span>Estágios</span>
+                      </div>
+
+                      <div className="flex shrink-0 items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[7.5px] font-medium text-stone-300">
+                        <span>Bolsas</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Feed Scrollável com Cabeçalho e as 4 Novas Imagens do Usuário */}
+                  <div className="px-3 py-2 space-y-2 overflow-y-auto scrollbar-none flex-1">
+                    {/* Cabeçalho da Seção de Oportunidades */}
+                    <div className="flex flex-col gap-0.5 px-0.5 pt-0.5">
+                      <div className="flex items-center gap-1">
+                        <Sparkles className="h-2 w-2 text-emerald-400" />
+                        <span className="text-[8.5px] font-bold text-white tracking-tight">Feed de Oportunidades</span>
+                      </div>
+                      <p className="text-[6.5px] text-stone-400 leading-tight">
+                        Atualizações em tempo real das principais instituições.
+                      </p>
+                      <div className="flex items-center gap-1 text-[6.5px] text-emerald-400 font-semibold mt-0.5">
+                        <span className="h-1 w-1 rounded-full bg-emerald-400 animate-pulse" />
+                        <span>9 oportunidades encontradas</span>
+                      </div>
+                    </div>
+
+                    {/* 1. Card Amplo: Hero (Auditório de Congresso SNCT - mockup-congresso.png) */}
                     <div className="rounded-xl overflow-hidden border border-white/10 bg-[#12151c] flex flex-col shadow-xs">
-                      {/* Foto de Capa do Campus */}
-                      <div className="relative h-19 w-full bg-stone-900">
+                      {/* Foto de Capa do Congresso com Overlay */}
+                      <div className="relative h-18 w-full bg-stone-900">
                         <Image
-                          src="/images/auth-visual.jpg"
-                          alt="Campus IFPE"
+                          src="/images/mockup-congresso.png"
+                          alt="Congresso Acadêmico SNCT IFPE"
                           fill
-                          className="object-cover opacity-90"
+                          className="object-cover"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
                       </div>
 
                       {/* Conteúdo Informativo */}
                       <div className="p-2">
                         {/* Linha de Tags */}
                         <div className="flex items-center gap-1">
-                          <span className="bg-black/80 px-1 py-0.2 rounded-xs text-[7px] font-black uppercase text-white tracking-wider">
+                          <span className="bg-black/90 px-1 py-0.2 rounded-xs text-[7px] font-black uppercase text-white tracking-wider border border-white/10">
                             EVENTO
                           </span>
-                          <span className="text-stone-500 text-[7px]">•</span>
+                          <span className="text-stone-500 text-[6.5px]">•</span>
                           <div className="flex items-center gap-0.5">
                             <Image
                               src="/institutions/ifpe.png"
@@ -164,10 +210,10 @@ export function SobrePWASection() {
                               height={10}
                               className="object-contain"
                             />
-                            <span className="text-[7.5px] font-bold text-stone-300">IFPE</span>
+                            <span className="text-[7.5px] font-bold text-stone-200">IFPE</span>
                           </div>
-                          <span className="text-stone-500 text-[7px]">•</span>
-                          <span className="bg-emerald-500/20 text-emerald-300 px-1 py-0.2 rounded-xs text-[7px] font-bold">
+                          <span className="text-stone-500 text-[6.5px]">•</span>
+                          <span className="bg-emerald-500/20 text-emerald-300 px-1 py-0.2 rounded-xs text-[7px] font-bold border border-emerald-500/30">
                             Gratuito
                           </span>
                         </div>
@@ -177,95 +223,146 @@ export function SobrePWASection() {
                           IFPE Recife prorroga prazo de submissão de atividades e trabalhos para a 23ª SNCT – 2026
                         </p>
 
+                        {/* Resumo */}
+                        <p className="mt-0.5 text-[7px] text-stone-400 line-clamp-1 leading-tight">
+                          Submissão de atividades e trabalhos para a 15ª Semana Nacional de Ciência e Tecnologia.
+                        </p>
+
                         {/* Rodapé com Prazo Vermelho e Botão de Ação Circular */}
                         <div className="mt-1.5 flex items-center justify-between border-t border-white/5 pt-1">
                           <span className="text-[7.5px] font-bold text-rose-400">
                             Termina hoje
                           </span>
-                          <div className="flex h-4 w-4 items-center justify-center rounded-full bg-white text-black shadow-xs">
-                            <span className="text-[8px] font-bold leading-none">→</span>
+                          <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white text-black shadow-xs">
+                            <span className="text-[7.5px] font-bold leading-none">→</span>
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* 2. Sub-cabeçalho de Atualizações Recentes */}
-                    <div className="flex items-center justify-between text-[7.5px] font-mono uppercase text-stone-400 px-0.5">
-                      <span>ATUALIZAÇÕES DE IFPE E UPE</span>
-                      <span className="text-emerald-400 font-bold flex items-center gap-0.5">
-                        <span className="h-1 w-1 rounded-full bg-emerald-400 animate-pulse" />
-                        AO VIVO
-                      </span>
-                    </div>
+                    {/* 2. Card Lateral 1: Graduação IFPE (Celebração de Formatura - mockup-graduacao.png) */}
+                    <div className="rounded-xl border border-white/10 bg-[#12151c] p-1.5 flex items-center gap-2">
+                      <div className="relative h-11 w-11 shrink-0 rounded-lg overflow-hidden bg-stone-800">
+                        <Image
+                          src="/images/mockup-graduacao.png"
+                          alt="Graduação IFPE"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
 
-                    {/* 3. Cards Laterais Compactos (Foto quadrada na esquerda + texto na direita) */}
-                    <div className="space-y-1.5">
-                      {/* Card Lateral 1: Graduação IFPE */}
-                      <div className="rounded-xl border border-white/10 bg-[#12151c] p-1.5 flex items-center gap-2">
-                        {/* Imagem Lateral Quadrada */}
-                        <div className="relative h-11 w-11 shrink-0 rounded-lg overflow-hidden bg-stone-800">
-                          <Image
-                            src="/images/recife-cais-day.jpg"
-                            alt="Seleção IFPE"
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-
-                        {/* Conteúdo Textual */}
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-1">
-                            <span className="text-[7px] font-medium text-stone-400">Graduação</span>
-                            <span className="text-stone-600 text-[6px]">•</span>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-0.5">
+                            <Image
+                              src="/institutions/ifpe.png"
+                              alt="IFPE"
+                              width={9}
+                              height={9}
+                              className="object-contain"
+                            />
                             <span className="text-[7px] font-bold text-stone-300">IFPE</span>
                           </div>
-                          <p className="text-[8px] font-semibold text-white truncate leading-tight mt-0.5">
-                            Inscrições abertas para seleção de portadores de diploma...
-                          </p>
-                          <div className="mt-1 flex items-center justify-between">
-                            <span className="text-[7px] font-bold text-rose-400">Termina amanhã</span>
-                            <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white/10 text-white">
-                              <span className="text-[7px] font-bold leading-none">→</span>
-                            </div>
+                          <span className="text-stone-600 text-[6px]">•</span>
+                          <span className="text-[7px] font-medium text-stone-400">Graduação</span>
+                        </div>
+                        <p className="text-[8px] font-semibold text-white truncate leading-tight mt-0.5">
+                          Inscrições abertas para seleção de portadores/a...
+                        </p>
+                        <div className="mt-1 flex items-center justify-between">
+                          <span className="text-[7px] font-bold text-rose-400">Termina amanhã</span>
+                          <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white/10 text-white">
+                            <span className="text-[7px] font-bold leading-none">→</span>
                           </div>
                         </div>
                       </div>
+                    </div>
 
-                      {/* Card Lateral 2: Evento UPE */}
-                      <div className="rounded-xl border border-white/10 bg-[#12151c] p-1.5 flex items-center gap-2">
-                        {/* Imagem Lateral Quadrada */}
-                        <div className="relative h-11 w-11 shrink-0 rounded-lg overflow-hidden bg-stone-800">
-                          <Image
-                            src="/images/coralink-editorial-hero.jpg"
-                            alt="Semana Universitária UPE"
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
+                    {/* 3. Card Lateral 2: Evento UPE (Equipe Tech / Hackathon - mockup-hackathon.png) */}
+                    <div className="rounded-xl border border-white/10 bg-[#12151c] p-1.5 flex items-center gap-2">
+                      <div className="relative h-11 w-11 shrink-0 rounded-lg overflow-hidden bg-stone-800">
+                        <Image
+                          src="/images/mockup-hackathon.png"
+                          alt="Semana Universitária UPE"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
 
-                        {/* Conteúdo Textual */}
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-1">
-                            <span className="text-[7px] font-medium text-stone-400">Evento</span>
-                            <span className="text-stone-600 text-[6px]">•</span>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-0.5">
+                            <Image
+                              src="/institutions/upe.png"
+                              alt="UPE"
+                              width={9}
+                              height={9}
+                              className="object-contain"
+                            />
                             <span className="text-[7px] font-bold text-stone-300">UPE</span>
                           </div>
-                          <p className="text-[8px] font-semibold text-white truncate leading-tight mt-0.5">
-                            Semana Universitária UPE 2026 prorroga inscrições...
-                          </p>
-                          <div className="mt-1 flex items-center justify-between">
-                            <span className="text-[7px] font-bold text-rose-400">3 dias restantes</span>
-                            <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white/10 text-white">
-                              <span className="text-[7px] font-bold leading-none">→</span>
-                            </div>
+                          <span className="text-stone-600 text-[6px]">•</span>
+                          <span className="text-[7px] font-medium text-stone-400">Evento</span>
+                        </div>
+                        <p className="text-[8px] font-semibold text-white truncate leading-tight mt-0.5">
+                          Semana Universitária UPE 2026 prorroga prazo para...
+                        </p>
+                        <div className="mt-1 flex items-center justify-between">
+                          <span className="text-[7px] font-bold text-rose-400">3 dias restantes</span>
+                          <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white/10 text-white">
+                            <span className="text-[7px] font-bold leading-none">→</span>
                           </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 4. Card Editorial: Bolsa de Inovação Tech (Laboratório / Neons - mockup-tech-lab.png) */}
+                    <div className="rounded-xl border border-white/10 bg-[#12151c] p-2 flex flex-col gap-1.5">
+                      <div className="flex items-center gap-1">
+                        <span className="rounded-full bg-white/10 px-1 py-0.2 text-[6.5px] font-bold uppercase text-white">
+                          BOLSA
+                        </span>
+                        <span className="text-stone-600 text-[6px]">•</span>
+                        <span className="text-[6.5px] text-stone-400">Presencial</span>
+                        <span className="text-stone-600 text-[6px]">•</span>
+                        <span className="text-emerald-400 text-[6.5px] font-bold">Gratuito</span>
+                      </div>
+
+                      <p className="text-[8px] font-bold text-white leading-tight">
+                        UPE seleciona bolsistas para atuação como agentes de inovação...
+                      </p>
+
+                      <div className="relative h-14 w-full rounded-lg overflow-hidden bg-stone-800">
+                        <Image
+                          src="/images/mockup-tech-lab.png"
+                          alt="Bolsa de Inovação UPE"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between pt-0.5">
+                        <div className="flex items-center gap-1">
+                          <Image
+                            src="/institutions/upe.png"
+                            alt="UPE"
+                            width={9}
+                            height={9}
+                            className="object-contain"
+                          />
+                          <span className="text-[7px] font-bold text-stone-300">UPE</span>
+                          <span className="text-stone-600 text-[6px]">•</span>
+                          <span className="text-[7px] text-rose-400 font-semibold">Termina em 5 dias</span>
+                        </div>
+                        <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white/10 text-white">
+                          <span className="text-[7px] font-bold leading-none">→</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Base: Barra Home Indicator do iOS */}
-                  <div className="pb-1.5 pt-1 flex justify-center shrink-0">
+                  <div className="pb-1.5 pt-1 flex justify-center shrink-0 bg-[#0a0b0d]">
                     <div className="h-1 w-20 rounded-full bg-white/30" />
                   </div>
                 </div>
