@@ -104,6 +104,32 @@ article {
   }
 }
 
+/* Mini Marquee contínuo para o mockup mobile do iPhone */
+@keyframes mini-marquee {
+  0% {
+    transform: translate3d(0%, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-mini-marquee {
+  display: flex;
+  width: max-content;
+  animation: mini-marquee 18s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-mini-marquee {
+    animation: none;
+    transform: none;
+    width: auto;
+    overflow-x: auto;
+  }
+}
+
 /* Estilos de Vidro Jateado (Glassmorphism Editorial) */
 .glass-overlay {
   background: rgba(255, 255, 255, 0.88);
