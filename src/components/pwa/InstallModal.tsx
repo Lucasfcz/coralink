@@ -71,7 +71,7 @@ export function InstallModal({ isOpen, onClose }: InstallModalProps) {
                 Instalar Coralink
               </h2>
               <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                PWA Oficial
+                Instalação Direta
               </span>
             </div>
             <p className="text-xs text-[#64748b] dark:text-[#9aa1ad]">
