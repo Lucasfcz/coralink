@@ -125,8 +125,8 @@ export function CategoryFilter({
 
           <div className="h-5 w-px bg-[#e5e7eb] shrink-0 dark:bg-[#242831]" />
 
-          {/* Pílulas de Categoria Rápidas com Scroll Horizontal */}
-          <div className="flex flex-1 items-center gap-2 overflow-x-auto pb-0.5 scrollbar-none">
+          {/* Pílulas de Categoria Rápidas com Scroll Horizontal e máscara de fade lateral */}
+          <div className="flex flex-1 items-center gap-2 overflow-x-auto pb-0.5 scrollbar-none [mask-image:linear-gradient(to_right,black_calc(100%-24px),transparent)] sm:[mask-image:none]">
             {CATEGORY_FILTERS.map((cat) => {
               const isSelected = selectedFilter === cat.id;
 

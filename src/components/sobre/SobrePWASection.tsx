@@ -2,79 +2,8 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Download, Wifi, Battery, Search, Sparkles } from 'lucide-react';
+import { Download, Search } from 'lucide-react';
 import { InstallModal } from '@/components/pwa/InstallModal';
-
-interface MiniCard {
-  institution: string;
-  logo: string;
-  badge: string;
-  badgeColor: string;
-  title: string;
-  deadline: string;
-}
-
-const FEATURED_ITEMS = [
-  {
-    institution: 'UFPE',
-    tag: 'PESQUISA',
-    title: 'Edital PIBIC 2026/2027',
-    desc: 'Bolsas de Iniciação Científica • R$ 700/mês',
-    border: 'border-emerald-500/30',
-    tagBg: 'bg-emerald-500/20 text-emerald-300',
-  },
-  {
-    institution: 'CESAR School',
-    tag: 'ESTÁGIO',
-    title: 'Summer Job Tech 2026',
-    desc: 'Vagas em IA e Engenharia de Software',
-    border: 'border-sky-500/30',
-    tagBg: 'bg-sky-500/20 text-sky-300',
-  },
-  {
-    institution: 'Porto Digital',
-    tag: 'FORMAÇÃO',
-    title: 'Embarque Digital 2026',
-    desc: 'Graduação 100% custeada no Recife',
-    border: 'border-purple-500/30',
-    tagBg: 'bg-purple-500/20 text-purple-300',
-  },
-  {
-    institution: 'FACEPE',
-    tag: 'INOVAÇÃO',
-    title: 'Aceleração de Startups',
-    desc: 'Fomento a projetos acadêmicos inovadores',
-    border: 'border-amber-500/30',
-    tagBg: 'bg-amber-500/20 text-amber-300',
-  },
-];
-
-const RECENT_ITEMS: MiniCard[] = [
-  {
-    institution: 'UFPE',
-    logo: '/institutions/ufpe.png',
-    badge: 'Inscrições abertas',
-    badgeColor: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
-    title: 'Edital PROPESQI Nº 04/2026: Bolsas CNPq',
-    deadline: 'Até 15/04',
-  },
-  {
-    institution: 'CESAR',
-    logo: '/institutions/cesar.png',
-    badge: 'Remunerado',
-    badgeColor: 'text-sky-400 bg-sky-500/10 border-sky-500/20',
-    title: 'Residência Tecnológica em Inteligência Artificial',
-    deadline: 'Até 22/04',
-  },
-  {
-    institution: 'IFPE',
-    logo: '/institutions/ifpe.png',
-    badge: 'Bolsa Ativa',
-    badgeColor: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
-    title: 'Programa de Monitoria Acadêmica 2026.1',
-    deadline: 'Até 30/04',
-  },
-];
 
 export function SobrePWASection() {
   const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
@@ -151,127 +80,197 @@ export function SobrePWASection() {
                     borderRadius: '40px',
                   }}
                 >
-                  {/* Topo: Status Bar do iOS + Micro Header do Coralink */}
-                  <div className="pt-3 px-4 shrink-0">
-                    {/* Status bar */}
-                    <div className="flex items-center justify-between text-[10px] font-bold text-stone-400 px-1">
-                      <span>09:41</span>
-                      <div className="flex items-center gap-1">
-                        <Wifi className="h-2.5 w-2.5" />
-                        <Battery className="h-3 w-3" />
+                  {/* Topo: Status Bar Oficial do iOS 18 */}
+                  <div className="pt-2 px-4 shrink-0 flex items-center justify-between text-white">
+                    {/* Horário 9:41 (Alinhado à esquerda) */}
+                    <span className="font-bold text-[10px] tracking-tight pl-1">9:41</span>
+
+                    {/* Espaço central reservado para a Dynamic Island */}
+                    <div className="w-[74px] h-[22px]" />
+
+                    {/* Ícones oficiais Apple (Sinal 4 barras, Wi-Fi sólido, Bateria horizontal) */}
+                    <div className="flex items-center gap-1.5 pr-1">
+                      {/* Sinal celular 4 barras em escada */}
+                      <svg className="w-3.5 h-2.5 fill-current" viewBox="0 0 17 12">
+                        <rect x="0" y="9" width="2.6" height="3" rx="0.8" />
+                        <rect x="4.8" y="6" width="2.6" height="6" rx="0.8" />
+                        <rect x="9.6" y="3" width="2.6" height="9" rx="0.8" />
+                        <rect x="14.4" y="0" width="2.6" height="12" rx="0.8" />
+                      </svg>
+
+                      {/* Wi-Fi 3 arcos concêntricos sólidos */}
+                      <svg className="w-3.5 h-2.5 fill-current" viewBox="0 0 16 12">
+                        <path d="M8 12a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-3.8-4.2a5.5 5.5 0 017.6 0 .8.8 0 101.1-1.1 7.1 7.1 0 00-9.8 0 .8.8 0 001.1 1.1zm-2.8-2.8a9.5 9.5 0 0113.2 0 .8.8 0 101.1-1.1 11.1 11.1 0 00-15.4 0 .8.8 0 001.1 1.1z" />
+                      </svg>
+
+                      {/* Bateria iOS com corpo sólido e polo positivo */}
+                      <div className="flex items-center gap-[1px]">
+                        <div className="w-[17px] h-[8.5px] rounded-[2.8px] border border-white p-[1px] flex items-center">
+                          <div className="h-full w-full bg-white rounded-[1.2px]" />
+                        </div>
+                        <div className="w-[1.2px] h-[3px] bg-white rounded-r-[0.6px]" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Micro Header Coralink */}
+                  <div className="px-3.5 pt-1.5 pb-2 shrink-0 border-b border-white/10 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <div className="relative h-3.5 w-3.5">
+                        <Image
+                          src="/coralink-logo.png"
+                          alt="Coralink"
+                          fill
+                          className="object-contain invert"
+                        />
+                      </div>
+                      <span className="font-extrabold text-[10.5px] tracking-tight">CORALINK</span>
+                    </div>
+
+                    <div className="flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[8.5px] text-stone-300">
+                      <Search className="h-2 w-2 text-stone-400" />
+                      <span>Buscar...</span>
+                    </div>
+                  </div>
+
+                  {/* Feed com Cadência Alternada: Hero Amplo + Cards Laterais (Fiel a media_1790115048519.jpg) */}
+                  <div className="px-3 py-1.5 space-y-2 overflow-hidden flex-1 flex flex-col justify-between">
+                    {/* 1. Card Amplo (Hero com foto de capa e overlay de informações) */}
+                    <div className="rounded-xl overflow-hidden border border-white/10 bg-[#12151c] flex flex-col shadow-xs">
+                      {/* Foto de Capa do Campus */}
+                      <div className="relative h-19 w-full bg-stone-900">
+                        <Image
+                          src="/images/auth-visual.jpg"
+                          alt="Campus IFPE"
+                          fill
+                          className="object-cover opacity-90"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                      </div>
+
+                      {/* Conteúdo Informativo */}
+                      <div className="p-2">
+                        {/* Linha de Tags */}
+                        <div className="flex items-center gap-1">
+                          <span className="bg-black/80 px-1 py-0.2 rounded-xs text-[7px] font-black uppercase text-white tracking-wider">
+                            EVENTO
+                          </span>
+                          <span className="text-stone-500 text-[7px]">•</span>
+                          <div className="flex items-center gap-0.5">
+                            <Image
+                              src="/institutions/ifpe.png"
+                              alt="IFPE"
+                              width={10}
+                              height={10}
+                              className="object-contain"
+                            />
+                            <span className="text-[7.5px] font-bold text-stone-300">IFPE</span>
+                          </div>
+                          <span className="text-stone-500 text-[7px]">•</span>
+                          <span className="bg-emerald-500/20 text-emerald-300 px-1 py-0.2 rounded-xs text-[7px] font-bold">
+                            Gratuito
+                          </span>
+                        </div>
+
+                        {/* Título do Edital */}
+                        <p className="mt-1 text-[8.5px] font-bold text-white leading-snug line-clamp-2">
+                          IFPE Recife prorroga prazo de submissão de atividades e trabalhos para a 23ª SNCT – 2026
+                        </p>
+
+                        {/* Rodapé com Prazo Vermelho e Botão de Ação Circular */}
+                        <div className="mt-1.5 flex items-center justify-between border-t border-white/5 pt-1">
+                          <span className="text-[7.5px] font-bold text-rose-400">
+                            Termina hoje
+                          </span>
+                          <div className="flex h-4 w-4 items-center justify-center rounded-full bg-white text-black shadow-xs">
+                            <span className="text-[8px] font-bold leading-none">→</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Espaço para a Dynamic Island que está na camada PNG superior */}
-                    <div className="h-5" />
+                    {/* 2. Sub-cabeçalho de Atualizações Recentes */}
+                    <div className="flex items-center justify-between text-[7.5px] font-mono uppercase text-stone-400 px-0.5">
+                      <span>ATUALIZAÇÕES DE IFPE E UPE</span>
+                      <span className="text-emerald-400 font-bold flex items-center gap-0.5">
+                        <span className="h-1 w-1 rounded-full bg-emerald-400 animate-pulse" />
+                        AO VIVO
+                      </span>
+                    </div>
 
-                    {/* Micro Header Coralink */}
-                    <div className="mt-1 flex items-center justify-between border-b border-white/10 pb-2">
-                      <div className="flex items-center gap-1.5">
-                        <div className="relative h-4 w-4">
+                    {/* 3. Cards Laterais Compactos (Foto quadrada na esquerda + texto na direita) */}
+                    <div className="space-y-1.5">
+                      {/* Card Lateral 1: Graduação IFPE */}
+                      <div className="rounded-xl border border-white/10 bg-[#12151c] p-1.5 flex items-center gap-2">
+                        {/* Imagem Lateral Quadrada */}
+                        <div className="relative h-11 w-11 shrink-0 rounded-lg overflow-hidden bg-stone-800">
                           <Image
-                            src="/coralink-logo.png"
-                            alt="Coralink"
+                            src="/images/recife-cais-day.jpg"
+                            alt="Seleção IFPE"
                             fill
-                            className="object-contain invert"
+                            className="object-cover"
                           />
                         </div>
-                        <span className="font-extrabold text-[11px] tracking-tight">CORALINK</span>
-                      </div>
-                      <div className="flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[9px] text-stone-300">
-                        <Search className="h-2.5 w-2.5 text-stone-400" />
-                        <span>Buscar</span>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Meio: Mini Carrossel Marquee de Destaques em Loop Contínuo */}
-                  <div className="py-2 overflow-hidden shrink-0">
-                    <div className="px-4 mb-1.5 flex items-center justify-between">
-                      <div className="flex items-center gap-1">
-                        <Sparkles className="h-2.5 w-2.5 text-amber-400" />
-                        <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-stone-300">
-                          DESTAQUES
-                        </span>
-                      </div>
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    </div>
-
-                    {/* Trilho Contínuo Infinito do Marquee */}
-                    <div className="overflow-hidden flex">
-                      <div className="flex gap-2 animate-mini-marquee whitespace-nowrap px-2">
-                        {[...FEATURED_ITEMS, ...FEATURED_ITEMS].map((item, idx) => (
-                          <div
-                            key={`mini-featured-${item.institution}-${idx}`}
-                            className={`shrink-0 w-36 rounded-xl border ${item.border} bg-[#13161c] p-2 flex flex-col justify-between shadow-xs`}
-                          >
-                            <div className="flex items-center justify-between gap-1">
-                              <span className="text-[8px] font-bold text-stone-300 truncate">
-                                {item.institution}
-                              </span>
-                              <span
-                                className={`text-[7px] font-extrabold px-1 py-0.2 rounded-sm uppercase ${item.tagBg}`}
-                              >
-                                {item.tag}
-                              </span>
-                            </div>
-                            <p className="mt-1 text-[9px] font-bold text-white leading-tight truncate">
-                              {item.title}
-                            </p>
-                            <p className="mt-0.5 text-[8px] text-stone-400 truncate">{item.desc}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Feed Recente de Oportunidades (Mini Cards) */}
-                  <div className="px-3.5 space-y-1.5 overflow-hidden flex-1 flex flex-col justify-center">
-                    <div className="flex items-center justify-between text-[8px] font-mono uppercase text-stone-400 px-0.5">
-                      <span>FEED RECENTE</span>
-                      <span className="text-emerald-400 font-bold">AO VIVO</span>
-                    </div>
-
-                    {RECENT_ITEMS.map((card) => (
-                      <div
-                        key={card.title}
-                        className="rounded-xl border border-white/10 bg-[#12151c] p-2 flex items-center gap-2 transition-transform hover:scale-[1.01]"
-                      >
-                        <div className="relative h-6 w-6 shrink-0 rounded-lg overflow-hidden bg-white/5 p-1 border border-white/10 flex items-center justify-center">
-                          <Image
-                            src={card.logo}
-                            alt={card.institution}
-                            width={20}
-                            height={20}
-                            className="object-contain"
-                          />
-                        </div>
+                        {/* Conteúdo Textual */}
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-1">
-                            <span className="text-[8px] font-bold text-stone-300">
-                              {card.institution}
-                            </span>
-                            <span
-                              className={`text-[7px] font-bold px-1 rounded-sm border ${card.badgeColor}`}
-                            >
-                              {card.badge}
-                            </span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-[7px] font-medium text-stone-400">Graduação</span>
+                            <span className="text-stone-600 text-[6px]">•</span>
+                            <span className="text-[7px] font-bold text-stone-300">IFPE</span>
                           </div>
-                          <p className="text-[9px] font-semibold text-white truncate leading-tight mt-0.5">
-                            {card.title}
+                          <p className="text-[8px] font-semibold text-white truncate leading-tight mt-0.5">
+                            Inscrições abertas para seleção de portadores de diploma...
                           </p>
+                          <div className="mt-1 flex items-center justify-between">
+                            <span className="text-[7px] font-bold text-rose-400">Termina amanhã</span>
+                            <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white/10 text-white">
+                              <span className="text-[7px] font-bold leading-none">→</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    ))}
+
+                      {/* Card Lateral 2: Evento UPE */}
+                      <div className="rounded-xl border border-white/10 bg-[#12151c] p-1.5 flex items-center gap-2">
+                        {/* Imagem Lateral Quadrada */}
+                        <div className="relative h-11 w-11 shrink-0 rounded-lg overflow-hidden bg-stone-800">
+                          <Image
+                            src="/images/coralink-editorial-hero.jpg"
+                            alt="Semana Universitária UPE"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+
+                        {/* Conteúdo Textual */}
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1">
+                            <span className="text-[7px] font-medium text-stone-400">Evento</span>
+                            <span className="text-stone-600 text-[6px]">•</span>
+                            <span className="text-[7px] font-bold text-stone-300">UPE</span>
+                          </div>
+                          <p className="text-[8px] font-semibold text-white truncate leading-tight mt-0.5">
+                            Semana Universitária UPE 2026 prorroga inscrições...
+                          </p>
+                          <div className="mt-1 flex items-center justify-between">
+                            <span className="text-[7px] font-bold text-rose-400">3 dias restantes</span>
+                            <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white/10 text-white">
+                              <span className="text-[7px] font-bold leading-none">→</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Base: Barra Home Indicator do iOS */}
                   <div className="pb-1.5 pt-1 flex justify-center shrink-0">
-                    <div className="h-1 w-24 rounded-full bg-white/30" />
+                    <div className="h-1 w-20 rounded-full bg-white/30" />
                   </div>
                 </div>
 
-                {/* 2. Moldura Fotográfica Transparente do iPhone 16 Pro (Camada Frontal Z-20) */}
+                {/* 2. Moldura Fotográfica Transparente do iPhone 16 Pro (Camada Z-20) */}
                 <Image
                   src="/images/iphone-16-pro-frame.png"
                   alt="Moldura iPhone 16 Pro Coralink"
@@ -281,9 +280,21 @@ export function SobrePWASection() {
                   className="pointer-events-none absolute inset-0 z-20 object-contain drop-shadow-2xl"
                 />
 
-                {/* 3. Reflexo Sutil de Vidro (Camada Z-30) */}
+                {/* 3. Dynamic Island Sólida Matte Black (Camada Z-30 que veda qualquer reflexo estranho da lente) */}
                 <div
-                  className="pointer-events-none absolute z-30 overflow-hidden"
+                  className="pointer-events-none absolute z-30 bg-black rounded-full shadow-inner"
+                  style={{
+                    top: '5.03%',
+                    left: '50.07%',
+                    width: '26.6%',
+                    height: '3.9%',
+                    transform: 'translateX(-50%)',
+                  }}
+                />
+
+                {/* 4. Reflexo Sutil de Vidro (Camada Z-35) */}
+                <div
+                  className="pointer-events-none absolute z-35 overflow-hidden"
                   style={{
                     top: '3.54%',
                     bottom: '3.54%',

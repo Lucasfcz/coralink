@@ -34,16 +34,16 @@ export function FeaturedCard({ opportunity, onSelect }: FeaturedCardProps) {
   return (
     <motion.article
       onClick={() => onSelect(opportunity)}
-      className="group relative flex flex-col w-[420px] sm:w-[480px] md:w-[520px] shrink-0 cursor-pointer pt-1 pb-6 transition-transform duration-300 hover:-translate-y-1"
+      className="group relative flex flex-col w-[84vw] max-w-[340px] sm:w-[480px] md:w-[520px] shrink-0 cursor-pointer pt-1 pb-6 transition-transform duration-300 hover:-translate-y-1"
     >
       {/* 1. Retângulo Maior: Imagem da Oportunidade (Conforme esboço) */}
-      <div className="relative h-[250px] sm:h-[280px] w-full overflow-hidden rounded-[24px] sm:rounded-[28px] border border-[#e5e7eb] bg-[#121417] shadow-sm dark:border-[#242831]">
+      <div className="relative h-[210px] sm:h-[280px] w-full overflow-hidden rounded-[22px] sm:rounded-[28px] border border-[#e5e7eb] bg-[#121417] shadow-sm dark:border-[#242831]">
         <SafeImage
           src={imageUrl}
           fallbackSrc={fallbackUrl}
           alt={opportunity.title}
           fill
-          sizes="(max-width: 768px) 420px, 520px"
+          sizes="(max-width: 640px) 340px, (max-width: 768px) 480px, 520px"
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
         />
         {/* Gradiente sutil */}
@@ -51,7 +51,7 @@ export function FeaturedCard({ opportunity, onSelect }: FeaturedCardProps) {
       </div>
 
       {/* 2. Retângulo Menor Sobreposto: Título e Informações (Conforme esboço) */}
-      <div className="relative -mt-16 sm:-mt-20 mx-4 sm:mx-6 z-10 rounded-[20px] sm:rounded-[22px] border border-white/70 bg-white/92 p-4.5 sm:p-5 shadow-[0_12px_32px_rgba(0,0,0,0.09)] backdrop-blur-xl transition-all duration-300 group-hover:bg-white group-hover:shadow-xl dark:border-[#2b303a] dark:bg-[#15181e]/95 dark:group-hover:bg-[#181b22] dark:shadow-[0_12px_32px_rgba(0,0,0,0.4)]">
+      <div className="relative -mt-14 sm:-mt-20 mx-3 sm:mx-6 z-10 rounded-[18px] sm:rounded-[22px] border border-white/70 bg-white/92 p-4 sm:p-5 shadow-[0_12px_32px_rgba(0,0,0,0.09)] backdrop-blur-xl transition-all duration-300 group-hover:bg-white group-hover:shadow-xl dark:border-[#2b303a] dark:bg-[#15181e]/95 dark:group-hover:bg-[#181b22] dark:shadow-[0_12px_32px_rgba(0,0,0,0.4)]">
         {/* Top row: Badges informativos essenciais da API */}
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-[#121417] px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white shadow-2xs dark:bg-white dark:text-[#121417]">

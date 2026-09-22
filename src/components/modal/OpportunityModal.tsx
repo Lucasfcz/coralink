@@ -264,8 +264,8 @@ export function OpportunityModal({
                   )}
               </div>
 
-              {/* Modal Actions Footer */}
-              <div className="sticky bottom-0 border-t border-[#e5e7eb] bg-white/95 px-6 py-4 backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-3 dark:border-[#242831] dark:bg-[#15181e]/95">
+              {/* Modal Actions Footer com suporte a safe area do iOS */}
+              <div className="sticky bottom-0 border-t border-[#e5e7eb] bg-white/95 px-6 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-3 dark:border-[#242831] dark:bg-[#15181e]/95">
                 <Link
                   href={`/oportunidades/${opportunity.id}`}
                   onClick={onClose}

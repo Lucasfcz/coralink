@@ -37,9 +37,9 @@ export function BentoCard({
     return (
       <motion.article
         onClick={() => onSelect(opportunity)}
-        className="group relative min-h-[420px] sm:min-h-[480px] w-full cursor-pointer overflow-hidden rounded-3xl border border-[#e5e7eb] bg-[#121417] shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl lg:col-span-2 dark:border-[#242831] will-change-transform"
+        className="group relative min-h-[380px] sm:min-h-[480px] w-full cursor-pointer overflow-hidden rounded-3xl border border-[#e5e7eb] bg-[#121417] shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl lg:col-span-2 dark:border-[#242831] will-change-transform"
       >
-        <div className="relative h-full w-full min-h-[420px] sm:min-h-[480px] overflow-hidden">
+        <div className="relative h-full w-full min-h-[380px] sm:min-h-[480px] overflow-hidden">
           <SafeImage
             src={imageUrl}
             fallbackSrc={fallbackUrl}
@@ -52,7 +52,7 @@ export function BentoCard({
         </div>
 
         {/* Floating Glassmorphism overlay */}
-        <div className="absolute inset-x-4 bottom-4 z-10 rounded-2xl border border-white/60 bg-white/92 p-5 shadow-xl backdrop-blur-md transition-all duration-300 group-hover:bg-white dark:border-[#2b303a] dark:bg-[#15181e]/95 dark:group-hover:bg-[#181b22]">
+        <div className="absolute inset-x-3 sm:inset-x-4 bottom-3 sm:bottom-4 z-10 rounded-2xl border border-white/60 bg-white/92 p-4 sm:p-5 shadow-xl backdrop-blur-md transition-all duration-300 group-hover:bg-white dark:border-[#2b303a] dark:bg-[#15181e]/95 dark:group-hover:bg-[#181b22]">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-[#121417] px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white dark:bg-white dark:text-[#121417]">
               {typeLabel}
@@ -75,7 +75,7 @@ export function BentoCard({
             )}
           </div>
 
-          <h3 className="mt-3 font-bold text-xl sm:text-2xl leading-snug tracking-tight text-[#121417] line-clamp-2 dark:text-[#f3f4f6]">
+          <h3 className="mt-2.5 sm:mt-3 font-bold text-lg sm:text-2xl leading-snug tracking-tight text-[#121417] line-clamp-2 dark:text-[#f3f4f6]">
             {opportunity.title}
           </h3>
 
@@ -83,10 +83,10 @@ export function BentoCard({
             {opportunity.summary}
           </p>
 
-          <div className="mt-4 flex items-center justify-between border-t border-[#f1f3f6] pt-3 dark:border-[#242831]">
-            <div className="flex items-center gap-4 text-xs text-[#64748b] dark:text-[#9aa1ad]">
+          <div className="mt-3.5 sm:mt-4 flex items-center justify-between border-t border-[#f1f3f6] pt-2.5 sm:pt-3 dark:border-[#242831]">
+            <div className="flex items-center gap-3 sm:gap-4 text-xs text-[#64748b] dark:text-[#9aa1ad]">
               <span className="flex items-center gap-1.5 font-medium">
-                <Calendar className="h-4 w-4 text-[#9aa1ad]" />
+                <Calendar className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-[#9aa1ad]" />
                 <span className={deadlineBadge.isUrgent ? 'font-semibold text-rose-600 dark:text-rose-400' : ''}>
                   {deadlineBadge.label}
                 </span>
@@ -99,8 +99,8 @@ export function BentoCard({
               )}
             </div>
 
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#121417] text-white shadow transition-transform group-hover:scale-110 dark:bg-white dark:text-[#121417]">
-              <ArrowRight className="h-4 w-4" />
+            <div className="flex h-7.5 sm:h-8 w-7.5 sm:w-8 items-center justify-center rounded-full bg-[#121417] text-white shadow-xs transition-transform group-hover:scale-110 dark:bg-white dark:text-[#121417]">
+              <ArrowRight className="h-3.5 sm:h-4 w-3.5 sm:w-4" />
             </div>
           </div>
         </div>
@@ -108,49 +108,50 @@ export function BentoCard({
     );
   }
 
-  // 2. VARIANT: STACKED (Cards compactos empilhados)
+  // 2. VARIANT: STACKED (Cards compactos com imagem lateral no mobile para cadência dinâmica)
   if (variant === 'stacked') {
     return (
       <motion.article
         onClick={() => onSelect(opportunity)}
-        className="group flex flex-col sm:flex-row h-full w-full cursor-pointer overflow-hidden rounded-3xl border border-[#e5e7eb] bg-white p-4 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#d1d5db] hover:shadow-lg dark:border-[#242831] dark:bg-[#15181e] dark:hover:border-stone-600 will-change-transform"
+        className="group flex flex-row h-full w-full cursor-pointer overflow-hidden rounded-3xl border border-[#e5e7eb] bg-white p-3 sm:p-4 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#d1d5db] hover:shadow-lg dark:border-[#242831] dark:bg-[#15181e] dark:hover:border-stone-600 will-change-transform gap-3 sm:gap-4"
       >
-        <div className="relative h-44 sm:h-auto sm:w-44 shrink-0 overflow-hidden rounded-2xl bg-[#f1f3f6] dark:bg-[#20242b]">
+        {/* Imagem Lateral (Compacta no mobile w-28 h-28, ampla no desktop w-44) */}
+        <div className="relative h-28 w-28 sm:h-auto sm:w-44 shrink-0 overflow-hidden rounded-2xl bg-[#f1f3f6] dark:bg-[#20242b]">
           <SafeImage
             src={imageUrl}
             fallbackSrc={fallbackUrl}
             alt={opportunity.title}
             fill
-            sizes="(max-width: 640px) 100vw, 180px"
+            sizes="(max-width: 640px) 112px, 180px"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
         </div>
 
-        <div className="flex flex-1 flex-col justify-between pt-3 sm:pt-0 sm:pl-4">
+        <div className="flex flex-1 flex-col justify-between min-w-0">
           <div>
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <InstitutionLogo sourceName={opportunity.sourceName} size={20} />
+              <div className="flex items-center gap-1.5 sm:gap-2 truncate">
+                <InstitutionLogo sourceName={opportunity.sourceName} size={18} />
                 <span className="rounded-full bg-[#f1f3f6] px-2 py-0.5 text-[10px] font-bold text-[#121417] dark:bg-[#20242b] dark:text-[#f3f4f6]">
                   {typeLabel}
                 </span>
                 <span className="text-stone-300 dark:text-stone-600">•</span>
-                <span className="text-[11px] font-semibold text-[#121417] dark:text-[#f3f4f6]">
+                <span className="text-[11px] font-semibold text-[#121417] truncate dark:text-[#f3f4f6]">
                   {formattedSource}
                 </span>
               </div>
             </div>
 
-            <h4 className="mt-2 font-bold text-base leading-snug tracking-tight text-[#121417] line-clamp-2 group-hover:text-black dark:text-[#f3f4f6] dark:group-hover:text-white">
+            <h4 className="mt-1.5 font-bold text-sm sm:text-base leading-snug tracking-tight text-[#121417] line-clamp-2 group-hover:text-black dark:text-[#f3f4f6] dark:group-hover:text-white">
               {opportunity.title}
             </h4>
 
-            <p className="mt-1 text-xs text-[#64748b] line-clamp-2 dark:text-[#9aa1ad]">
+            <p className="mt-1 text-xs text-[#64748b] line-clamp-2 dark:text-[#9aa1ad] hidden sm:block">
               {opportunity.summary}
             </p>
           </div>
 
-          <div className="mt-3 flex items-center justify-between border-t border-[#f1f3f6] pt-2 dark:border-[#242831]">
+          <div className="mt-2.5 flex items-center justify-between border-t border-[#f1f3f6] pt-2 dark:border-[#242831]">
             <span className="text-[11px] font-medium text-[#64748b] dark:text-[#9aa1ad]">
               <span className={deadlineBadge.isUrgent ? 'font-semibold text-rose-600 dark:text-rose-400' : ''}>
                 {deadlineBadge.label}

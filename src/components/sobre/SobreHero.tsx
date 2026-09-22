@@ -81,7 +81,7 @@ export function SobreHero() {
             className="mt-6 max-w-2xl text-base sm:text-lg md:text-xl leading-relaxed text-[#374151] dark:text-[#d1d5db] font-normal drop-shadow-xs"
           >
             Editais, bolsas de iniciação científica, estágios e congressos dos maiores polos acadêmicos
-            e tecnológicos de Pernambuco, centralizados e curados para você.
+            e tecnológicos de Pernambuco, centralizados e classificados para você.
           </motion.p>
 
           {/* CTAs de Navegação Direta de Alto Contraste */}
