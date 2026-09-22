@@ -34,7 +34,7 @@ export function FeaturedCard({ opportunity, onSelect }: FeaturedCardProps) {
   return (
     <motion.article
       onClick={() => onSelect(opportunity)}
-      className="group relative flex flex-col w-[84vw] max-w-[340px] sm:w-[480px] md:w-[520px] shrink-0 cursor-pointer pt-1 pb-6 transition-transform duration-300 hover:-translate-y-1"
+      className="group relative flex flex-col w-[84vw] max-w-[340px] sm:max-w-none sm:w-[480px] md:w-[520px] shrink-0 cursor-pointer pt-1 pb-6 transition-transform duration-300 hover:-translate-y-1"
     >
       {/* 1. Retângulo Maior: Imagem da Oportunidade (Conforme esboço) */}
       <div className="relative h-[210px] sm:h-[280px] w-full overflow-hidden rounded-[22px] sm:rounded-[28px] border border-[#e5e7eb] bg-[#121417] shadow-sm dark:border-[#242831]">

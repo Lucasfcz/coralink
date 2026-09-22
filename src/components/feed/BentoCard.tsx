@@ -79,7 +79,7 @@ export function BentoCard({
             {opportunity.title}
           </h3>
 
-          <p className="mt-1.5 text-xs sm:text-sm text-[#525866] line-clamp-2 dark:text-[#9aa1ad]">
+          <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-[#525866] line-clamp-2 dark:text-[#9aa1ad]">
             {opportunity.summary}
           </p>
 
@@ -99,7 +99,7 @@ export function BentoCard({
               )}
             </div>
 
-            <div className="flex h-7.5 sm:h-8 w-7.5 sm:w-8 items-center justify-center rounded-full bg-[#121417] text-white shadow-xs transition-transform group-hover:scale-110 dark:bg-white dark:text-[#121417]">
+            <div className="flex h-7.5 sm:h-8 w-7.5 sm:w-8 items-center justify-center rounded-full bg-[#121417] text-white shadow-xs sm:shadow transition-transform group-hover:scale-110 dark:bg-white dark:text-[#121417]">
               <ArrowRight className="h-3.5 sm:h-4 w-3.5 sm:w-4" />
             </div>
           </div>
@@ -131,7 +131,12 @@ export function BentoCard({
           <div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 sm:gap-2 truncate">
-                <InstitutionLogo sourceName={opportunity.sourceName} size={18} />
+                <span className="inline-flex sm:hidden">
+                  <InstitutionLogo sourceName={opportunity.sourceName} size={18} />
+                </span>
+                <span className="hidden sm:inline-flex">
+                  <InstitutionLogo sourceName={opportunity.sourceName} size={20} />
+                </span>
                 <span className="rounded-full bg-[#f1f3f6] px-2 py-0.5 text-[10px] font-bold text-[#121417] dark:bg-[#20242b] dark:text-[#f3f4f6]">
                   {typeLabel}
                 </span>
@@ -142,16 +147,19 @@ export function BentoCard({
               </div>
             </div>
 
-            <h4 className="mt-1.5 font-bold text-sm sm:text-base leading-snug tracking-tight text-[#121417] line-clamp-2 group-hover:text-black dark:text-[#f3f4f6] dark:group-hover:text-white">
+            <h4 className="mt-1.5 sm:mt-2 font-bold text-sm sm:text-base leading-snug tracking-tight text-[#121417] line-clamp-2 group-hover:text-black dark:text-[#f3f4f6] dark:group-hover:text-white">
               {opportunity.title}
             </h4>
 
-            <p className="mt-1 text-xs text-[#64748b] line-clamp-2 dark:text-[#9aa1ad] hidden sm:block">
-              {opportunity.summary}
-            </p>
+            {/* Resumo limitado a 2 linhas com invólucro limpo para preservar -webkit-box no desktop sem sobreposição de display */}
+            <div className="hidden sm:block">
+              <p className="mt-1 text-xs text-[#64748b] line-clamp-2 dark:text-[#9aa1ad]">
+                {opportunity.summary}
+              </p>
+            </div>
           </div>
 
-          <div className="mt-2.5 flex items-center justify-between border-t border-[#f1f3f6] pt-2 dark:border-[#242831]">
+          <div className="mt-2.5 sm:mt-3 flex items-center justify-between border-t border-[#f1f3f6] pt-2 dark:border-[#242831]">
             <span className="text-[11px] font-medium text-[#64748b] dark:text-[#9aa1ad]">
               <span className={deadlineBadge.isUrgent ? 'font-semibold text-rose-600 dark:text-rose-400' : ''}>
                 {deadlineBadge.label}
