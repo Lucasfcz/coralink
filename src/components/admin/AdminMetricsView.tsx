@@ -8,6 +8,12 @@ import {
   Layers,
   Building,
   TrendingUp,
+  Activity,
+  ExternalLink,
+  Globe,
+  Users,
+  Eye,
+  ShieldCheck,
 } from 'lucide-react';
 import { DashboardMetricsResponse } from '@/services/admin';
 
@@ -109,7 +115,69 @@ export function AdminMetricsView({ metrics, isLoading }: AdminMetricsViewProps) 
         </div>
       </div>
 
-      {/* 2. Seção de Gráficos e Distribuições */}
+      {/* 2. Banner de Telemetria e Audiência Vercel Analytics */}
+      <div className="relative overflow-hidden rounded-2xl border border-[#e5e7eb] bg-gradient-to-br from-white via-white to-[#f8f9fa] p-6 shadow-xs dark:border-[#242831] dark:from-[#15181e] dark:via-[#15181e] dark:to-[#1a1e26]">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Telemetria Ativa
+              </span>
+              <span className="rounded-full bg-[#f1f3f6] px-2.5 py-0.5 text-[11px] font-semibold text-[#64748b] dark:bg-[#20242b] dark:text-[#9aa1ad]">
+                @vercel/analytics
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Activity className="h-5 w-5 text-[#121417] dark:text-white" />
+              <h3 className="text-base sm:text-lg font-bold text-[#121417] dark:text-white">
+                Tráfego & Audiência em Tempo Real
+              </h3>
+            </div>
+
+            <p className="text-xs sm:text-sm text-[#64748b] dark:text-[#9aa1ad] max-w-2xl">
+              Rastreamento de visitantes únicos, visualizações de páginas, fontes de tráfego (referrers),
+              dispositivos e cidades em produção com privacidade garantida e conformidade LGPD.
+            </p>
+
+            {/* Badges de Métricas Monitoradas */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] font-medium text-[#4b5563] dark:text-[#9aa1ad]">
+              <span className="inline-flex items-center gap-1 rounded-lg border border-[#e5e7eb] bg-white px-2.5 py-1 dark:border-[#2b303a] dark:bg-[#1a1e27]">
+                <Users className="h-3 w-3 text-sky-500" />
+                Visitantes Únicos
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-lg border border-[#e5e7eb] bg-white px-2.5 py-1 dark:border-[#2b303a] dark:bg-[#1a1e27]">
+                <Eye className="h-3 w-3 text-emerald-500" />
+                Pageviews & Rotas
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-lg border border-[#e5e7eb] bg-white px-2.5 py-1 dark:border-[#2b303a] dark:bg-[#1a1e27]">
+                <Globe className="h-3 w-3 text-indigo-500" />
+                Geolocalização & Referrers
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-lg border border-[#e5e7eb] bg-white px-2.5 py-1 dark:border-[#2b303a] dark:bg-[#1a1e27]">
+                <ShieldCheck className="h-3 w-3 text-amber-500" />
+                Cookieless / LGPD
+              </span>
+            </div>
+          </div>
+
+          {/* Botão de Ação Rápida: Dashboard Vercel */}
+          <div className="shrink-0">
+            <a
+              href="https://vercel.com/lucasfcz/coralink/analytics"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#121417] px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-all hover:bg-black hover:scale-[1.02] active:scale-[0.98] dark:bg-white dark:text-[#121417] dark:hover:bg-stone-200"
+            >
+              <span>Abrir Painel no Vercel</span>
+              <ExternalLink className="h-3.5 w-3.5" />
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Seção de Gráficos e Distribuições */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Distribuição por Categoria / Tipo */}
         <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-xs dark:border-[#242831] dark:bg-[#15181e]">
