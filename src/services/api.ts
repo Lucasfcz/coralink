@@ -77,6 +77,16 @@ export async function fetchApi<T>(
                 localStorage.setItem('coralink_user', JSON.stringify(refreshData.user));
               }
 
+              // Dispara evento global para o AuthProvider sincronizar o estado React em memória
+              window.dispatchEvent(
+                new CustomEvent('coralink-session-refreshed', {
+                  detail: {
+                    accessToken: refreshData.accessToken,
+                    user: refreshData.user,
+                  },
+                })
+              );
+
               // Repete a requisição original com o novo token de acesso
               const retryResponse = await fetch(url, {
                 ...options,

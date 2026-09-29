@@ -86,6 +86,48 @@ const SOURCES: SourceItem[] = [
     logo: '/institutions/unifafire.png',
     category: 'Graduação, Extensão & Carreira',
   },
+  {
+    name: 'FPS',
+    fullName: 'Faculdade Pernambucana de Saúde',
+    logo: '/institutions/fps.png',
+    category: 'Excelência em Ciências da Saúde & IMIP',
+  },
+  {
+    name: 'UNICAP',
+    fullName: 'Universidade Católica de Pernambuco',
+    logo: '/institutions/unicap.png',
+    category: 'Ensino Superior Comunitário & Pesquisa',
+  },
+  {
+    name: 'REC’n’Play',
+    fullName: 'Festival de Inovação do Recife Antigo',
+    logo: '/institutions/recnplay.png',
+    category: 'Festival, Hackathons & Arenas Universitárias',
+  },
+  {
+    name: 'Doity PE',
+    fullName: 'Plataforma de Congressos e Simpósios',
+    logo: '/institutions/doity.png',
+    category: 'Eventos Científicos & Submissão de Trabalhos',
+  },
+  {
+    name: 'Even3',
+    fullName: 'Plataforma Científica e Acadêmica',
+    logo: '/institutions/even3.png',
+    category: 'Congressos & Chamadas de Trabalhos',
+  },
+  {
+    name: 'IEL PE',
+    fullName: 'Instituto Euvaldo Lodi de Pernambuco',
+    logo: '/institutions/iel.png',
+    category: 'Estágios & Bolsas Inova Talentos',
+  },
+  {
+    name: 'Comunidade Manguezal',
+    fullName: 'Comunidade de Startups de Recife',
+    logo: '/institutions/manguezal.png',
+    category: 'Meetups, Inovação & Networking Universitário',
+  },
 ];
 
 export function SobreSourcesGrid() {
@@ -99,7 +141,7 @@ export function SobreSourcesGrid() {
               CANAIS MONITORADOS
             </span>
             <h2 className="mt-2 text-3xl sm:text-5xl font-black tracking-tight uppercase text-[#121417] dark:text-white">
-              12 FONTES OFICIAIS
+              19 FONTES OFICIAIS
             </h2>
           </div>
 

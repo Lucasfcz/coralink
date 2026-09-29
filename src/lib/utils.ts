@@ -116,6 +116,14 @@ export function formatSourceName(sourceName: string | null | undefined): string 
     SYMPLA: 'Sympla',
     UNIBRA: 'UNIBRA',
     UNIFAFIRE: 'UNIFAFIRE',
+    UFRPE: 'UFRPE',
+    FPS: 'FPS',
+    UNICAP: 'UNICAP',
+    RECNPLAY: 'REC’n’Play',
+    DOITY: 'Doity',
+    EVEN3: 'Even3',
+    IEL: 'IEL PE',
+    MANGUEZAL: 'Comunidade Manguezal',
     AWS_USER_GROUP_RECIFE: 'AWS User Group Recife',
     KAGGLE_DAYS: 'Kaggle Days',
     TECH_BANK: 'Tech Bank',
@@ -150,6 +158,13 @@ export function getSourceLogoUrl(sourceName: string | null | undefined): string 
     SYMPLA: '/institutions/sympla.webp',
     UNIBRA: '/institutions/unibra.png',
     UNIFAFIRE: '/institutions/unifafire.png',
+    FPS: '/institutions/fps.png',
+    UNICAP: '/institutions/unicap.png',
+    RECNPLAY: '/institutions/recnplay.png',
+    DOITY: '/institutions/doity.png',
+    EVEN3: '/institutions/even3.png',
+    IEL: '/institutions/iel.png',
+    MANGUEZAL: '/institutions/manguezal.png',
   };
 
   return logos[clean] || null;

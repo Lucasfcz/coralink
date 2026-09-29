@@ -60,6 +60,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(false);
       }
     });
+
+    const handleSessionRefreshed = (event: Event) => {
+      const customEvent = event as CustomEvent<{ accessToken: string; user?: User }>;
+      if (customEvent.detail?.accessToken) {
+        setToken(customEvent.detail.accessToken);
+        if (customEvent.detail.user) {
+          setUser(customEvent.detail.user);
+        }
+      }
+    };
+
+    window.addEventListener('coralink-session-refreshed', handleSessionRefreshed);
+    return () => {
+      window.removeEventListener('coralink-session-refreshed', handleSessionRefreshed);
+    };
   }, []);
 
   const handleAuthSuccess = (res: { accessToken: string; user: User }) => {

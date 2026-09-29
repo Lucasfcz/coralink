@@ -68,18 +68,25 @@ export const COURSE_OPTIONS: { id: TargetCourseAudience; label: string }[] = [
   { id: 'DENTISTRY', label: 'Odontologia' },
 ];
 
-// Lista de fontes / instituições monitoradas (12 fontes oficiais da API)
+// Lista de fontes / instituições monitoradas (19 fontes oficiais da API)
 export const INSTITUTION_OPTIONS = [
   { id: 'UFPE', label: 'UFPE' },
   { id: 'CIN_UFPE', label: 'CIn-UFPE' },
   { id: 'IFPE', label: 'IFPE' },
   { id: 'UPE', label: 'UPE' },
+  { id: 'UNICAP', label: 'UNICAP' },
+  { id: 'FPS', label: 'FPS' },
   { id: 'PORTO_DIGITAL', label: 'Porto Digital' },
   { id: 'CESAR', label: 'CESAR' },
   { id: 'CESAR_SCHOOL', label: 'CESAR School' },
   { id: 'FACEPE', label: 'FACEPE' },
   { id: 'SENAC_PE', label: 'Senac PE' },
   { id: 'SYMPLA', label: 'Sympla Tech' },
+  { id: 'RECNPLAY', label: 'REC’n’Play' },
+  { id: 'DOITY', label: 'Doity' },
+  { id: 'EVEN3', label: 'Even3' },
+  { id: 'IEL', label: 'IEL PE' },
+  { id: 'MANGUEZAL', label: 'Comunidade Manguezal' },
   { id: 'UNIBRA', label: 'UNIBRA' },
   { id: 'UNIFAFIRE', label: 'UNIFAFIRE / Fafire' },
 ];
