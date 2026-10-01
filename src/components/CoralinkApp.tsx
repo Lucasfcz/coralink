@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Opportunity } from '@/types/opportunity';
 import { Header } from '@/components/layout/Header';
 import { FeaturedMarquee } from '@/components/featured/FeaturedMarquee';
@@ -9,6 +9,7 @@ import { BentoFeed } from '@/components/feed/BentoFeed';
 import { FilterDrawer, AdvancedFilterState } from '@/components/feed/FilterDrawer';
 import { OpportunityModal } from '@/components/modal/OpportunityModal';
 import { SearchModal } from '@/components/modal/SearchModal';
+import { ForYouOnboardingModal } from '@/components/foryou/ForYouOnboardingModal';
 import { Footer } from '@/components/layout/Footer';
 
 interface CoralinkAppProps {
@@ -27,6 +28,33 @@ export function CoralinkApp({
   const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilterState>({});
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isOnboardingModalOpen, setIsOnboardingModalOpen] = useState(false);
+  const [feedMode, setFeedMode] = useState<'ALL' | 'FOR_YOU'>('ALL');
+
+  useEffect(() => {
+    // Se o usuário já concluiu o mini-formulário, direciona direto para o 'Para Você'
+    queueMicrotask(() => {
+      try {
+        const hasOnboarded = localStorage.getItem('coralink_has_completed_onboarding') === 'true';
+        if (hasOnboarded) {
+          setFeedMode('FOR_YOU');
+        }
+      } catch {
+        // Ignora erro de acesso a storage
+      }
+    });
+  }, []);
+
+  const handleChangeFeedMode = (newMode: 'ALL' | 'FOR_YOU') => {
+    if (newMode === 'FOR_YOU') {
+      const hasOnboarded = localStorage.getItem('coralink_has_completed_onboarding') === 'true';
+      if (!hasOnboarded) {
+        setIsOnboardingModalOpen(true);
+        return;
+      }
+    }
+    setFeedMode(newMode);
+  };
 
   const handleRemoveAdvancedFilter = (key: keyof AdvancedFilterState) => {
     setAdvancedFilters((prev) => {
@@ -62,6 +90,8 @@ export function CoralinkApp({
           onOpenDrawer={() => setIsFilterDrawerOpen(true)}
           onRemoveAdvancedFilter={handleRemoveAdvancedFilter}
           onResetAllFilters={handleResetAllFilters}
+          feedMode={feedMode}
+          onChangeFeedMode={handleChangeFeedMode}
         />
 
         {/* 4. Bento Feed com Scroll Infinito (Peek suave dos cards) */}
@@ -71,6 +101,8 @@ export function CoralinkApp({
           selectedFilter={selectedFilter}
           advancedFilters={advancedFilters}
           onSelectOpportunity={setSelectedOpportunity}
+          feedMode={feedMode}
+          onOpenPreferences={() => setIsOnboardingModalOpen(true)}
         />
       </main>
 
@@ -78,6 +110,14 @@ export function CoralinkApp({
       <Footer />
 
       {/* 6. Modals & Drawer */}
+      <ForYouOnboardingModal
+        isOpen={isOnboardingModalOpen}
+        onClose={() => setIsOnboardingModalOpen(false)}
+        onCompleted={() => {
+          setFeedMode('FOR_YOU');
+        }}
+      />
+
       <FilterDrawer
         isOpen={isFilterDrawerOpen}
         onClose={() => setIsFilterDrawerOpen(false)}

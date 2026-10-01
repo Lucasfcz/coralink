@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { SafeImage } from '@/components/common/SafeImage';
-import { ArrowRight, MapPin, Calendar } from 'lucide-react';
+import { ArrowRight, MapPin, Calendar, Sparkles } from 'lucide-react';
 import { Opportunity } from '@/types/opportunity';
 import {
   formatDeadlineBadge,
@@ -18,12 +18,14 @@ interface BentoCardProps {
   opportunity: Opportunity;
   variant?: 'hero' | 'stacked' | 'editorial';
   onSelect: (opportunity: Opportunity) => void;
+  matchBadge?: { percentage: number; label?: string };
 }
 
 export function BentoCard({
   opportunity,
   variant = 'editorial',
   onSelect,
+  matchBadge,
 }: BentoCardProps) {
   const imageUrl = getCleanImageUrl(opportunity.imageUrl, opportunity.id);
   const fallbackUrl = getFallbackImageUrl(opportunity.id);
@@ -54,6 +56,12 @@ export function BentoCard({
         {/* Floating Glassmorphism overlay */}
         <div className="absolute inset-x-3 sm:inset-x-4 bottom-3 sm:bottom-4 z-10 rounded-2xl border border-white/60 bg-white/92 p-4 sm:p-5 shadow-xl backdrop-blur-md transition-all duration-300 group-hover:bg-white dark:border-[#2b303a] dark:bg-[#15181e]/95 dark:group-hover:bg-[#181b22]">
           <div className="flex flex-wrap items-center gap-2">
+            {matchBadge && (
+              <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-extrabold text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
+                <Sparkles className="h-3 w-3" />
+                <span>{matchBadge.percentage}% match</span>
+              </span>
+            )}
             <span className="rounded-full bg-[#121417] px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white dark:bg-white dark:text-[#121417]">
               {typeLabel}
             </span>
@@ -144,6 +152,12 @@ export function BentoCard({
                 <span className="text-[11px] font-semibold text-[#121417] truncate dark:text-[#f3f4f6]">
                   {formattedSource}
                 </span>
+                {matchBadge && (
+                  <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-1.5 py-0.2 text-[9px] font-extrabold text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 shrink-0">
+                    <Sparkles className="h-2.5 w-2.5" />
+                    <span>{matchBadge.percentage}%</span>
+                  </span>
+                )}
               </div>
             </div>
 
@@ -185,6 +199,12 @@ export function BentoCard({
         {/* Header Tags */}
         <div className="flex items-center justify-between">
           <div className="flex flex-wrap items-center gap-1.5">
+            {matchBadge && (
+              <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-extrabold text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
+                <Sparkles className="h-3 w-3" />
+                <span>{matchBadge.percentage}% match</span>
+              </span>
+            )}
             <span className="rounded-full bg-[#f1f3f6] px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#121417] dark:bg-[#20242b] dark:text-[#f3f4f6]">
               {typeLabel}
             </span>

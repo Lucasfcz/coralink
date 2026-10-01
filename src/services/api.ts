@@ -57,9 +57,10 @@ export async function fetchApi<T>(
     });
 
     if (!response.ok) {
-      // Se receber 401 em rota autenticada no cliente, tenta renovar a sessão silenciosamente via refresh token cookie
+      // Se receber 401 em rota autenticada no cliente, tenta renovar a sessão silenciosamente via refresh token cookie ou body fallback
       if (response.status === 401 && typeof window !== 'undefined' && !endpoint.includes('/auth/')) {
         try {
+          const storedRefreshToken = localStorage.getItem('coralink_refresh_token');
           const refreshRes = await fetch(`${baseUrl}/auth/refresh`, {
             method: 'POST',
             headers: {
@@ -67,12 +68,16 @@ export async function fetchApi<T>(
               Accept: 'application/json',
             },
             credentials: 'include',
+            body: storedRefreshToken ? JSON.stringify({ refreshToken: storedRefreshToken }) : undefined,
           });
 
           if (refreshRes.ok) {
             const refreshData = await refreshRes.json();
             if (refreshData?.accessToken) {
               localStorage.setItem('coralink_token', refreshData.accessToken);
+              if (refreshData.refreshToken) {
+                localStorage.setItem('coralink_refresh_token', refreshData.refreshToken);
+              }
               if (refreshData.user) {
                 localStorage.setItem('coralink_user', JSON.stringify(refreshData.user));
               }
@@ -82,6 +87,7 @@ export async function fetchApi<T>(
                 new CustomEvent('coralink-session-refreshed', {
                   detail: {
                     accessToken: refreshData.accessToken,
+                    refreshToken: refreshData.refreshToken,
                     user: refreshData.user,
                   },
                 })

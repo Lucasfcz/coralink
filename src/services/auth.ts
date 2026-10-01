@@ -107,13 +107,15 @@ export const authService = {
   /**
    * Logout seguro
    */
-  async logout(): Promise<void> {
+  async logout(refreshToken?: string | null): Promise<void> {
     try {
       const baseUrl = getApiBaseUrl();
+      const token = refreshToken || (typeof window !== 'undefined' ? localStorage.getItem('coralink_refresh_token') : null);
       await fetch(`${baseUrl}/auth/logout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
+        body: token ? JSON.stringify({ refreshToken: token }) : undefined,
       });
     } catch {
       // Falha silenciosa de rede no logout
@@ -121,10 +123,11 @@ export const authService = {
   },
 
   /**
-   * Renovação de Access Token via Refresh Token Cookie
+   * Renovação de Access Token via Refresh Token Cookie ou Body Fallback
    */
-  async refreshToken(): Promise<AuthResponse> {
+  async refreshToken(fallbackToken?: string | null): Promise<AuthResponse> {
     const baseUrl = getApiBaseUrl();
+    const token = fallbackToken || (typeof window !== 'undefined' ? localStorage.getItem('coralink_refresh_token') : null);
     const res = await fetch(`${baseUrl}/auth/refresh`, {
       method: 'POST',
       headers: {
@@ -132,6 +135,7 @@ export const authService = {
         Accept: 'application/json',
       },
       credentials: 'include',
+      body: token ? JSON.stringify({ refreshToken: token }) : undefined,
     });
 
     if (!res.ok) {

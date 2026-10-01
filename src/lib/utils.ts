@@ -123,7 +123,6 @@ export function formatSourceName(sourceName: string | null | undefined): string 
     DOITY: 'Doity',
     EVEN3: 'Even3',
     IEL: 'IEL PE',
-    MANGUEZAL: 'Comunidade Manguezal',
     AWS_USER_GROUP_RECIFE: 'AWS User Group Recife',
     KAGGLE_DAYS: 'Kaggle Days',
     TECH_BANK: 'Tech Bank',
@@ -164,7 +163,6 @@ export function getSourceLogoUrl(sourceName: string | null | undefined): string 
     DOITY: '/institutions/doity.png',
     EVEN3: '/institutions/even3.png',
     IEL: '/institutions/iel.png',
-    MANGUEZAL: '/institutions/manguezal.png',
   };
 
   return logos[clean] || null;

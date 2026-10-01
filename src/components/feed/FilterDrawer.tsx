@@ -68,7 +68,7 @@ export const COURSE_OPTIONS: { id: TargetCourseAudience; label: string }[] = [
   { id: 'DENTISTRY', label: 'Odontologia' },
 ];
 
-// Lista de fontes / instituições monitoradas (19 fontes oficiais da API)
+// Lista de fontes / instituições monitoradas (18 fontes oficiais da API)
 export const INSTITUTION_OPTIONS = [
   { id: 'UFPE', label: 'UFPE' },
   { id: 'CIN_UFPE', label: 'CIn-UFPE' },
@@ -86,7 +86,6 @@ export const INSTITUTION_OPTIONS = [
   { id: 'DOITY', label: 'Doity' },
   { id: 'EVEN3', label: 'Even3' },
   { id: 'IEL', label: 'IEL PE' },
-  { id: 'MANGUEZAL', label: 'Comunidade Manguezal' },
   { id: 'UNIBRA', label: 'UNIBRA' },
   { id: 'UNIFAFIRE', label: 'UNIFAFIRE / Fafire' },
 ];

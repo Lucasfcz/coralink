@@ -122,12 +122,6 @@ const SOURCES: SourceItem[] = [
     logo: '/institutions/iel.png',
     category: 'Estágios & Bolsas Inova Talentos',
   },
-  {
-    name: 'Comunidade Manguezal',
-    fullName: 'Comunidade de Startups de Recife',
-    logo: '/institutions/manguezal.png',
-    category: 'Meetups, Inovação & Networking Universitário',
-  },
 ];
 
 export function SobreSourcesGrid() {
@@ -141,7 +135,7 @@ export function SobreSourcesGrid() {
               CANAIS MONITORADOS
             </span>
             <h2 className="mt-2 text-3xl sm:text-5xl font-black tracking-tight uppercase text-[#121417] dark:text-white">
-              19 FONTES OFICIAIS
+              18 FONTES OFICIAIS
             </h2>
           </div>
 
