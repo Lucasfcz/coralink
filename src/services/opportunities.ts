@@ -9,10 +9,28 @@ export async function getOpportunities(
   const params = new URLSearchParams();
 
   if (filters.title) params.append('title', filters.title);
-  if (filters.type) params.append('type', filters.type);
-  if (filters.targetCourseAudience) params.append('targetCourseAudience', filters.targetCourseAudience);
+
+  if (filters.types && filters.types.length > 0) {
+    filters.types.forEach((t) => params.append('type', t));
+  } else if (filters.type) {
+    params.append('type', filters.type);
+  }
+
+  const resolvedCourses = filters.courses || filters.targetCourseAudiences;
+  if (resolvedCourses && resolvedCourses.length > 0) {
+    resolvedCourses.forEach((c) => params.append('targetCourseAudience', c));
+  } else if (filters.targetCourseAudience) {
+    params.append('targetCourseAudience', filters.targetCourseAudience);
+  }
+
   if (filters.modality) params.append('modality', filters.modality);
-  if (filters.sourceName) params.append('sourceName', filters.sourceName);
+
+  if (filters.sourceNames && filters.sourceNames.length > 0) {
+    filters.sourceNames.forEach((s) => params.append('sourceName', s));
+  } else if (filters.sourceName) {
+    params.append('sourceName', filters.sourceName);
+  }
+
   if (filters.isFree !== undefined) params.append('isFree', String(filters.isFree));
   if (filters.isForAll !== undefined) params.append('isForAll', String(filters.isForAll));
 

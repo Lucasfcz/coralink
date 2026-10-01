@@ -62,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     const handleSessionRefreshed = (event: Event) => {
-      const customEvent = event as CustomEvent<{ accessToken: string; user?: User }>;
+      const customEvent = event as CustomEvent<{ accessToken: string; refreshToken?: string; user?: User }>;
       if (customEvent.detail?.accessToken) {
         setToken(customEvent.detail.accessToken);
         if (customEvent.detail.user) {
@@ -77,16 +77,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const handleAuthSuccess = (res: { accessToken: string; user: User }) => {
+  const handleAuthSuccess = (res: { accessToken: string; refreshToken?: string; user: User }) => {
     setUser(res.user);
     setToken(res.accessToken);
     try {
       localStorage.setItem('coralink_user', JSON.stringify(res.user));
       localStorage.setItem('coralink_token', res.accessToken);
+      if (res.refreshToken) {
+        localStorage.setItem('coralink_refresh_token', res.refreshToken);
+      }
     } catch {
       // Ignora erro de cota de storage
     }
   };
+
+  // Renovação proativa do token aos 13 minutos (evita que a sessão expire durante a navegação)
+  useEffect(() => {
+    if (!token || !user) return;
+
+    // Dispara 13 minutos após o login/renovação de token (780.000 ms)
+    const REFRESH_INTERVAL_MS = 13 * 60 * 1000;
+    const timer = setTimeout(async () => {
+      try {
+        const storedRefreshToken = localStorage.getItem('coralink_refresh_token');
+        const res = await authService.refreshToken(storedRefreshToken);
+        if (res?.accessToken) {
+          handleAuthSuccess(res);
+        }
+      } catch (err) {
+        console.warn('Renovação proativa de sessão não pôde ser completada:', err);
+      }
+    }, REFRESH_INTERVAL_MS);
+
+    return () => clearTimeout(timer);
+  }, [token, user]);
 
   const loginWithGoogle = async (idToken: string) => {
     setIsLoading(true);
@@ -121,12 +145,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     setIsLoading(true);
     try {
-      await authService.logout();
+      const storedRefreshToken = localStorage.getItem('coralink_refresh_token');
+      await authService.logout(storedRefreshToken);
     } finally {
       setUser(null);
       setToken(null);
       localStorage.removeItem('coralink_user');
       localStorage.removeItem('coralink_token');
+      localStorage.removeItem('coralink_refresh_token');
       setIsLoading(false);
     }
   };

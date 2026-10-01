@@ -101,9 +101,13 @@ export interface PageResponse<T> {
 export interface OpportunityFilters {
   title?: string;
   type?: OpportunityType;
+  types?: OpportunityType[];
   targetCourseAudience?: TargetCourseAudience;
+  targetCourseAudiences?: TargetCourseAudience[];
+  courses?: TargetCourseAudience[];
   modality?: Modality;
   sourceName?: string;
+  sourceNames?: string[];
   isFree?: boolean;
   isForAll?: boolean;
   page?: number;

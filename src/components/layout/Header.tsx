@@ -147,6 +147,19 @@ export function Header({ onSearchClick }: HeaderProps) {
               <span className="hidden sm:inline">Buscar oportunidades</span>
             </button>
 
+            {/* Atalho Rápido para Painel Admin no Mobile */}
+            {user?.role === 'ROLE_ADMIN' && (
+              <Link
+                href="/admin"
+                aria-label="Acessar Painel Administrativo"
+                title="Painel Administrativo"
+                className="flex md:hidden h-10 px-3 items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-300 text-xs font-bold transition-all hover:bg-amber-500/20"
+              >
+                <ShieldAlert className="h-4 w-4 text-amber-500" />
+                <span className="text-[11px] font-extrabold uppercase">Admin</span>
+              </Link>
+            )}
+
             {/* Ícone de Perfil / Menu Dropdown (Desktop) */}
             <div className="relative hidden md:block" ref={profileMenuRef}>
               <button
@@ -351,6 +364,43 @@ export function Header({ onSearchClick }: HeaderProps) {
                 );
               })}
               <div className="pt-4 border-t border-[#f1f3f6] dark:border-[#242831] flex flex-col gap-3">
+                {/* Perfil e Atalho do Admin no Topo da Gaveta */}
+                {user && (
+                  <div className="flex flex-col gap-2">
+                    <div className="px-3 py-2.5 rounded-xl bg-[#f8f9fa] dark:bg-[#1a1d24]">
+                      <div className="flex items-center justify-between">
+                        <p className="truncate text-sm font-bold text-[#121417] dark:text-white">
+                          {user.name}
+                        </p>
+                        {user.role === 'ROLE_ADMIN' && (
+                          <span className="rounded-md bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                            Admin
+                          </span>
+                        )}
+                      </div>
+                      <p className="truncate text-xs text-[#64748b] dark:text-[#9aa1ad]">
+                        {user.email}
+                      </p>
+                    </div>
+
+                    {user.role === 'ROLE_ADMIN' && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex w-full items-center justify-between rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2.5 text-xs font-bold text-amber-800 transition-all hover:bg-amber-500/20 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-300"
+                      >
+                        <div className="flex items-center gap-2">
+                          <ShieldAlert className="h-4 w-4 text-amber-500" />
+                          <span>Acessar Painel Admin</span>
+                        </div>
+                        <span className="rounded-md bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-300">
+                          Acesso Master
+                        </span>
+                      </Link>
+                    )}
+                  </div>
+                )}
+
                 {/* Alternador de Tema: Claro / Escuro */}
                 <div className="flex items-center justify-between rounded-xl px-3 py-2.5 bg-[#f8f9fa] dark:bg-[#1c2027]">
                   <div className="flex items-center gap-2.5 text-xs font-semibold text-[#121417] dark:text-[#f3f4f6]">
@@ -397,45 +447,18 @@ export function Header({ onSearchClick }: HeaderProps) {
                   </span>
                 </button>
 
-                {/* Atalho Restrito: Painel Admin no Mobile */}
-                {user?.role === 'ROLE_ADMIN' && (
-                  <Link
-                    href="/admin"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex w-full items-center justify-between rounded-xl border border-amber-500/20 bg-amber-500/5 px-3 py-2.5 text-xs font-bold text-amber-700 transition-all hover:bg-amber-500/10 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-300"
-                  >
-                    <div className="flex items-center gap-2">
-                      <ShieldAlert className="h-4 w-4 text-amber-500" />
-                      <span>Painel Admin</span>
-                    </div>
-                    <span className="rounded-md bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-                      Admin
-                    </span>
-                  </Link>
-                )}
-
                 {user ? (
-                  <>
-                    <div className="px-3 py-2 rounded-xl bg-[#f8f9fa] dark:bg-[#1a1d24]">
-                      <p className="truncate text-sm font-bold text-[#121417] dark:text-white">
-                        {user.name}
-                      </p>
-                      <p className="truncate text-xs text-[#64748b] dark:text-[#9aa1ad]">
-                        {user.email}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        setMobileMenuOpen(false);
-                        await logout();
-                      }}
-                      className="flex items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 py-3 text-sm font-semibold text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300"
-                    >
-                      <LogOut className="h-4 w-4" />
-                      <span>Sair da conta</span>
-                    </button>
-                  </>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setMobileMenuOpen(false);
+                      await logout();
+                    }}
+                    className="flex items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 py-3 text-sm font-semibold text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Sair da conta</span>
+                  </button>
                 ) : (
                   <button
                     type="button"

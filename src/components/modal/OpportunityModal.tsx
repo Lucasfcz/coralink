@@ -27,7 +27,7 @@ import {
 } from '@/lib/utils';
 import { InstitutionLogo } from '@/components/common/InstitutionLogo';
 import { ShareModal } from '@/components/common/ShareModal';
-
+import { recordOpportunityInteraction } from '@/lib/recommendationEngine';
 import { useModalScrollLock } from '@/hooks/useModalScrollLock';
 
 interface OpportunityModalProps {
@@ -44,6 +44,8 @@ export function OpportunityModal({
 
   useEffect(() => {
     if (!opportunity) return;
+
+    recordOpportunityInteraction(opportunity.type, 'VIEW_DETAILS');
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -279,6 +281,7 @@ export function OpportunityModal({
                   href={opportunity.officialUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => recordOpportunityInteraction(opportunity.type, 'CLICK_OFFICIAL')}
                   className="flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-[#121417] px-7 py-3 text-xs font-bold text-white shadow-md transition-all hover:bg-black hover:shadow-lg dark:bg-white dark:text-[#121417] dark:hover:bg-stone-200"
                 >
                   <span>Acessar Edital Oficial</span>

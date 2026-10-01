@@ -262,9 +262,10 @@ export function AdminOpportunitiesTable() {
         </div>
       </div>
 
-      {/* Tabela de Oportunidades */}
+      {/* Tabela de Oportunidades (Desktop) e Lista de Cards Touch-Friendly (Mobile) */}
       <div className="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-xs dark:border-[#242831] dark:bg-[#15181e]">
-        <div className="overflow-x-auto">
+        {/* VISUALIZAÇÃO DESKTOP: Tabela tradicional */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-[#f1f3f6] bg-[#f8f9fa] text-[11px] font-black uppercase tracking-wider text-[#64748b] dark:border-[#242831] dark:bg-[#181b22] dark:text-[#9aa1ad]">
@@ -381,6 +382,124 @@ export function AdminOpportunitiesTable() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* VISUALIZAÇÃO MOBILE: Cards Verticais Touch-Friendly */}
+        <div className="block md:hidden divide-y divide-[#f1f3f6] dark:divide-[#242831]">
+          {isLoading ? (
+            [...Array(4)].map((_, i) => (
+              <div key={i} className="p-4 space-y-2.5 animate-pulse">
+                <div className="flex justify-between items-center">
+                  <div className="h-4 w-16 rounded bg-stone-200 dark:bg-stone-800" />
+                  <div className="h-4 w-20 rounded bg-stone-200 dark:bg-stone-800" />
+                </div>
+                <div className="h-5 w-3/4 rounded bg-stone-200 dark:bg-stone-800" />
+                <div className="h-8 w-full rounded-xl bg-stone-200 dark:bg-stone-800" />
+              </div>
+            ))
+          ) : filteredOpportunities.length === 0 ? (
+            <div className="py-8 px-4 text-center text-xs text-[#64748b] dark:text-[#9aa1ad]">
+              Nenhuma oportunidade encontrada com os filtros selecionados.
+            </div>
+          ) : (
+            filteredOpportunities.map((opp) => {
+              const isExpired = opp.expiresAt < todayStr;
+              return (
+                <div
+                  key={opp.id}
+                  className="p-4 space-y-3 transition-colors hover:bg-[#f8f9fa] dark:hover:bg-[#181b22]"
+                >
+                  {/* Top: ID, Fonte e Status */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono text-xs font-bold text-stone-500 dark:text-stone-400">
+                        #{opp.id}
+                      </span>
+                      <span className="rounded-md bg-blue-500/10 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
+                        {opp.sourceName}
+                      </span>
+                    </div>
+
+                    {isExpired ? (
+                      <span className="rounded-full bg-rose-500/10 px-2 py-0.5 text-[10px] font-extrabold text-rose-600 dark:bg-rose-500/20 dark:text-rose-400">
+                        Expirada
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-extrabold text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
+                        Vigente
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Título */}
+                  <h3 className="text-xs sm:text-sm font-bold text-[#121417] dark:text-white leading-snug">
+                    {opp.title}
+                  </h3>
+
+                  {/* Seletor Rápido de Tipo */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-semibold text-[#64748b] dark:text-[#9aa1ad] shrink-0">
+                      Tipo:
+                    </span>
+                    <select
+                      value={opp.type}
+                      disabled={updatingTypeId === opp.id}
+                      onChange={(e) =>
+                        handleQuickTypeChange(opp.id, e.target.value as OpportunityType)
+                      }
+                      className="w-full rounded-lg border border-[#e5e7eb] bg-[#f8f9fa] px-2 py-1.5 text-xs font-bold text-[#121417] focus:border-[#121417] focus:outline-none dark:border-[#242831] dark:bg-[#181b22] dark:text-[#f3f4f6]"
+                    >
+                      {ALL_TYPES.map((t) => (
+                        <option
+                          key={t}
+                          value={t}
+                          className="bg-white dark:bg-[#15181e] text-[#121417] dark:text-[#f3f4f6]"
+                        >
+                          {getOpportunityTypeLabel(t)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Rodapé do Card: Data de Validade e Ações */}
+                  <div className="flex items-center justify-between pt-1 border-t border-[#f1f3f6] dark:border-[#242831]/60">
+                    <span className="font-mono text-[11px] text-[#64748b] dark:text-[#9aa1ad]">
+                      Até {opp.expiresAt}
+                    </span>
+
+                    <div className="flex items-center gap-1">
+                      <a
+                        href={opp.officialUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-[#64748b] hover:bg-[#f1f3f6] dark:text-[#9aa1ad] dark:hover:bg-[#1e222a]"
+                        title="Abrir URL Oficial"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(opp)}
+                        className="flex h-8 items-center gap-1 px-2.5 rounded-lg bg-blue-50 text-xs font-bold text-blue-600 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400"
+                        title="Editar Oportunidade"
+                      >
+                        <Edit2 className="h-3 w-3" />
+                        <span>Editar</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickSoftDelete(opp.id)}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/30"
+                        title="Soft Delete (Expirar Agora)"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
 
         {/* Paginação */}

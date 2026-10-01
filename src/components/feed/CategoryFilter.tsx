@@ -1,6 +1,6 @@
 'use client';
 
-import { SlidersHorizontal, X } from 'lucide-react';
+import { SlidersHorizontal, X, Sparkles } from 'lucide-react';
 import { OpportunityType } from '@/types/opportunity';
 import {
   AdvancedFilterState,
@@ -36,8 +36,10 @@ interface CategoryFilterProps {
   totalCount?: number;
   advancedFilters?: AdvancedFilterState;
   onOpenDrawer?: () => void;
-  onRemoveAdvancedFilter?: (key: keyof AdvancedFilterState) => void;
+  onRemoveAdvancedFilter?: (key: keyof AdvancedFilterState, value?: string) => void;
   onResetAllFilters?: () => void;
+  feedMode?: 'ALL' | 'FOR_YOU';
+  onChangeFeedMode?: (mode: 'ALL' | 'FOR_YOU') => void;
 }
 
 export function CategoryFilter({
@@ -48,36 +50,62 @@ export function CategoryFilter({
   onOpenDrawer,
   onRemoveAdvancedFilter,
   onResetAllFilters,
+  feedMode = 'ALL',
+  onChangeFeedMode,
 }: CategoryFilterProps) {
-  // Contabilizar filtros avançados ativos
-  const activeKeys = (Object.keys(advancedFilters) as (keyof AdvancedFilterState)[]).filter(
-    (key) => advancedFilters[key] !== undefined
-  );
-  const activeCount = activeKeys.length;
-
   // Montar etiquetas legíveis para badges de filtros avançados
-  const activeBadges: { key: keyof AdvancedFilterState; label: string }[] = [];
+  const activeBadges: { key: keyof AdvancedFilterState; value?: string; label: string }[] = [];
 
-  if (advancedFilters.course) {
+  if (advancedFilters.courses && advancedFilters.courses.length > 0) {
+    advancedFilters.courses.forEach((course) => {
+      const found = COURSE_OPTIONS.find((c) => c.id === course);
+      activeBadges.push({
+        key: 'courses',
+        value: course,
+        label: `Curso: ${found ? found.label : course}`,
+      });
+    });
+  } else if (advancedFilters.course) {
     const found = COURSE_OPTIONS.find((c) => c.id === advancedFilters.course);
     activeBadges.push({
       key: 'course',
+      value: advancedFilters.course,
       label: `Curso: ${found ? found.label : advancedFilters.course}`,
     });
   }
 
-  if (advancedFilters.institution) {
+  if (advancedFilters.institutions && advancedFilters.institutions.length > 0) {
+    advancedFilters.institutions.forEach((inst) => {
+      const found = INSTITUTION_OPTIONS.find((i) => i.id === inst);
+      activeBadges.push({
+        key: 'institutions',
+        value: inst,
+        label: `Fonte: ${found ? found.label : inst}`,
+      });
+    });
+  } else if (advancedFilters.institution) {
     const found = INSTITUTION_OPTIONS.find((i) => i.id === advancedFilters.institution);
     activeBadges.push({
       key: 'institution',
-      label: `Faculdade: ${found ? found.label : advancedFilters.institution}`,
+      value: advancedFilters.institution,
+      label: `Fonte: ${found ? found.label : advancedFilters.institution}`,
     });
   }
 
-  if (advancedFilters.type) {
+  if (advancedFilters.types && advancedFilters.types.length > 0) {
+    advancedFilters.types.forEach((t) => {
+      const found = TYPE_OPTIONS.find((opt) => opt.id === t);
+      activeBadges.push({
+        key: 'types',
+        value: t,
+        label: `Tipo: ${found ? found.label : t}`,
+      });
+    });
+  } else if (advancedFilters.type) {
     const found = TYPE_OPTIONS.find((t) => t.id === advancedFilters.type);
     activeBadges.push({
       key: 'type',
+      value: advancedFilters.type,
       label: `Tipo: ${found ? found.label : advancedFilters.type}`,
     });
   }
@@ -98,9 +126,53 @@ export function CategoryFilter({
     activeBadges.push({ key: 'isForAll', label: 'Aberto a Todos' });
   }
 
+  const activeCount = activeBadges.length;
+
   return (
     <div className="w-full border-y border-[#e5e7eb] bg-[#fbfbfb]/80 py-3.5 backdrop-blur-sm dark:border-[#242831] dark:bg-[#0a0b0d]/80">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Barra Superior: Alternador de Modo Feed Geral vs Para Você */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-3 pb-3 border-b border-[#f1f3f6] dark:border-[#20242b]">
+          <div className="flex items-center rounded-2xl bg-[#f1f3f6] p-1 dark:bg-[#181b22] w-fit">
+            <button
+              type="button"
+              onClick={() => onChangeFeedMode?.('ALL')}
+              className={`flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
+                feedMode === 'ALL'
+                  ? 'bg-white text-[#121417] shadow-xs dark:bg-[#20242b] dark:text-white'
+                  : 'text-[#64748b] hover:text-[#121417] dark:text-[#9aa1ad] dark:hover:text-white'
+              }`}
+            >
+              <span>Feed Geral</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onChangeFeedMode?.('FOR_YOU')}
+              className={`flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
+                feedMode === 'FOR_YOU'
+                  ? 'bg-[#121417] text-white shadow-xs dark:bg-white dark:text-[#121417]'
+                  : 'text-[#64748b] hover:text-[#121417] dark:text-[#9aa1ad] dark:hover:text-white'
+              }`}
+            >
+              <Sparkles className="h-3.5 w-3.5 text-emerald-500 dark:text-emerald-400" />
+              <span>Para Você</span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2 text-[#64748b] dark:text-[#9aa1ad]">
+            {feedMode === 'FOR_YOU' ? (
+              <span className="font-medium text-[11px]">
+                Feed personalizado com base nas suas preferências e área
+              </span>
+            ) : (
+              <span className="font-medium text-[11px]">
+                Feed cronológico completo de todas as fontes
+              </span>
+            )}
+          </div>
+        </div>
+
         <div className="flex items-center gap-3">
           {/* Botão Gatilho Filtros Avançados */}
           {onOpenDrawer && (
@@ -167,14 +239,14 @@ export function CategoryFilter({
             </span>
             {activeBadges.map((b) => (
               <span
-                key={b.key}
+                key={`${b.key}-${b.value || 'single'}`}
                 className="inline-flex items-center gap-1.5 rounded-full border border-[#e5e7eb] bg-white px-2.5 py-1 text-[11px] font-medium text-[#121417] shadow-2xs dark:border-[#242831] dark:bg-[#181b22] dark:text-[#f3f4f6]"
               >
                 <span>{b.label}</span>
                 {onRemoveAdvancedFilter && (
                   <button
                     type="button"
-                    onClick={() => onRemoveAdvancedFilter(b.key)}
+                    onClick={() => onRemoveAdvancedFilter(b.key, b.value)}
                     className="text-[#64748b] hover:text-rose-600 dark:text-[#9aa1ad] dark:hover:text-rose-400"
                     aria-label={`Remover filtro ${b.label}`}
                   >

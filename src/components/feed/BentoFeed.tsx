@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Opportunity } from '@/types/opportunity';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { Opportunity, OpportunityType } from '@/types/opportunity';
 import { BentoCard } from './BentoCard';
 import { FeedSkeleton } from './FeedSkeleton';
 import { FeedPeekSkeleton } from './FeedPeekSkeleton';
 import { FilterOption } from './CategoryFilter';
 import { AdvancedFilterState } from './FilterDrawer';
 import { getOpportunities } from '@/services/opportunities';
-import { Flame, CheckCircle2 } from 'lucide-react';
+import { Flame, CheckCircle2, Sparkles, SlidersHorizontal } from 'lucide-react';
+import { getUserPreferences, getScoredOpportunities } from '@/lib/recommendationEngine';
+import { UserPreferences } from '@/types/userPreferences';
 
 interface BentoFeedProps {
   initialOpportunities: Opportunity[];
@@ -16,6 +18,8 @@ interface BentoFeedProps {
   selectedFilter: FilterOption;
   advancedFilters?: AdvancedFilterState;
   onSelectOpportunity: (opp: Opportunity) => void;
+  feedMode?: 'ALL' | 'FOR_YOU';
+  onOpenPreferences?: () => void;
 }
 
 export function BentoFeed({
@@ -23,12 +27,43 @@ export function BentoFeed({
   selectedFilter,
   advancedFilters,
   onSelectOpportunity,
+  feedMode = 'ALL',
+  onOpenPreferences,
 }: BentoFeedProps) {
   const [opportunities, setOpportunities] = useState<Opportunity[]>(initialOpportunities);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isFilterLoading, setIsFilterLoading] = useState(false);
+  const [preferences, setPreferences] = useState<UserPreferences>(() => getUserPreferences());
+
+  useEffect(() => {
+    const handlePrefsUpdated = (e: Event) => {
+      const customEvent = e as CustomEvent<UserPreferences>;
+      if (customEvent.detail) {
+        setPreferences(customEvent.detail);
+      } else {
+        setPreferences(getUserPreferences());
+      }
+    };
+
+    window.addEventListener('coralink-preferences-updated', handlePrefsUpdated);
+    return () => {
+      window.removeEventListener('coralink-preferences-updated', handlePrefsUpdated);
+    };
+  }, []);
+
+  const displayOpportunities = useMemo(() => {
+    if (feedMode === 'FOR_YOU') {
+      return getScoredOpportunities(opportunities, preferences);
+    }
+    return opportunities.map((opp) => ({
+      ...opp,
+      score: 0,
+      matchPercentage: 0,
+      matchReasons: [],
+    }));
+  }, [opportunities, feedMode, preferences]);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const isInitialMount = useRef(true);
@@ -48,10 +83,31 @@ export function BentoFeed({
     async function applyFilter() {
       setIsFilterLoading(true);
       try {
+        const combinedTypes: OpportunityType[] = [];
+        if (advancedFilters?.types && advancedFilters.types.length > 0) {
+          combinedTypes.push(...advancedFilters.types);
+        } else if (advancedFilters?.type) {
+          combinedTypes.push(advancedFilters.type);
+        }
+        if (selectedFilter.type && !combinedTypes.includes(selectedFilter.type)) {
+          combinedTypes.push(selectedFilter.type);
+        }
+
+        const combinedCourses = advancedFilters?.courses && advancedFilters.courses.length > 0
+          ? advancedFilters.courses
+          : advancedFilters?.course ? [advancedFilters.course] : undefined;
+
+        const combinedSources = advancedFilters?.institutions && advancedFilters.institutions.length > 0
+          ? advancedFilters.institutions
+          : advancedFilters?.institution ? [advancedFilters.institution] : undefined;
+
         const res = await getOpportunities({
-          type: advancedFilters?.type || selectedFilter.type,
-          targetCourseAudience: advancedFilters?.course,
-          sourceName: advancedFilters?.institution,
+          types: combinedTypes.length > 0 ? combinedTypes : undefined,
+          type: combinedTypes.length === 1 ? combinedTypes[0] : (selectedFilter.type || advancedFilters?.type),
+          courses: combinedCourses,
+          targetCourseAudience: combinedCourses && combinedCourses.length === 1 ? combinedCourses[0] : undefined,
+          sourceNames: combinedSources,
+          sourceName: combinedSources && combinedSources.length === 1 ? combinedSources[0] : undefined,
           modality: advancedFilters?.modality,
           isFree: advancedFilters?.isFree !== undefined ? advancedFilters.isFree : selectedFilter.isFree,
           isForAll: advancedFilters?.isForAll !== undefined ? advancedFilters.isForAll : selectedFilter.isForAll,
@@ -88,11 +144,32 @@ export function BentoFeed({
     const nextPage = page + 1;
 
     try {
+      const combinedTypes: OpportunityType[] = [];
+      if (advancedFilters?.types && advancedFilters.types.length > 0) {
+        combinedTypes.push(...advancedFilters.types);
+      } else if (advancedFilters?.type) {
+        combinedTypes.push(advancedFilters.type);
+      }
+      if (selectedFilter.type && !combinedTypes.includes(selectedFilter.type)) {
+        combinedTypes.push(selectedFilter.type);
+      }
+
+      const combinedCourses = advancedFilters?.courses && advancedFilters.courses.length > 0
+        ? advancedFilters.courses
+        : advancedFilters?.course ? [advancedFilters.course] : undefined;
+
+      const combinedSources = advancedFilters?.institutions && advancedFilters.institutions.length > 0
+        ? advancedFilters.institutions
+        : advancedFilters?.institution ? [advancedFilters.institution] : undefined;
+
       const [res] = await Promise.all([
         getOpportunities({
-          type: advancedFilters?.type || selectedFilter.type,
-          targetCourseAudience: advancedFilters?.course,
-          sourceName: advancedFilters?.institution,
+          types: combinedTypes.length > 0 ? combinedTypes : undefined,
+          type: combinedTypes.length === 1 ? combinedTypes[0] : (selectedFilter.type || advancedFilters?.type),
+          courses: combinedCourses,
+          targetCourseAudience: combinedCourses && combinedCourses.length === 1 ? combinedCourses[0] : undefined,
+          sourceNames: combinedSources,
+          sourceName: combinedSources && combinedSources.length === 1 ? combinedSources[0] : undefined,
           modality: advancedFilters?.modality,
           isFree: advancedFilters?.isFree !== undefined ? advancedFilters.isFree : selectedFilter.isFree,
           isForAll: advancedFilters?.isForAll !== undefined ? advancedFilters.isForAll : selectedFilter.isForAll,
@@ -153,8 +230,8 @@ export function BentoFeed({
     const blocks: React.ReactNode[] = [];
     const chunkSize = 5;
 
-    for (let i = 0; i < opportunities.length; i += chunkSize) {
-      const chunk = opportunities.slice(i, i + chunkSize);
+    for (let i = 0; i < displayOpportunities.length; i += chunkSize) {
+      const chunk = displayOpportunities.slice(i, i + chunkSize);
       const heroItem = chunk[0];
       const stackedItems = chunk.slice(1, 3);
       const editorialItems = chunk.slice(3, 5);
@@ -168,6 +245,11 @@ export function BentoFeed({
                 opportunity={heroItem}
                 variant="hero"
                 onSelect={onSelectOpportunity}
+                matchBadge={
+                  feedMode === 'FOR_YOU' && heroItem.matchPercentage >= 50
+                    ? { percentage: heroItem.matchPercentage, label: heroItem.matchReasons[0] }
+                    : undefined
+                }
               />
             )}
 
@@ -179,6 +261,11 @@ export function BentoFeed({
                     opportunity={item}
                     variant="stacked"
                     onSelect={onSelectOpportunity}
+                    matchBadge={
+                      feedMode === 'FOR_YOU' && item.matchPercentage >= 50
+                        ? { percentage: item.matchPercentage, label: item.matchReasons[0] }
+                        : undefined
+                    }
                   />
                 ))}
               </div>
@@ -194,6 +281,11 @@ export function BentoFeed({
                   opportunity={item}
                   variant="editorial"
                   onSelect={onSelectOpportunity}
+                  matchBadge={
+                    feedMode === 'FOR_YOU' && item.matchPercentage >= 50
+                      ? { percentage: item.matchPercentage, label: item.matchReasons[0] }
+                      : undefined
+                  }
                 />
               ))}
             </div>
@@ -207,40 +299,77 @@ export function BentoFeed({
 
   return (
     <section id="feed" className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-      {/* Feed Section Header (Estilo image.png) */}
+      {/* Feed Section Header */}
       <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between border-b border-[#e5e7eb] pb-5 dark:border-[#242831]">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-sm font-bold text-[#121417] dark:text-white">✦</span>
+            {feedMode === 'FOR_YOU' ? (
+              <Sparkles className="h-4 w-4 text-emerald-500" />
+            ) : (
+              <span className="text-sm font-bold text-[#121417] dark:text-white">✦</span>
+            )}
             <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#121417] dark:text-white">
-              Feed de Oportunidades
+              {feedMode === 'FOR_YOU' ? 'Para Você' : 'Feed de Oportunidades'}
             </h2>
           </div>
           <p className="mt-1 text-xs sm:text-sm text-[#64748b] dark:text-[#9aa1ad]">
-            Atualizações em tempo real em todas as fontes monitoradas
+            {feedMode === 'FOR_YOU'
+              ? 'Oportunidades recomendadas para o seu curso e interesses acadêmicos'
+              : 'Atualizações em tempo real em todas as fontes monitoradas'}
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-semibold text-[#64748b] dark:text-[#9aa1ad]">
-          <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
-          <span>{opportunities.length} oportunidades exibidas</span>
+        <div className="flex items-center gap-3">
+          {feedMode === 'FOR_YOU' && onOpenPreferences && (
+            <button
+              type="button"
+              onClick={onOpenPreferences}
+              className="flex items-center gap-1.5 rounded-full border border-[#e5e7eb] bg-white px-3 py-1.5 text-xs font-semibold text-[#121417] transition-all hover:border-[#121417] dark:border-[#242831] dark:bg-[#15181e] dark:text-[#f3f4f6] dark:hover:border-stone-500 shadow-2xs"
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              <span>Ajustar preferências</span>
+            </button>
+          )}
+
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#64748b] dark:text-[#9aa1ad]">
+            <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
+            <span>{displayOpportunities.length} oportunidades exibidas</span>
+          </div>
         </div>
       </div>
 
       {/* Feed Content */}
       {isFilterLoading ? (
         <FeedSkeleton />
-      ) : opportunities.length === 0 ? (
+      ) : displayOpportunities.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-[#d1d5db] bg-white p-12 text-center dark:border-[#242831] dark:bg-[#15181e]">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#f1f3f6] text-[#64748b] mb-4 dark:bg-[#20242b] dark:text-[#9aa1ad]">
-            <Flame className="h-6 w-6" />
+            {feedMode === 'FOR_YOU' ? (
+              <Sparkles className="h-6 w-6 text-emerald-500" />
+            ) : (
+              <Flame className="h-6 w-6" />
+            )}
           </div>
           <h3 className="text-base font-bold text-[#121417] dark:text-white">
-            Nenhuma oportunidade encontrada
+            {feedMode === 'FOR_YOU'
+              ? 'Nenhuma recomendação imediata encontrada'
+              : 'Nenhuma oportunidade encontrada'}
           </h3>
           <p className="mt-1 max-w-sm text-xs text-[#64748b] dark:text-[#9aa1ad]">
-            Não há oportunidades vigentes com o filtro selecionado no momento. Tente selecionar outra categoria.
+            {feedMode === 'FOR_YOU'
+              ? 'Tente selecionar outras categorias de oportunidade ou ajustar seus cursos nas preferências.'
+              : 'Não há oportunidades vigentes com o filtro selecionado no momento. Tente selecionar outra categoria.'}
           </p>
+          {feedMode === 'FOR_YOU' && onOpenPreferences && (
+            <button
+              type="button"
+              onClick={onOpenPreferences}
+              className="mt-4 flex items-center gap-1.5 rounded-xl bg-[#121417] px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-black dark:bg-white dark:text-[#121417] dark:hover:bg-stone-200"
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              <span>Ajustar preferências</span>
+            </button>
+          )}
         </div>
       ) : (
         <div className="flex flex-col gap-8">
