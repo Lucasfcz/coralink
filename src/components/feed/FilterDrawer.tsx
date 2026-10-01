@@ -19,12 +19,16 @@ import {
 import { useModalScrollLock } from '@/hooks/useModalScrollLock';
 
 export interface AdvancedFilterState {
-  course?: TargetCourseAudience;
-  institution?: string;
-  type?: OpportunityType;
+  courses?: TargetCourseAudience[];
+  institutions?: string[];
+  types?: OpportunityType[];
   modality?: Modality;
   isFree?: boolean;
   isForAll?: boolean;
+  // Retrocompatibilidade
+  course?: TargetCourseAudience;
+  institution?: string;
+  type?: OpportunityType;
 }
 
 interface FilterDrawerProps {
@@ -35,37 +39,48 @@ interface FilterDrawerProps {
   onResetFilters: () => void;
 }
 
-// Lista curada de cursos e públicos mais frequentes na plataforma
-export const COURSE_OPTIONS: { id: TargetCourseAudience; label: string }[] = [
-  // Categorias amplas / gerais (sem emojis)
-  { id: 'UNIVERSITY_STUDENTS', label: 'Todos os Universitários (Geral)' },
-  { id: 'TECHNOLOGY_STUDENTS', label: 'Estudantes de Tecnologia (Geral)' },
-  { id: 'ENGINEERING_STUDENTS', label: 'Estudantes de Engenharia (Geral)' },
-  { id: 'EXACT_SCIENCES_STUDENTS', label: 'Estudantes de Ciências Exatas (Geral)' },
-  { id: 'HEALTH_STUDENTS', label: 'Estudantes de Saúde (Geral)' },
-  { id: 'HUMANITIES_STUDENTS', label: 'Estudantes de Humanas (Geral)' },
-  { id: 'BUSINESS_STUDENTS', label: 'Estudantes de Negócios (Geral)' },
-
-  // Cursos e formações específicas
-  { id: 'LAW', label: 'Direito' },
+// Cursos e formações acadêmicas específicas
+export const SPECIFIC_COURSE_OPTIONS: { id: TargetCourseAudience; label: string }[] = [
+  { id: 'ADS', label: 'Análise e Desenv. de Sistemas (ADS)' },
+  { id: 'SOFTWARE_ENGINEERING', label: 'Engenharia de Software' },
+  { id: 'COMPUTER_SCIENCE', label: 'Ciência da Computação' },
+  { id: 'INFORMATION_SYSTEMS', label: 'Sistemas de Informação' },
+  { id: 'COMPUTER_ENGINEERING', label: 'Engenharia da Computação' },
+  { id: 'DATA_SCIENCE', label: 'Ciência de Dados' },
   { id: 'BUSINESS_ADMINISTRATION', label: 'Administração & Gestão' },
+  { id: 'ACCOUNTING', label: 'Ciências Contábeis' },
+  { id: 'ECONOMICS', label: 'Economia' },
+  { id: 'LAW', label: 'Direito' },
   { id: 'MEDICINE', label: 'Medicina' },
   { id: 'NURSING', label: 'Enfermagem' },
-  { id: 'PSYCHOLOGY', label: 'Psicologia' },
-  { id: 'COMPUTER_SCIENCE', label: 'Ciência da Computação' },
-  { id: 'SOFTWARE_ENGINEERING', label: 'Engenharia de Software' },
-  { id: 'ADS', label: 'Análise e Desenv. de Sistemas (ADS)' },
-  { id: 'CIVIL_ENGINEERING', label: 'Engenharia Civil' },
-  { id: 'ARCHITECTURE_AND_URBANISM', label: 'Arquitetura e Urbanismo' },
-  { id: 'ACCOUNTING', label: 'Ciências Contábeis' },
-  { id: 'DESIGN', label: 'Design & UX' },
-  { id: 'NUTRITION', label: 'Nutrição' },
   { id: 'PHARMACY', label: 'Farmácia' },
   { id: 'PHYSICAL_THERAPY', label: 'Fisioterapia' },
-  { id: 'PEDAGOGY', label: 'Pedagogia' },
-  { id: 'MARKETING', label: 'Marketing & Comunicação' },
+  { id: 'PSYCHOLOGY', label: 'Psicologia' },
+  { id: 'NUTRITION', label: 'Nutrição' },
   { id: 'BIOMEDICINE', label: 'Biomedicina' },
   { id: 'DENTISTRY', label: 'Odontologia' },
+  { id: 'DESIGN', label: 'Design & UX' },
+  { id: 'MARKETING', label: 'Marketing & Comunicação' },
+  { id: 'CIVIL_ENGINEERING', label: 'Engenharia Civil' },
+  { id: 'ARCHITECTURE_AND_URBANISM', label: 'Arquitetura e Urbanismo' },
+  { id: 'PEDAGOGY', label: 'Pedagogia' },
+];
+
+// Categorias amplas / públicos gerais (sem emojis)
+export const GENERAL_AUDIENCE_OPTIONS: { id: TargetCourseAudience; label: string }[] = [
+  { id: 'TECHNOLOGY_STUDENTS', label: 'Estudantes de Tecnologia (Geral)' },
+  { id: 'ENGINEERING_STUDENTS', label: 'Estudantes de Engenharia (Geral)' },
+  { id: 'BUSINESS_STUDENTS', label: 'Estudantes de Negócios (Geral)' },
+  { id: 'HEALTH_STUDENTS', label: 'Estudantes de Saúde (Geral)' },
+  { id: 'HUMANITIES_STUDENTS', label: 'Estudantes de Humanas (Geral)' },
+  { id: 'EXACT_SCIENCES_STUDENTS', label: 'Estudantes de Ciências Exatas (Geral)' },
+  { id: 'UNIVERSITY_STUDENTS', label: 'Todos os Universitários (Geral)' },
+];
+
+// Lista consolidada para badges e lookups
+export const COURSE_OPTIONS: { id: TargetCourseAudience; label: string }[] = [
+  ...SPECIFIC_COURSE_OPTIONS,
+  ...GENERAL_AUDIENCE_OPTIONS,
 ];
 
 // Lista de fontes / instituições monitoradas (18 fontes oficiais da API)
@@ -118,33 +133,49 @@ export function FilterDrawer({
   onResetFilters,
 }: FilterDrawerProps) {
   useModalScrollLock(isOpen);
-  const activeCount = [
-    filters.course,
-    filters.institution,
-    filters.type,
-    filters.modality,
-    filters.isFree,
-    filters.isForAll,
-  ].filter(Boolean).length;
 
-  const handleSelectCourse = (courseId: TargetCourseAudience) => {
+  const selectedCourses = filters.courses || (filters.course ? [filters.course] : []);
+  const selectedTypes = filters.types || (filters.type ? [filters.type] : []);
+  const selectedInstitutions = filters.institutions || (filters.institution ? [filters.institution] : []);
+
+  const activeCount =
+    selectedCourses.length +
+    selectedTypes.length +
+    selectedInstitutions.length +
+    (filters.modality ? 1 : 0) +
+    (filters.isFree ? 1 : 0) +
+    (filters.isForAll ? 1 : 0);
+
+  const handleToggleCourse = (courseId: TargetCourseAudience) => {
+    const updated = selectedCourses.includes(courseId)
+      ? selectedCourses.filter((id) => id !== courseId)
+      : [...selectedCourses, courseId];
     onApplyFilters({
       ...filters,
-      course: filters.course === courseId ? undefined : courseId,
+      courses: updated,
+      course: updated.length === 1 ? updated[0] : undefined,
     });
   };
 
-  const handleSelectInstitution = (instId: string) => {
+  const handleToggleInstitution = (instId: string) => {
+    const updated = selectedInstitutions.includes(instId)
+      ? selectedInstitutions.filter((id) => id !== instId)
+      : [...selectedInstitutions, instId];
     onApplyFilters({
       ...filters,
-      institution: filters.institution === instId ? undefined : instId,
+      institutions: updated,
+      institution: updated.length === 1 ? updated[0] : undefined,
     });
   };
 
-  const handleSelectType = (typeId: OpportunityType) => {
+  const handleToggleType = (typeId: OpportunityType) => {
+    const updated = selectedTypes.includes(typeId)
+      ? selectedTypes.filter((id) => id !== typeId)
+      : [...selectedTypes, typeId];
     onApplyFilters({
       ...filters,
-      type: filters.type === typeId ? undefined : typeId,
+      types: updated,
+      type: updated.length === 1 ? updated[0] : undefined,
     });
   };
 
@@ -191,7 +222,7 @@ export function FilterDrawer({
                     Filtros Avançados
                   </h3>
                   <p className="text-xs text-[#64748b] dark:text-[#9aa1ad]">
-                    Refine por curso, faculdade e formato
+                    Selecione múltiplos cursos, tipos e faculdades
                   </p>
                 </div>
               </div>
@@ -213,17 +244,17 @@ export function FilterDrawer({
                 <div className="flex items-center gap-2 mb-3">
                   <GraduationCap className="h-4 w-4 text-[#64748b] dark:text-[#9aa1ad]" />
                   <h4 className="text-xs font-bold uppercase tracking-wider text-[#121417] dark:text-white">
-                    Curso / Formação
+                    Cursos & Formações
                   </h4>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {COURSE_OPTIONS.map((c) => {
-                    const isSelected = filters.course === c.id;
+                  {SPECIFIC_COURSE_OPTIONS.map((c) => {
+                    const isSelected = selectedCourses.includes(c.id);
                     return (
                       <button
                         key={c.id}
                         type="button"
-                        onClick={() => handleSelectCourse(c.id)}
+                        onClick={() => handleToggleCourse(c.id)}
                         className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
                           isSelected
                             ? 'bg-[#121417] text-white shadow-xs dark:bg-white dark:text-[#121417]'
@@ -235,6 +266,33 @@ export function FilterDrawer({
                       </button>
                     );
                   })}
+                </div>
+
+                {/* Sub-grupo para Áreas Gerais */}
+                <div className="mt-3.5 pt-3 border-t border-dashed border-[#e5e7eb] dark:border-[#242831]">
+                  <span className="block text-[11px] font-semibold text-[#64748b] mb-2 dark:text-[#9aa1ad]">
+                    Áreas de Interesse Geral
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {GENERAL_AUDIENCE_OPTIONS.map((c) => {
+                      const isSelected = selectedCourses.includes(c.id);
+                      return (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => handleToggleCourse(c.id)}
+                          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
+                            isSelected
+                              ? 'bg-[#121417] text-white shadow-xs dark:bg-white dark:text-[#121417]'
+                              : 'border border-[#e5e7eb] bg-[#f8f9fa] text-[#4b5563] hover:border-[#121417] dark:border-[#242831] dark:bg-[#181b22] dark:text-[#9aa1ad] dark:hover:border-stone-500'
+                          }`}
+                        >
+                          {isSelected && <Check className="h-3 w-3" />}
+                          <span>{c.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
@@ -248,12 +306,12 @@ export function FilterDrawer({
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {INSTITUTION_OPTIONS.map((inst) => {
-                    const isSelected = filters.institution === inst.id;
+                    const isSelected = selectedInstitutions.includes(inst.id);
                     return (
                       <button
                         key={inst.id}
                         type="button"
-                        onClick={() => handleSelectInstitution(inst.id)}
+                        onClick={() => handleToggleInstitution(inst.id)}
                         className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
                           isSelected
                             ? 'bg-[#121417] text-white shadow-xs dark:bg-white dark:text-[#121417]'
@@ -278,12 +336,12 @@ export function FilterDrawer({
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {TYPE_OPTIONS.map((t) => {
-                    const isSelected = filters.type === t.id;
+                    const isSelected = selectedTypes.includes(t.id);
                     return (
                       <button
                         key={t.id}
                         type="button"
-                        onClick={() => handleSelectType(t.id)}
+                        onClick={() => handleToggleType(t.id)}
                         className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
                           isSelected
                             ? 'bg-[#121417] text-white shadow-xs dark:bg-white dark:text-[#121417]'

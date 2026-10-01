@@ -56,10 +56,19 @@ export function CoralinkApp({
     setFeedMode(newMode);
   };
 
-  const handleRemoveAdvancedFilter = (key: keyof AdvancedFilterState) => {
+  const handleRemoveAdvancedFilter = (key: keyof AdvancedFilterState, value?: string) => {
     setAdvancedFilters((prev) => {
       const copy = { ...prev };
-      delete copy[key];
+      if (value && Array.isArray(copy[key])) {
+        const arr = (copy[key] as string[]).filter((item) => item !== value);
+        if (arr.length === 0) {
+          delete copy[key];
+        } else {
+          (copy[key] as unknown) = arr;
+        }
+      } else {
+        delete copy[key];
+      }
       return copy;
     });
   };

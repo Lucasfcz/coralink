@@ -144,12 +144,6 @@ export function calculateOpportunityScore(
     if (hasExactMatch) {
       score += 30;
       matchReasons.push('Compatível com seus cursos de interesse');
-    } else if (
-      opp.isForAll ||
-      oppAudiences.includes('UNIVERSITY_STUDENTS')
-    ) {
-      score += 15;
-      matchReasons.push('Aberto a todos os estudantes universitários');
     }
   } else {
     score += 10;

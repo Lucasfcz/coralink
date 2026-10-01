@@ -36,7 +36,7 @@ interface CategoryFilterProps {
   totalCount?: number;
   advancedFilters?: AdvancedFilterState;
   onOpenDrawer?: () => void;
-  onRemoveAdvancedFilter?: (key: keyof AdvancedFilterState) => void;
+  onRemoveAdvancedFilter?: (key: keyof AdvancedFilterState, value?: string) => void;
   onResetAllFilters?: () => void;
   feedMode?: 'ALL' | 'FOR_YOU';
   onChangeFeedMode?: (mode: 'ALL' | 'FOR_YOU') => void;
@@ -53,35 +53,59 @@ export function CategoryFilter({
   feedMode = 'ALL',
   onChangeFeedMode,
 }: CategoryFilterProps) {
-  // Contabilizar filtros avançados ativos
-  const activeKeys = (Object.keys(advancedFilters) as (keyof AdvancedFilterState)[]).filter(
-    (key) => advancedFilters[key] !== undefined
-  );
-  const activeCount = activeKeys.length;
-
   // Montar etiquetas legíveis para badges de filtros avançados
-  const activeBadges: { key: keyof AdvancedFilterState; label: string }[] = [];
+  const activeBadges: { key: keyof AdvancedFilterState; value?: string; label: string }[] = [];
 
-  if (advancedFilters.course) {
+  if (advancedFilters.courses && advancedFilters.courses.length > 0) {
+    advancedFilters.courses.forEach((course) => {
+      const found = COURSE_OPTIONS.find((c) => c.id === course);
+      activeBadges.push({
+        key: 'courses',
+        value: course,
+        label: `Curso: ${found ? found.label : course}`,
+      });
+    });
+  } else if (advancedFilters.course) {
     const found = COURSE_OPTIONS.find((c) => c.id === advancedFilters.course);
     activeBadges.push({
       key: 'course',
+      value: advancedFilters.course,
       label: `Curso: ${found ? found.label : advancedFilters.course}`,
     });
   }
 
-  if (advancedFilters.institution) {
+  if (advancedFilters.institutions && advancedFilters.institutions.length > 0) {
+    advancedFilters.institutions.forEach((inst) => {
+      const found = INSTITUTION_OPTIONS.find((i) => i.id === inst);
+      activeBadges.push({
+        key: 'institutions',
+        value: inst,
+        label: `Fonte: ${found ? found.label : inst}`,
+      });
+    });
+  } else if (advancedFilters.institution) {
     const found = INSTITUTION_OPTIONS.find((i) => i.id === advancedFilters.institution);
     activeBadges.push({
       key: 'institution',
-      label: `Faculdade: ${found ? found.label : advancedFilters.institution}`,
+      value: advancedFilters.institution,
+      label: `Fonte: ${found ? found.label : advancedFilters.institution}`,
     });
   }
 
-  if (advancedFilters.type) {
+  if (advancedFilters.types && advancedFilters.types.length > 0) {
+    advancedFilters.types.forEach((t) => {
+      const found = TYPE_OPTIONS.find((opt) => opt.id === t);
+      activeBadges.push({
+        key: 'types',
+        value: t,
+        label: `Tipo: ${found ? found.label : t}`,
+      });
+    });
+  } else if (advancedFilters.type) {
     const found = TYPE_OPTIONS.find((t) => t.id === advancedFilters.type);
     activeBadges.push({
       key: 'type',
+      value: advancedFilters.type,
       label: `Tipo: ${found ? found.label : advancedFilters.type}`,
     });
   }
@@ -101,6 +125,8 @@ export function CategoryFilter({
   if (advancedFilters.isForAll) {
     activeBadges.push({ key: 'isForAll', label: 'Aberto a Todos' });
   }
+
+  const activeCount = activeBadges.length;
 
   return (
     <div className="w-full border-y border-[#e5e7eb] bg-[#fbfbfb]/80 py-3.5 backdrop-blur-sm dark:border-[#242831] dark:bg-[#0a0b0d]/80">
@@ -213,14 +239,14 @@ export function CategoryFilter({
             </span>
             {activeBadges.map((b) => (
               <span
-                key={b.key}
+                key={`${b.key}-${b.value || 'single'}`}
                 className="inline-flex items-center gap-1.5 rounded-full border border-[#e5e7eb] bg-white px-2.5 py-1 text-[11px] font-medium text-[#121417] shadow-2xs dark:border-[#242831] dark:bg-[#181b22] dark:text-[#f3f4f6]"
               >
                 <span>{b.label}</span>
                 {onRemoveAdvancedFilter && (
                   <button
                     type="button"
-                    onClick={() => onRemoveAdvancedFilter(b.key)}
+                    onClick={() => onRemoveAdvancedFilter(b.key, b.value)}
                     className="text-[#64748b] hover:text-rose-600 dark:text-[#9aa1ad] dark:hover:text-rose-400"
                     aria-label={`Remover filtro ${b.label}`}
                   >

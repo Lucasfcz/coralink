@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Opportunity } from '@/types/opportunity';
+import { Opportunity, OpportunityType } from '@/types/opportunity';
 import { BentoCard } from './BentoCard';
 import { FeedSkeleton } from './FeedSkeleton';
 import { FeedPeekSkeleton } from './FeedPeekSkeleton';
@@ -83,10 +83,31 @@ export function BentoFeed({
     async function applyFilter() {
       setIsFilterLoading(true);
       try {
+        const combinedTypes: OpportunityType[] = [];
+        if (advancedFilters?.types && advancedFilters.types.length > 0) {
+          combinedTypes.push(...advancedFilters.types);
+        } else if (advancedFilters?.type) {
+          combinedTypes.push(advancedFilters.type);
+        }
+        if (selectedFilter.type && !combinedTypes.includes(selectedFilter.type)) {
+          combinedTypes.push(selectedFilter.type);
+        }
+
+        const combinedCourses = advancedFilters?.courses && advancedFilters.courses.length > 0
+          ? advancedFilters.courses
+          : advancedFilters?.course ? [advancedFilters.course] : undefined;
+
+        const combinedSources = advancedFilters?.institutions && advancedFilters.institutions.length > 0
+          ? advancedFilters.institutions
+          : advancedFilters?.institution ? [advancedFilters.institution] : undefined;
+
         const res = await getOpportunities({
-          type: advancedFilters?.type || selectedFilter.type,
-          targetCourseAudience: advancedFilters?.course,
-          sourceName: advancedFilters?.institution,
+          types: combinedTypes.length > 0 ? combinedTypes : undefined,
+          type: combinedTypes.length === 1 ? combinedTypes[0] : (selectedFilter.type || advancedFilters?.type),
+          courses: combinedCourses,
+          targetCourseAudience: combinedCourses && combinedCourses.length === 1 ? combinedCourses[0] : undefined,
+          sourceNames: combinedSources,
+          sourceName: combinedSources && combinedSources.length === 1 ? combinedSources[0] : undefined,
           modality: advancedFilters?.modality,
           isFree: advancedFilters?.isFree !== undefined ? advancedFilters.isFree : selectedFilter.isFree,
           isForAll: advancedFilters?.isForAll !== undefined ? advancedFilters.isForAll : selectedFilter.isForAll,
@@ -123,11 +144,32 @@ export function BentoFeed({
     const nextPage = page + 1;
 
     try {
+      const combinedTypes: OpportunityType[] = [];
+      if (advancedFilters?.types && advancedFilters.types.length > 0) {
+        combinedTypes.push(...advancedFilters.types);
+      } else if (advancedFilters?.type) {
+        combinedTypes.push(advancedFilters.type);
+      }
+      if (selectedFilter.type && !combinedTypes.includes(selectedFilter.type)) {
+        combinedTypes.push(selectedFilter.type);
+      }
+
+      const combinedCourses = advancedFilters?.courses && advancedFilters.courses.length > 0
+        ? advancedFilters.courses
+        : advancedFilters?.course ? [advancedFilters.course] : undefined;
+
+      const combinedSources = advancedFilters?.institutions && advancedFilters.institutions.length > 0
+        ? advancedFilters.institutions
+        : advancedFilters?.institution ? [advancedFilters.institution] : undefined;
+
       const [res] = await Promise.all([
         getOpportunities({
-          type: advancedFilters?.type || selectedFilter.type,
-          targetCourseAudience: advancedFilters?.course,
-          sourceName: advancedFilters?.institution,
+          types: combinedTypes.length > 0 ? combinedTypes : undefined,
+          type: combinedTypes.length === 1 ? combinedTypes[0] : (selectedFilter.type || advancedFilters?.type),
+          courses: combinedCourses,
+          targetCourseAudience: combinedCourses && combinedCourses.length === 1 ? combinedCourses[0] : undefined,
+          sourceNames: combinedSources,
+          sourceName: combinedSources && combinedSources.length === 1 ? combinedSources[0] : undefined,
           modality: advancedFilters?.modality,
           isFree: advancedFilters?.isFree !== undefined ? advancedFilters.isFree : selectedFilter.isFree,
           isForAll: advancedFilters?.isForAll !== undefined ? advancedFilters.isForAll : selectedFilter.isForAll,
