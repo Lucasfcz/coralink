@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { useTheme } from '@/components/providers/ThemeProvider';
+import { hasUserCompletedPreferences } from '@/lib/recommendationEngine';
 
 interface GoogleCredentialResponse {
   credential?: string;
@@ -93,12 +94,22 @@ function LoginContent() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [googleReady, setGoogleReady] = useState(false);
 
+  const handlePostAuthRedirect = (targetUser?: { id: string } | null) => {
+    const userId = targetUser?.id || user?.id;
+    const hasCompleted = hasUserCompletedPreferences(userId);
+    if (!hasCompleted) {
+      router.replace(`/preferencias?onboarding=true&redirect=${encodeURIComponent(safeRedirect)}`);
+    } else {
+      router.replace(safeRedirect);
+    }
+  };
+
   // Redireciona imediatamente se já estiver logado
   useEffect(() => {
     if (!isLoading && user) {
-      router.replace(safeRedirect);
+      handlePostAuthRedirect(user);
     }
-  }, [user, isLoading, router, safeRedirect]);
+  }, [user, isLoading, safeRedirect]);
 
   // Inicialização do Google Identity Services (GIS)
   useEffect(() => {
@@ -582,7 +593,7 @@ function LoginContent() {
                 onClick={handleDevMockLogin}
                 className="mt-1 text-[11px] text-stone-500 hover:text-stone-800 dark:hover:text-stone-300 hover:underline transition-colors cursor-pointer block mx-auto"
               >
-                ⚡ Simular login de teste (Mock Dev)
+                Simular login de teste (Mock Dev)
               </button>
             )}
           </div>

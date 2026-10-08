@@ -194,7 +194,7 @@ export function InstallModal({ isOpen, onClose }: InstallModalProps) {
           {activeTab === 'ios' && (
             <div className="space-y-4 animate-in fade-in duration-200">
               <div className="rounded-2xl border border-sky-500/20 bg-sky-500/5 p-3 text-xs text-sky-700 dark:text-sky-300">
-                💡 No iPhone ou iPad, a instalação deve ser feita pelo navegador <strong>Safari</strong>.
+                No iPhone ou iPad, a instalação deve ser feita pelo navegador <strong>Safari</strong>.
               </div>
 
               <div className="rounded-2xl border border-[#e5e7eb] bg-[#f8f9fa] p-4 dark:border-[#242831] dark:bg-[#171a22]">

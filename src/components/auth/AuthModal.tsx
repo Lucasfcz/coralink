@@ -484,7 +484,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   onClick={handleDevMockLogin}
                   className="mt-1 text-[11px] text-[#9aa1ad] hover:text-[#121417] hover:underline dark:hover:text-white"
                 >
-                  ⚡ Simular login de teste (Mock Dev)
+                  Simular login de teste (Mock Dev)
                 </button>
               )}
 

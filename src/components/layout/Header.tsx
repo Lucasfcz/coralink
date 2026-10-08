@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, X, User, Sun, Moon, LogOut, ShieldAlert, Download } from 'lucide-react';
+import { Search, X, User, Sun, Moon, LogOut, ShieldAlert, Download, SlidersHorizontal } from 'lucide-react';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { InstallModal } from '@/components/pwa/InstallModal';
@@ -240,6 +240,18 @@ export function Header({ onSearchClick }: HeaderProps) {
                   {/* Linha Divisória */}
                   <div className="my-2 border-t border-[#f1f3f6] dark:border-[#242831]" />
 
+                  {/* Preferências de Oportunidades */}
+                  <Link
+                    href="/preferencias"
+                    onClick={() => setProfileMenuOpen(false)}
+                    className="mb-2 flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-xs font-semibold text-[#121417] transition-all hover:bg-[#f8f9fa] dark:text-[#f3f4f6] dark:hover:bg-[#1c2027]"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <SlidersHorizontal className="h-4 w-4 text-emerald-500" />
+                      <span>Preferências</span>
+                    </div>
+                  </Link>
+
                   {/* Instalar Aplicativo (PWA) */}
                   <button
                     type="button"
@@ -428,6 +440,18 @@ export function Header({ onSearchClick }: HeaderProps) {
                     />
                   </button>
                 </div>
+
+                {/* Preferências no Mobile */}
+                <Link
+                  href="/preferencias"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-xs font-semibold text-[#121417] bg-[#f8f9fa] transition-all dark:bg-[#1c2027] dark:text-[#f3f4f6]"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <SlidersHorizontal className="h-4 w-4 text-emerald-500" />
+                    <span>Preferências</span>
+                  </div>
+                </Link>
 
                 {/* Instalar Aplicativo no Mobile */}
                 <button

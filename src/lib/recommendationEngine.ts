@@ -9,22 +9,58 @@ export interface ScoredOpportunity extends Opportunity {
 }
 
 /**
- * Lê as preferências do usuário salvas no localStorage.
+ * Obtém a chave de armazenamento adequada com base no ID do usuário.
  */
-export function getUserPreferences(): UserPreferences {
+export function getPreferencesStorageKey(userId?: string | null): string {
+  if (userId) {
+    return `${STORAGE_KEYS.PREFERENCES_PREFIX}${userId}`;
+  }
+  return STORAGE_KEYS.LEGACY_PREFERENCES;
+}
+
+/**
+ * Lê as preferências do usuário salvas no localStorage.
+ * Suporta isolamento por conta de usuário autenticado ou fallback local.
+ */
+export function getUserPreferences(userId?: string | null): UserPreferences {
   if (typeof window === 'undefined') {
     return DEFAULT_USER_PREFERENCES;
   }
 
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.PREFERENCES);
+    let effectiveUserId = userId;
+    if (!effectiveUserId) {
+      const storedUser = localStorage.getItem('coralink_user');
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          effectiveUserId = parsedUser.id;
+        } catch {
+          // Ignora erro de JSON
+        }
+      }
+    }
+
+    const key = getPreferencesStorageKey(effectiveUserId);
+    let raw = localStorage.getItem(key);
+
+    if (!raw && effectiveUserId) {
+      raw = localStorage.getItem(STORAGE_KEYS.LEGACY_PREFERENCES);
+    }
+
     if (!raw) {
       return DEFAULT_USER_PREFERENCES;
     }
+
     const parsed = JSON.parse(raw);
+    const institutions = Array.isArray(parsed.institutions)
+      ? parsed.institutions
+      : (parsed.institution ? [parsed.institution] : []);
+
     return {
       ...DEFAULT_USER_PREFERENCES,
       ...parsed,
+      institutions,
     };
   } catch {
     return DEFAULT_USER_PREFERENCES;
@@ -32,19 +68,83 @@ export function getUserPreferences(): UserPreferences {
 }
 
 /**
- * Salva as preferências do usuário no localStorage e dispara evento para atualização dos componentes.
+ * Salva as preferências do usuário no localStorage vinculadas à sua conta
+ * e dispara evento global para sincronização dos componentes.
  */
-export function saveUserPreferences(preferences: UserPreferences): void {
+export function saveUserPreferences(preferences: UserPreferences, userId?: string | null): void {
   if (typeof window === 'undefined') return;
 
   try {
-    localStorage.setItem(STORAGE_KEYS.PREFERENCES, JSON.stringify(preferences));
-    localStorage.setItem(STORAGE_KEYS.HAS_ONBOARDED, 'true');
+    let effectiveUserId = userId || preferences.userId;
+    if (!effectiveUserId) {
+      const storedUser = localStorage.getItem('coralink_user');
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          effectiveUserId = parsedUser.id;
+        } catch {
+          // Ignora erro
+        }
+      }
+    }
+
+    const key = getPreferencesStorageKey(effectiveUserId);
+    const dataToSave: UserPreferences = {
+      ...preferences,
+      userId: effectiveUserId || undefined,
+      hasCompletedOnboarding: true,
+    };
+
+    localStorage.setItem(key, JSON.stringify(dataToSave));
+    localStorage.setItem(STORAGE_KEYS.LEGACY_PREFERENCES, JSON.stringify(dataToSave));
+
+    if (effectiveUserId) {
+      localStorage.setItem(`${STORAGE_KEYS.HAS_ONBOARDED_PREFIX}${effectiveUserId}`, 'true');
+    }
+    localStorage.setItem(STORAGE_KEYS.LEGACY_HAS_ONBOARDED, 'true');
+
     window.dispatchEvent(
-      new CustomEvent('coralink-preferences-updated', { detail: preferences })
+      new CustomEvent('coralink-preferences-updated', { detail: dataToSave })
     );
   } catch {
     // Tratamento de cota de storage
+  }
+}
+
+/**
+ * Verifica se o usuário já completou suas preferências.
+ */
+export function hasUserCompletedPreferences(userId?: string | null): boolean {
+  if (typeof window === 'undefined') return false;
+
+  try {
+    let effectiveUserId = userId;
+    if (!effectiveUserId) {
+      const storedUser = localStorage.getItem('coralink_user');
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          effectiveUserId = parsedUser.id;
+        } catch {}
+      }
+    }
+
+    if (effectiveUserId) {
+      const onboardedKey = `${STORAGE_KEYS.HAS_ONBOARDED_PREFIX}${effectiveUserId}`;
+      if (localStorage.getItem(onboardedKey) === 'true') {
+        return true;
+      }
+      const prefKey = `${STORAGE_KEYS.PREFERENCES_PREFIX}${effectiveUserId}`;
+      const raw = localStorage.getItem(prefKey);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed.hasCompletedOnboarding) return true;
+      }
+    }
+
+    return localStorage.getItem(STORAGE_KEYS.LEGACY_HAS_ONBOARDED) === 'true';
+  } catch {
+    return false;
   }
 }
 
@@ -67,7 +167,6 @@ export function recordOpportunityInteraction(
 
   currentWeights[type] = (currentWeights[type] || 0) + points;
 
-  // Limite máximo por tipo para evitar saturação excessiva
   if (currentWeights[type] > 40) {
     currentWeights[type] = 40;
   }
@@ -93,7 +192,7 @@ function normalizeString(val: string): string {
 }
 
 /**
- * Calcula a pontuação individual de uma oportunidade em relação às preferências do usuário.
+ * Calcula a pontuação de relevância de uma oportunidade com base nas preferências do usuário.
  */
 export function calculateOpportunityScore(
   opp: Opportunity,
@@ -109,12 +208,11 @@ export function calculateOpportunityScore(
       matchReasons.push('Tipo de oportunidade selecionado');
     }
   } else {
-    score += 15; // Pontuação neutra caso não haja tipos estritos
+    score += 15;
   }
 
   // 2. Instituição e Situação Acadêmica (Até 35 pontos)
   if (prefs.notInCollege) {
-    // Aluno que ainda não está na faculdade
     if (opp.type === 'GRADUATION') {
       score += 35;
       matchReasons.push('Processo seletivo / Ingresso no ensino superior');
@@ -123,16 +221,26 @@ export function calculateOpportunityScore(
       score += 30;
       matchReasons.push('Aberto à comunidade geral');
     }
-  } else if (prefs.institution) {
-    // Aluno universitário com faculdade selecionada
-    const normUserInst = normalizeString(prefs.institution);
-    const normOppSource = normalizeString(opp.sourceName || '');
+  } else {
+    const selectedInsts = prefs.institutions && prefs.institutions.length > 0
+      ? prefs.institutions
+      : (prefs.institution ? [prefs.institution] : []);
 
-    if (normOppSource.includes(normUserInst) || normUserInst.includes(normOppSource)) {
-      score += 20;
-      matchReasons.push(`Sediado na ${formatSourceName(opp.sourceName)}`);
+    if (selectedInsts.length > 0) {
+      const normOppSource = normalizeString(opp.sourceName || '');
+      const hasMatch = selectedInsts.some((inst) => {
+        const normUserInst = normalizeString(inst);
+        return normOppSource.includes(normUserInst) || normUserInst.includes(normOppSource);
+      });
+
+      if (hasMatch) {
+        score += 25;
+        matchReasons.push(`Sediado na ${formatSourceName(opp.sourceName)}`);
+      } else {
+        score += 5;
+      }
     } else {
-      score += 5; // Oportunidades interinstitucionais
+      score += 15;
     }
   }
 
@@ -149,7 +257,7 @@ export function calculateOpportunityScore(
     score += 10;
   }
 
-  // 4. Critérios de Atratividade e Urgência (Até 10 pontos)
+  // 4. Critérios de Gratuidade e Urgência (Até 10 pontos)
   if (opp.isFree) {
     score += 5;
   }
@@ -171,7 +279,7 @@ export function calculateOpportunityScore(
     }
   }
 
-  // 5. Afinidade Comportamental por Cliques com Decaimento Temporal (Até 15 pontos)
+  // 5. Afinidade Comportamental por Cliques (Até 15 pontos)
   if (prefs.interactionWeights && prefs.interactionWeights[opp.type]) {
     const rawInteraction = prefs.interactionWeights[opp.type] || 0;
     let decayFactor = 1.0;
@@ -188,7 +296,6 @@ export function calculateOpportunityScore(
     }
   }
 
-  // Normalização do percentual de match para apresentação visual (entre 35% e 99%)
   const matchPercentage = Math.min(99, Math.max(35, Math.round((score / 100) * 100)));
 
   return {
@@ -199,7 +306,7 @@ export function calculateOpportunityScore(
 }
 
 /**
- * Ordena e pontua uma lista de oportunidades com base no perfil do usuário.
+ * Ordena oportunidades com base no perfil do usuário de forma orgânica e sutil.
  */
 export function getScoredOpportunities(
   opportunities: Opportunity[],
@@ -219,7 +326,6 @@ export function getScoredOpportunities(
     if (b.score !== a.score) {
       return b.score - a.score;
     }
-    // Desempate por mais recente (maior ID)
     return b.id - a.id;
   });
 }
