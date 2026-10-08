@@ -8,7 +8,7 @@ import { FeedPeekSkeleton } from './FeedPeekSkeleton';
 import { FilterOption } from './CategoryFilter';
 import { AdvancedFilterState } from './FilterDrawer';
 import { getOpportunities } from '@/services/opportunities';
-import { Flame, CheckCircle2, Sparkles, SlidersHorizontal } from 'lucide-react';
+import { Flame, CheckCircle2 } from 'lucide-react';
 import { getUserPreferences, getScoredOpportunities } from '@/lib/recommendationEngine';
 import { UserPreferences } from '@/types/userPreferences';
 
@@ -18,8 +18,6 @@ interface BentoFeedProps {
   selectedFilter: FilterOption;
   advancedFilters?: AdvancedFilterState;
   onSelectOpportunity: (opp: Opportunity) => void;
-  feedMode?: 'ALL' | 'FOR_YOU';
-  onOpenPreferences?: () => void;
 }
 
 export function BentoFeed({
@@ -27,8 +25,6 @@ export function BentoFeed({
   selectedFilter,
   advancedFilters,
   onSelectOpportunity,
-  feedMode = 'ALL',
-  onOpenPreferences,
 }: BentoFeedProps) {
   const [opportunities, setOpportunities] = useState<Opportunity[]>(initialOpportunities);
   const [page, setPage] = useState(0);
@@ -54,16 +50,18 @@ export function BentoFeed({
   }, []);
 
   const displayOpportunities = useMemo(() => {
-    if (feedMode === 'FOR_YOU') {
+    const hasPreferences =
+      preferences.hasCompletedOnboarding ||
+      (preferences.selectedTypes && preferences.selectedTypes.length > 0) ||
+      (preferences.institutions && preferences.institutions.length > 0) ||
+      (preferences.targetCourses && preferences.targetCourses.length > 0) ||
+      preferences.notInCollege;
+
+    if (hasPreferences) {
       return getScoredOpportunities(opportunities, preferences);
     }
-    return opportunities.map((opp) => ({
-      ...opp,
-      score: 0,
-      matchPercentage: 0,
-      matchReasons: [],
-    }));
-  }, [opportunities, feedMode, preferences]);
+    return opportunities;
+  }, [opportunities, preferences]);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const isInitialMount = useRef(true);
@@ -176,13 +174,11 @@ export function BentoFeed({
           page: nextPage,
           size: 9,
         }),
-        // Garante que a prévia discreta apareça com suavidade
         new Promise((resolve) => setTimeout(resolve, 350)),
       ]);
 
       if (res.content && res.content.length > 0) {
         setOpportunities((prev) => {
-          // Evitar duplicatas por ID
           const existingIds = new Set(prev.map((item) => item.id));
           const uniqueNew = res.content.filter((item) => !existingIds.has(item.id));
           return [...prev, ...uniqueNew];
@@ -212,7 +208,7 @@ export function BentoFeed({
         }
       },
       {
-        rootMargin: '80px', // Aciona suavemente ao se aproximar do final da página
+        rootMargin: '80px',
         threshold: 0.1,
       }
     );
@@ -225,7 +221,6 @@ export function BentoFeed({
   }, [loadNextPage, hasMore, isLoadingMore]);
 
   // Agrupar oportunidades em blocos Bento editoriais
-  // Bloco Bento: 1 Hero (2 cols) + 2 Stacked (1 col) + 2 Editorial (1.5 cols cada ou grid normal)
   const renderBentoBlocks = () => {
     const blocks: React.ReactNode[] = [];
     const chunkSize = 5;
@@ -245,11 +240,6 @@ export function BentoFeed({
                 opportunity={heroItem}
                 variant="hero"
                 onSelect={onSelectOpportunity}
-                matchBadge={
-                  feedMode === 'FOR_YOU' && heroItem.matchPercentage >= 50
-                    ? { percentage: heroItem.matchPercentage, label: heroItem.matchReasons[0] }
-                    : undefined
-                }
               />
             )}
 
@@ -261,11 +251,6 @@ export function BentoFeed({
                     opportunity={item}
                     variant="stacked"
                     onSelect={onSelectOpportunity}
-                    matchBadge={
-                      feedMode === 'FOR_YOU' && item.matchPercentage >= 50
-                        ? { percentage: item.matchPercentage, label: item.matchReasons[0] }
-                        : undefined
-                    }
                   />
                 ))}
               </div>
@@ -281,11 +266,6 @@ export function BentoFeed({
                   opportunity={item}
                   variant="editorial"
                   onSelect={onSelectOpportunity}
-                  matchBadge={
-                    feedMode === 'FOR_YOU' && item.matchPercentage >= 50
-                      ? { percentage: item.matchPercentage, label: item.matchReasons[0] }
-                      : undefined
-                  }
                 />
               ))}
             </div>
@@ -303,38 +283,19 @@ export function BentoFeed({
       <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between border-b border-[#e5e7eb] pb-5 dark:border-[#242831]">
         <div>
           <div className="flex items-center gap-2">
-            {feedMode === 'FOR_YOU' ? (
-              <Sparkles className="h-4 w-4 text-emerald-500" />
-            ) : (
-              <span className="text-sm font-bold text-[#121417] dark:text-white">✦</span>
-            )}
+            <span className="text-sm font-bold text-[#121417] dark:text-white">✦</span>
             <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#121417] dark:text-white">
-              {feedMode === 'FOR_YOU' ? 'Para Você' : 'Feed de Oportunidades'}
+              Feed de Oportunidades
             </h2>
           </div>
           <p className="mt-1 text-xs sm:text-sm text-[#64748b] dark:text-[#9aa1ad]">
-            {feedMode === 'FOR_YOU'
-              ? 'Oportunidades recomendadas para o seu curso e interesses acadêmicos'
-              : 'Atualizações em tempo real em todas as fontes monitoradas'}
+            Atualizações em tempo real em todas as fontes monitoradas
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          {feedMode === 'FOR_YOU' && onOpenPreferences && (
-            <button
-              type="button"
-              onClick={onOpenPreferences}
-              className="flex items-center gap-1.5 rounded-full border border-[#e5e7eb] bg-white px-3 py-1.5 text-xs font-semibold text-[#121417] transition-all hover:border-[#121417] dark:border-[#242831] dark:bg-[#15181e] dark:text-[#f3f4f6] dark:hover:border-stone-500 shadow-2xs"
-            >
-              <SlidersHorizontal className="h-3.5 w-3.5" />
-              <span>Ajustar preferências</span>
-            </button>
-          )}
-
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#64748b] dark:text-[#9aa1ad]">
-            <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
-            <span>{displayOpportunities.length} oportunidades exibidas</span>
-          </div>
+        <div className="flex items-center gap-2 text-xs font-semibold text-[#64748b] dark:text-[#9aa1ad]">
+          <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
+          <span>{displayOpportunities.length} oportunidades exibidas</span>
         </div>
       </div>
 
@@ -344,32 +305,14 @@ export function BentoFeed({
       ) : displayOpportunities.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-[#d1d5db] bg-white p-12 text-center dark:border-[#242831] dark:bg-[#15181e]">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#f1f3f6] text-[#64748b] mb-4 dark:bg-[#20242b] dark:text-[#9aa1ad]">
-            {feedMode === 'FOR_YOU' ? (
-              <Sparkles className="h-6 w-6 text-emerald-500" />
-            ) : (
-              <Flame className="h-6 w-6" />
-            )}
+            <Flame className="h-6 w-6" />
           </div>
           <h3 className="text-base font-bold text-[#121417] dark:text-white">
-            {feedMode === 'FOR_YOU'
-              ? 'Nenhuma recomendação imediata encontrada'
-              : 'Nenhuma oportunidade encontrada'}
+            Nenhuma oportunidade encontrada
           </h3>
           <p className="mt-1 max-w-sm text-xs text-[#64748b] dark:text-[#9aa1ad]">
-            {feedMode === 'FOR_YOU'
-              ? 'Tente selecionar outras categorias de oportunidade ou ajustar seus cursos nas preferências.'
-              : 'Não há oportunidades vigentes com o filtro selecionado no momento. Tente selecionar outra categoria.'}
+            Não há oportunidades vigentes com o filtro selecionado no momento. Tente selecionar outra categoria.
           </p>
-          {feedMode === 'FOR_YOU' && onOpenPreferences && (
-            <button
-              type="button"
-              onClick={onOpenPreferences}
-              className="mt-4 flex items-center gap-1.5 rounded-xl bg-[#121417] px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-black dark:bg-white dark:text-[#121417] dark:hover:bg-stone-200"
-            >
-              <SlidersHorizontal className="h-3.5 w-3.5" />
-              <span>Ajustar preferências</span>
-            </button>
-          )}
         </div>
       ) : (
         <div className="flex flex-col gap-8">

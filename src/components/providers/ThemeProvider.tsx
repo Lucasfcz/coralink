@@ -20,7 +20,14 @@ function subscribe(callback: () => void) {
 function getThemeSnapshot(): Theme {
   try {
     const savedTheme = localStorage.getItem('coralink-theme');
-    return savedTheme === 'dark' ? 'dark' : 'light';
+    if (savedTheme === 'dark' || savedTheme === 'light') return savedTheme;
+    if (typeof document !== 'undefined' && document.documentElement.classList.contains('dark')) {
+      return 'dark';
+    }
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    return 'light';
   } catch {
     return 'light';
   }
