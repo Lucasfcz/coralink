@@ -27,6 +27,7 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://coralink.com.br'),
   title: 'Coralink | Oportunidades Acadêmicas & Tech',
   description:
     'Ecossistema inteligente de agregação e distribuição de editais, estágios, bolsas de pesquisa e eventos acadêmicos e profissionais.',
