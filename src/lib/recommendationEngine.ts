@@ -1,4 +1,4 @@
-import { Opportunity, OpportunityType } from '@/types/opportunity';
+import { Opportunity, OpportunityType, TargetCourseAudience } from '@/types/opportunity';
 import { UserPreferences, DEFAULT_USER_PREFERENCES, STORAGE_KEYS } from '@/types/userPreferences';
 import { formatSourceName } from './utils';
 
@@ -192,6 +192,77 @@ function normalizeString(val: string): string {
 }
 
 /**
+ * Agrupamento de cursos por grandes áreas do conhecimento para reconhecimento
+ * bidirecional entre especialidades específicas e enums gerais (ex: ADS <-> TECHNOLOGY_STUDENTS).
+ */
+const COURSE_AREA_FAMILIES: Record<string, TargetCourseAudience[]> = {
+  TECHNOLOGY: [
+    'ADS',
+    'COMPUTER_SCIENCE',
+    'SOFTWARE_ENGINEERING',
+    'INFORMATION_SYSTEMS',
+    'COMPUTER_ENGINEERING',
+    'DATA_SCIENCE',
+    'TECHNOLOGY_STUDENTS',
+  ],
+  HEALTH: [
+    'MEDICINE',
+    'NURSING',
+    'PHARMACY',
+    'PHYSICAL_THERAPY',
+    'PSYCHOLOGY',
+    'PHYSICAL_EDUCATION',
+    'DENTISTRY',
+    'BIOMEDICINE',
+    'NUTRITION',
+    'VETERINARY_MEDICINE',
+    'AESTHETICS',
+    'HEALTH_STUDENTS',
+  ],
+  BUSINESS: [
+    'BUSINESS_ADMINISTRATION',
+    'ACCOUNTING',
+    'ECONOMICS',
+    'MARKETING',
+    'BUSINESS_STUDENTS',
+  ],
+  COMMUNICATION_DESIGN: [
+    'DESIGN',
+    'GRAPHIC_DESIGN',
+    'MARKETING',
+    'ADVERTISING',
+    'JOURNALISM',
+  ],
+  ENGINEERING: [
+    'CIVIL_ENGINEERING',
+    'ELECTRICAL_ENGINEERING',
+    'MECHANICAL_ENGINEERING',
+    'PRODUCTION_ENGINEERING',
+    'CHEMICAL_ENGINEERING',
+    'ENGINEERING_STUDENTS',
+  ],
+  EXACT_SCIENCES: [
+    'MATHEMATICS',
+    'STATISTICS',
+    'PHYSICS',
+    'CHEMISTRY',
+    'EXACT_SCIENCES_STUDENTS',
+  ],
+  HUMANITIES: [
+    'LAW',
+    'PEDAGOGY',
+    'SOCIAL_WORK',
+    'LANGUAGE_AND_LITERATURE',
+    'HUMANITIES_STUDENTS',
+  ],
+  OTHER_APPLIED: [
+    'ARCHITECTURE_AND_URBANISM',
+    'TOURISM_AND_HOSPITALITY',
+    'GASTRONOMY',
+  ],
+};
+
+/**
  * Calcula a pontuação de relevância de uma oportunidade com base nas preferências do usuário.
  */
 export function calculateOpportunityScore(
@@ -244,17 +315,33 @@ export function calculateOpportunityScore(
     }
   }
 
-  // 3. Cursos de Interesse e Grande Área (Até 30 pontos)
+  // 3. Cursos de Interesse e Grande Área (100 pontos para alta precisão de área)
   if (prefs.targetCourses && prefs.targetCourses.length > 0) {
     const oppAudiences = opp.targetCourseAudiences || [];
-    const hasExactMatch = prefs.targetCourses.some((c) => oppAudiences.includes(c));
 
-    if (hasExactMatch) {
-      score += 30;
+    // Checagem 1: Correspondência direta/exata
+    const hasDirectMatch = prefs.targetCourses.some((c) => oppAudiences.includes(c));
+
+    // Checagem 2: Correspondência bidirecional por família de área acadêmica
+    let hasFamilyMatch = false;
+    if (!hasDirectMatch) {
+      hasFamilyMatch = Object.values(COURSE_AREA_FAMILIES).some((familyCourses) => {
+        const userHasFamilyCourse = prefs.targetCourses.some((c) => familyCourses.includes(c));
+        const oppHasFamilyCourse = oppAudiences.some((c) => familyCourses.includes(c));
+        return userHasFamilyCourse && oppHasFamilyCourse;
+      });
+    }
+
+    if (hasDirectMatch || hasFamilyMatch) {
+      score += 100;
       matchReasons.push('Compatível com seus cursos de interesse');
+    } else if (oppAudiences.includes('UNIVERSITY_STUDENTS') || opp.isForAll) {
+      // Oportunidades genuinamente abertas a qualquer universitário recebem pontuação moderada (35 pontos)
+      score += 35;
+      matchReasons.push('Aberto a universitários de qualquer curso');
     }
   } else {
-    score += 10;
+    score += 15;
   }
 
   // 4. Critérios de Gratuidade e Urgência (Até 10 pontos)
@@ -296,7 +383,7 @@ export function calculateOpportunityScore(
     }
   }
 
-  const matchPercentage = Math.min(99, Math.max(35, Math.round((score / 100) * 100)));
+  const matchPercentage = Math.min(99, Math.max(35, Math.round((score / 195) * 100)));
 
   return {
     score,
