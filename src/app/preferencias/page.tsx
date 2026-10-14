@@ -24,6 +24,7 @@ import { getUserPreferences, saveUserPreferences } from '@/lib/recommendationEng
 import { InstitutionLogo } from '@/components/common/InstitutionLogo';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { useTheme } from '@/components/providers/ThemeProvider';
+import { getUserPreferencesApi, saveUserPreferencesApi } from '@/services/preferences';
 
 interface OpportunityTypeCard {
   type: OpportunityType;
@@ -266,7 +267,7 @@ const SPECIFIC_COURSE_OPTIONS: SpecificCourseOption[] = [
 function PreferenciasContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   const isOnboarding = searchParams.get('onboarding') === 'true';
@@ -283,20 +284,56 @@ function PreferenciasContent() {
   const [selectedCourses, setSelectedCourses] = useState<TargetCourseAudience[]>([]);
   const [courseSearch, setCourseSearch] = useState('');
   const [isSaved, setIsSaved] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Hidratar preferências da conta do usuário ou armazenamento local
   useEffect(() => {
-    queueMicrotask(() => {
-      const prefs = getUserPreferences(user?.id);
-      setSelectedTypes(prefs.selectedTypes || []);
-      const insts = Array.isArray(prefs.institutions)
-        ? prefs.institutions
-        : (prefs.institution ? [prefs.institution] : []);
-      setSelectedInstitutions(insts);
-      setNotInCollege(Boolean(prefs.notInCollege));
-      setSelectedCourses(prefs.targetCourses || []);
-    });
-  }, [user]);
+    let isCancelled = false;
+
+    // 1. Carrega preferências locais imediatamente
+    const localPrefs = getUserPreferences(user?.id);
+    setSelectedTypes(localPrefs.selectedTypes || []);
+    const insts = Array.isArray(localPrefs.institutions)
+      ? localPrefs.institutions
+      : (localPrefs.institution ? [localPrefs.institution] : []);
+    setSelectedInstitutions(insts);
+    setNotInCollege(Boolean(localPrefs.notInCollege));
+    setSelectedCourses(localPrefs.targetCourses || []);
+
+    // 2. Se o usuário estiver autenticado, sincroniza com o backend
+    if (token) {
+      getUserPreferencesApi(token)
+        .then((apiPrefs) => {
+          if (apiPrefs && !isCancelled) {
+            setSelectedTypes(apiPrefs.selectedTypes || []);
+            setSelectedInstitutions(apiPrefs.institutions || []);
+            setNotInCollege(Boolean(apiPrefs.notInCollege));
+            setSelectedCourses(apiPrefs.targetCourses || []);
+
+            saveUserPreferences(
+              {
+                ...localPrefs,
+                userId: user?.id,
+                selectedTypes: apiPrefs.selectedTypes || [],
+                institutions: apiPrefs.institutions || [],
+                institution: apiPrefs.institutions?.[0] || null,
+                notInCollege: Boolean(apiPrefs.notInCollege),
+                targetCourses: apiPrefs.targetCourses || [],
+                hasCompletedOnboarding: true,
+              },
+              user?.id
+            );
+          }
+        })
+        .catch((err) => {
+          console.debug('Falha ao obter preferências remotas do backend:', err);
+        });
+    }
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [user, token]);
 
   const toggleType = (t: OpportunityType) => {
     setSelectedTypes((prev) =>
@@ -343,7 +380,8 @@ function PreferenciasContent() {
     );
   }, [courseSearch]);
 
-  const handleSavePreferences = () => {
+  const handleSavePreferences = async () => {
+    setIsSubmitting(true);
     const existing = getUserPreferences(user?.id);
     const updated: UserPreferences = {
       ...existing,
@@ -357,6 +395,24 @@ function PreferenciasContent() {
     };
 
     saveUserPreferences(updated, user?.id);
+
+    if (token) {
+      try {
+        await saveUserPreferencesApi(
+          {
+            selectedTypes,
+            institutions: selectedInstitutions,
+            targetCourses: selectedCourses,
+            notInCollege,
+          },
+          token
+        );
+      } catch (err) {
+        console.error('Falha ao persistir preferências no backend:', err);
+      }
+    }
+
+    setIsSubmitting(false);
     setIsSaved(true);
 
     setTimeout(() => {
@@ -846,11 +902,11 @@ function PreferenciasContent() {
             ) : (
               <button
                 type="button"
-                disabled={isSaved}
+                disabled={isSaved || isSubmitting}
                 onClick={handleSavePreferences}
                 className="flex items-center gap-2 rounded-xl bg-[#121417] px-7 py-2.5 text-xs font-bold text-white shadow-md transition-all hover:bg-black disabled:opacity-50 dark:bg-white dark:text-[#121417] dark:hover:bg-stone-200 cursor-pointer"
               >
-                {isSaved ? (
+                {isSaved || isSubmitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
                     <span>Salvando...</span>

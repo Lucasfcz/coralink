@@ -344,9 +344,10 @@ export function calculateOpportunityScore(
     score += 15;
   }
 
-  // 4. Critérios de Gratuidade e Urgência (Até 10 pontos)
+  // 4. Critérios de Gratuidade e Urgência
   if (opp.isFree) {
-    score += 5;
+    score += 20;
+    matchReasons.push('Gratuito');
   }
 
   if (opp.registrationDeadline) {
@@ -358,10 +359,11 @@ export function calculateOpportunityScore(
       const diffDays = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
       if (diffDays >= 0 && diffDays <= 5) {
-        score += 5;
-        matchReasons.push('Inscrições encerrando em breve');
+        score += 15;
+        matchReasons.push('Inscrições encerrando em breve (até 5 dias)');
       } else if (diffDays > 5 && diffDays <= 15) {
-        score += 2;
+        score += 10;
+        matchReasons.push('Inscrições encerrando nas próximas semanas');
       }
     }
   }

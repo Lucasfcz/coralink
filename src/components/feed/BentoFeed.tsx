@@ -11,6 +11,7 @@ import { getOpportunities } from '@/services/opportunities';
 import { Flame, CheckCircle2 } from 'lucide-react';
 import { getUserPreferences, getScoredOpportunities } from '@/lib/recommendationEngine';
 import { UserPreferences } from '@/types/userPreferences';
+import { useAuth } from '@/components/providers/AuthProvider';
 
 interface BentoFeedProps {
   initialOpportunities: Opportunity[];
@@ -26,6 +27,7 @@ export function BentoFeed({
   advancedFilters,
   onSelectOpportunity,
 }: BentoFeedProps) {
+  const { user } = useAuth();
   const [opportunities, setOpportunities] = useState<Opportunity[]>(initialOpportunities);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -50,6 +52,12 @@ export function BentoFeed({
   }, []);
 
   const displayOpportunities = useMemo(() => {
+    // Quando o usuário está autenticado, o backend já entrega os dados ordenados diretamente
+    // pela query SQL do banco de dados (separação estrita de responsabilidades).
+    if (user) {
+      return opportunities;
+    }
+
     const hasPreferences =
       preferences.hasCompletedOnboarding ||
       (preferences.selectedTypes && preferences.selectedTypes.length > 0) ||
@@ -61,7 +69,7 @@ export function BentoFeed({
       return getScoredOpportunities(opportunities, preferences);
     }
     return opportunities;
-  }, [opportunities, preferences]);
+  }, [opportunities, preferences, user]);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const isInitialMount = useRef(true);
