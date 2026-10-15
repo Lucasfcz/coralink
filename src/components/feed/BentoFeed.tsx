@@ -35,22 +35,6 @@ export function BentoFeed({
   const [isFilterLoading, setIsFilterLoading] = useState(false);
   const [preferences, setPreferences] = useState<UserPreferences>(() => getUserPreferences());
 
-  useEffect(() => {
-    const handlePrefsUpdated = (e: Event) => {
-      const customEvent = e as CustomEvent<UserPreferences>;
-      if (customEvent.detail) {
-        setPreferences(customEvent.detail);
-      } else {
-        setPreferences(getUserPreferences());
-      }
-    };
-
-    window.addEventListener('coralink-preferences-updated', handlePrefsUpdated);
-    return () => {
-      window.removeEventListener('coralink-preferences-updated', handlePrefsUpdated);
-    };
-  }, []);
-
   const displayOpportunities = useMemo(() => {
     // Quando o usuário está autenticado, o backend já entrega os dados ordenados diretamente
     // pela query SQL do banco de dados (separação estrita de responsabilidades).
@@ -75,72 +59,84 @@ export function BentoFeed({
   const isInitialMount = useRef(true);
   const hasInitialData = useRef(initialOpportunities && initialOpportunities.length > 0);
 
-  // Efeito ao trocar os filtros: resetar página e buscar novos dados
+  const applyFilter = useCallback(async () => {
+    setIsFilterLoading(true);
+    try {
+      const combinedTypes: OpportunityType[] = [];
+      if (advancedFilters?.types && advancedFilters.types.length > 0) {
+        combinedTypes.push(...advancedFilters.types);
+      } else if (advancedFilters?.type) {
+        combinedTypes.push(advancedFilters.type);
+      }
+      if (selectedFilter.type && !combinedTypes.includes(selectedFilter.type)) {
+        combinedTypes.push(selectedFilter.type);
+      }
+
+      const combinedCourses = advancedFilters?.courses && advancedFilters.courses.length > 0
+        ? advancedFilters.courses
+        : advancedFilters?.course ? [advancedFilters.course] : undefined;
+
+      const combinedSources = advancedFilters?.institutions && advancedFilters.institutions.length > 0
+        ? advancedFilters.institutions
+        : advancedFilters?.institution ? [advancedFilters.institution] : undefined;
+
+      const res = await getOpportunities({
+        types: combinedTypes.length > 0 ? combinedTypes : undefined,
+        type: combinedTypes.length === 1 ? combinedTypes[0] : (selectedFilter.type || advancedFilters?.type),
+        courses: combinedCourses,
+        targetCourseAudience: combinedCourses && combinedCourses.length === 1 ? combinedCourses[0] : undefined,
+        sourceNames: combinedSources,
+        sourceName: combinedSources && combinedSources.length === 1 ? combinedSources[0] : undefined,
+        modality: advancedFilters?.modality,
+        isFree: advancedFilters?.isFree !== undefined ? advancedFilters.isFree : selectedFilter.isFree,
+        isForAll: advancedFilters?.isForAll !== undefined ? advancedFilters.isForAll : selectedFilter.isForAll,
+        page: 0,
+        size: 9,
+      });
+
+      setOpportunities(res.content || []);
+      setPage(0);
+      setHasMore(!res.last && (res.content?.length ?? 0) > 0);
+    } catch (error) {
+      console.error('Erro ao filtrar oportunidades:', error);
+    } finally {
+      setIsFilterLoading(false);
+    }
+  }, [selectedFilter, advancedFilters]);
+
+  // Efeito ao atualizar preferências globais (via modal, página de preferências ou onboarding)
+  useEffect(() => {
+    const handlePrefsUpdated = (e: Event) => {
+      const customEvent = e as CustomEvent<UserPreferences>;
+      if (customEvent.detail) {
+        setPreferences(customEvent.detail);
+      } else {
+        setPreferences(getUserPreferences());
+      }
+      // Recarrega o feed imediatamente com a nova ordenação do backend/cache invalidado
+      applyFilter();
+    };
+
+    window.addEventListener('coralink-preferences-updated', handlePrefsUpdated);
+    return () => {
+      window.removeEventListener('coralink-preferences-updated', handlePrefsUpdated);
+    };
+  }, [applyFilter]);
+
+  // Efeito ao trocar os filtros ou ao autenticar usuário
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
-      if (hasInitialData.current) {
+      // Se não há usuário logado e já existem dados iniciais do SSR, mantemos os dados.
+      // Caso haja usuário logado, o SSR trouxe dados anônimos, logo precisamos buscar
+      // a lista personalizada diretamente da API com base no scoring do usuário.
+      if (!user && hasInitialData.current) {
         return;
       }
     }
 
-    let isCancelled = false;
-
-    async function applyFilter() {
-      setIsFilterLoading(true);
-      try {
-        const combinedTypes: OpportunityType[] = [];
-        if (advancedFilters?.types && advancedFilters.types.length > 0) {
-          combinedTypes.push(...advancedFilters.types);
-        } else if (advancedFilters?.type) {
-          combinedTypes.push(advancedFilters.type);
-        }
-        if (selectedFilter.type && !combinedTypes.includes(selectedFilter.type)) {
-          combinedTypes.push(selectedFilter.type);
-        }
-
-        const combinedCourses = advancedFilters?.courses && advancedFilters.courses.length > 0
-          ? advancedFilters.courses
-          : advancedFilters?.course ? [advancedFilters.course] : undefined;
-
-        const combinedSources = advancedFilters?.institutions && advancedFilters.institutions.length > 0
-          ? advancedFilters.institutions
-          : advancedFilters?.institution ? [advancedFilters.institution] : undefined;
-
-        const res = await getOpportunities({
-          types: combinedTypes.length > 0 ? combinedTypes : undefined,
-          type: combinedTypes.length === 1 ? combinedTypes[0] : (selectedFilter.type || advancedFilters?.type),
-          courses: combinedCourses,
-          targetCourseAudience: combinedCourses && combinedCourses.length === 1 ? combinedCourses[0] : undefined,
-          sourceNames: combinedSources,
-          sourceName: combinedSources && combinedSources.length === 1 ? combinedSources[0] : undefined,
-          modality: advancedFilters?.modality,
-          isFree: advancedFilters?.isFree !== undefined ? advancedFilters.isFree : selectedFilter.isFree,
-          isForAll: advancedFilters?.isForAll !== undefined ? advancedFilters.isForAll : selectedFilter.isForAll,
-          page: 0,
-          size: 9,
-        });
-
-        if (!isCancelled) {
-          setOpportunities(res.content || []);
-          setPage(0);
-          setHasMore(!res.last && (res.content?.length ?? 0) > 0);
-        }
-      } catch (error) {
-        console.error('Erro ao filtrar oportunidades:', error);
-      } finally {
-        if (!isCancelled) {
-          setIsFilterLoading(false);
-        }
-      }
-    }
-
     applyFilter();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [selectedFilter, advancedFilters]);
+  }, [user, applyFilter]);
 
   // Função para carregar próxima página (Scroll Infinito com peek discreto)
   const loadNextPage = useCallback(async () => {

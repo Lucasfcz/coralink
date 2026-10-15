@@ -270,7 +270,6 @@ function PreferenciasContent() {
   const { user, token } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
-  const isOnboarding = searchParams.get('onboarding') === 'true';
   const rawRedirect = searchParams.get('redirect') || '/';
   const safeRedirect =
     rawRedirect.startsWith('/') && !rawRedirect.startsWith('//')
@@ -289,16 +288,19 @@ function PreferenciasContent() {
   // Hidratar preferências da conta do usuário ou armazenamento local
   useEffect(() => {
     let isCancelled = false;
-
-    // 1. Carrega preferências locais imediatamente
     const localPrefs = getUserPreferences(user?.id);
-    setSelectedTypes(localPrefs.selectedTypes || []);
-    const insts = Array.isArray(localPrefs.institutions)
-      ? localPrefs.institutions
-      : (localPrefs.institution ? [localPrefs.institution] : []);
-    setSelectedInstitutions(insts);
-    setNotInCollege(Boolean(localPrefs.notInCollege));
-    setSelectedCourses(localPrefs.targetCourses || []);
+
+    // 1. Carrega preferências locais imediatamente via microtask para evitar cascading renders síncronos
+    queueMicrotask(() => {
+      if (isCancelled) return;
+      setSelectedTypes(localPrefs.selectedTypes || []);
+      const insts = Array.isArray(localPrefs.institutions)
+        ? localPrefs.institutions
+        : (localPrefs.institution ? [localPrefs.institution] : []);
+      setSelectedInstitutions(insts);
+      setNotInCollege(Boolean(localPrefs.notInCollege));
+      setSelectedCourses(localPrefs.targetCourses || []);
+    });
 
     // 2. Se o usuário estiver autenticado, sincroniza com o backend
     if (token) {
