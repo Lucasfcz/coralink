@@ -21,13 +21,16 @@ export function FeaturedMarquee({
 
   const xPosRef = useRef(0);
   const velocityRef = useRef(0);
+  const isPointerDownRef = useRef(false);
   const isDraggingRef = useRef(false);
   const dragStartXRef = useRef(0);
+  const dragStartYRef = useRef(0);
   const lastDragXRef = useRef(0);
   const lastDragTimeRef = useRef(0);
   const hasMovedRef = useRef(false);
   const isHoveredRef = useRef(false);
   const animationFrameIdRef = useRef<number | null>(null);
+
   useEffect(() => {
     isHoveredRef.current = isHovered;
   }, [isHovered]);
@@ -90,32 +93,40 @@ export function FeaturedMarquee({
   }, [opportunities]);
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    isDraggingRef.current = true;
-    setIsDragging(true);
+    isPointerDownRef.current = true;
+    hasMovedRef.current = false;
     dragStartXRef.current = e.clientX;
+    dragStartYRef.current = e.clientY;
     lastDragXRef.current = e.clientX;
     lastDragTimeRef.current = performance.now();
     velocityRef.current = 0;
-    hasMovedRef.current = false;
-
-    if (containerRef.current) {
-      try {
-        containerRef.current.setPointerCapture(e.pointerId);
-      } catch {
-        // Ignora erro de captura se não suportado
-      }
-    }
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDraggingRef.current || !trackRef.current) return;
+    if (!isPointerDownRef.current || !trackRef.current) return;
 
     const dx = e.clientX - lastDragXRef.current;
+    const distX = Math.abs(e.clientX - dragStartXRef.current);
     const now = performance.now();
     const dt = now - lastDragTimeRef.current;
 
-    if (Math.abs(e.clientX - dragStartXRef.current) > 5) {
-      hasMovedRef.current = true;
+    // Threshold de 8px para distinguir toque/clique estático de arraste intencional
+    if (!isDraggingRef.current) {
+      if (distX > 8) {
+        hasMovedRef.current = true;
+        isDraggingRef.current = true;
+        setIsDragging(true);
+
+        if (containerRef.current) {
+          try {
+            containerRef.current.setPointerCapture(e.pointerId);
+          } catch {
+            // Ignora erro de captura se não suportado
+          }
+        }
+      } else {
+        return;
+      }
     }
 
     xPosRef.current += dx;
@@ -142,16 +153,19 @@ export function FeaturedMarquee({
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
-    if (!isDraggingRef.current) return;
-    isDraggingRef.current = false;
-    setIsDragging(false);
+    isPointerDownRef.current = false;
 
-    try {
-      if (containerRef.current?.hasPointerCapture(e.pointerId)) {
-        containerRef.current.releasePointerCapture(e.pointerId);
+    if (isDraggingRef.current) {
+      isDraggingRef.current = false;
+      setIsDragging(false);
+
+      try {
+        if (containerRef.current?.hasPointerCapture(e.pointerId)) {
+          containerRef.current.releasePointerCapture(e.pointerId);
+        }
+      } catch {
+        // Ignora erro de liberação de captura
       }
-    } catch {
-      // Ignora erro de liberação de captura
     }
   };
 
