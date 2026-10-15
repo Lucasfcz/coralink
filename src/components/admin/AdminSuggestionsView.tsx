@@ -10,10 +10,10 @@ import {
   Mail,
   Calendar,
 } from 'lucide-react';
-import { adminService, UserHelpResponse, SuggestionType } from '@/services/admin';
+import { adminService, UserSuggestionResponse, SuggestionType } from '@/services/admin';
 
 export function AdminSuggestionsView() {
-  const [suggestions, setSuggestions] = useState<UserHelpResponse[]>([]);
+  const [suggestions, setSuggestions] = useState<UserSuggestionResponse[]>([]);
   const [selectedType, setSelectedType] = useState<SuggestionType | 'ALL'>('ALL');
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);

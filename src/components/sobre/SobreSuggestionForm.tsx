@@ -11,10 +11,10 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import {
-  createUserHelp,
+  createUserSuggestion,
   SuggestionType,
   SuggestionError,
-} from '@/services/userHelp';
+} from '@/services/userSuggestion';
 
 const SUGGESTION_TYPES: { value: SuggestionType; label: string }[] = [
   { value: 'FEATURE', label: 'Sugerir Nova Fonte de Oportunidades' },
@@ -58,7 +58,7 @@ export function SobreSuggestionForm() {
     setErrorMessage(null);
 
     try {
-      await createUserHelp(payload, authToken);
+      await createUserSuggestion(payload, authToken);
       setIsSuccess(true);
       setSuggestion('');
       setPendingDraft(null);

@@ -71,13 +71,15 @@ export interface AdminOpportunityUpdateRequest {
 
 export type SuggestionType = 'BUG' | 'NEW_SOURCE' | 'SUGGESTION';
 
-export interface UserHelpResponse {
+export interface UserSuggestionResponse {
   id: number;
   type: SuggestionType;
   suggestion: string;
   userEmail: string;
   createdAt: string;
 }
+
+export type UserHelpResponse = UserSuggestionResponse;
 
 export const adminService = {
   /**
