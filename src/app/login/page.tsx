@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -94,7 +94,7 @@ function LoginContent() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [googleReady, setGoogleReady] = useState(false);
 
-  const handlePostAuthRedirect = (targetUser?: { id: string } | null) => {
+  const handlePostAuthRedirect = useCallback((targetUser?: { id: string } | null) => {
     const userId = targetUser?.id || user?.id;
     const hasCompleted = hasUserCompletedPreferences(userId);
     if (!hasCompleted) {
@@ -102,14 +102,14 @@ function LoginContent() {
     } else {
       router.replace(safeRedirect);
     }
-  };
+  }, [user, safeRedirect, router]);
 
   // Redireciona imediatamente se já estiver logado
   useEffect(() => {
     if (!isLoading && user) {
       handlePostAuthRedirect(user);
     }
-  }, [user, isLoading, safeRedirect]);
+  }, [user, isLoading, handlePostAuthRedirect]);
 
   // Inicialização do Google Identity Services (GIS)
   useEffect(() => {
